@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --background: #f6f3ec;
+  --foreground: #1c1917;
+  --card: #fffcf7;
+  --card-foreground: #1c1917;
+  --popover: #fffcf7;
+  --popover-foreground: #1c1917;
+  --primary: #166534;
+  --primary-foreground: #f7fee7;
+  --secondary: #e8dfd0;
+  --secondary-foreground: #3f2e1e;
+  --muted: #efe8db;
+  --muted-foreground: #57534e;
+  --accent: #ca8a04;
+  --accent-foreground: #1c1917;
+  --destructive: #b91c1c;
+  --destructive-foreground: #fef2f2;
+  --border: #e4d8c4;
+  --input: #e4d8c4;
+  --ring: #166534;
+  --radius: 0.9rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-dm-sans);
+  --font-serif: var(--font-fraunces);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+}
