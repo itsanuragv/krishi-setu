@@ -234,6 +234,7 @@ export function VoiceAssistant() {
                 </Button>
                 <button
                   onClick={() => setIsOpen(false)}
+                  aria-label="Close voice assistant"
                   className="rounded-full p-1 text-muted-foreground hover:bg-muted"
                 >
                   <X className="size-5" />
@@ -244,6 +245,7 @@ export function VoiceAssistant() {
             <div className="text-center py-4 space-y-4">
               <button
                 onClick={toggleListen}
+                aria-label={isListening ? "Stop listening" : "Start voice assistant"}
                 className={`relative mx-auto size-24 rounded-full flex items-center justify-center transition-all ${
                   isListening
                     ? "bg-red-500 text-white ring-8 ring-red-200 animate-pulse"

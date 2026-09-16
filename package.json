@@ -54,5 +54,11 @@
     "workerDirectory": [
       "public"
     ]
-  }
+  },
+  "browserslist": [
+    ">0.3%",
+    "not dead",
+    "not op_mini all",
+    "last 2 versions"
+  ]
 }

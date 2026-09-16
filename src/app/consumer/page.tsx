@@ -317,7 +317,8 @@ export default function ConsumerPortalPage() {
                   </div>
                   <button
                     onClick={() => setEscrowListing(null)}
-                    className="rounded-full p-1 text-slate-400 hover:bg-slate-100"
+                    aria-label="Close escrow modal"
+                    className="rounded-full p-1 text-slate-500 hover:bg-slate-100"
                   >
                     <X className="size-5" />
                   </button>
@@ -403,7 +404,8 @@ export default function ConsumerPortalPage() {
                             navigator.clipboard?.writeText(generatedPin);
                             toast.success("PIN Copied to Clipboard!");
                           }}
-                          className="rounded-lg p-1 text-slate-400 hover:text-emerald-700"
+                          aria-label="Copy secret delivery PIN"
+                          className="rounded-lg p-1 text-slate-500 hover:text-emerald-700"
                         >
                           <Copy className="size-4" />
                         </button>

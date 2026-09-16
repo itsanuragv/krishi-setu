@@ -104,7 +104,8 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
 
           <button
             onClick={onClose}
-            className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            aria-label="Close match score details"
+            className="rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
           >
             <X className="size-5" />
           </button>

@@ -73,6 +73,7 @@ export default function HomePage() {
       role: "delivery",
       title: "Delivery Transporter (परिवहन)",
       href: "/delivery",
+      ariaLabel: "Explore Delivery Options",
       tagline: "OR-Tools Optimized Multi-Stop Routing",
       description:
         "Multi-stop farm pickups and consumer drop-offs with distance optimization and instant 4-digit PIN verification settlement.",
@@ -84,6 +85,7 @@ export default function HomePage() {
       role: "admin",
       title: "Admin Dispute & Trust (प्रशासन)",
       href: "/admin",
+      ariaLabel: "Explore Admin Panel",
       tagline: "Escrow GMV & Split-Screen Mediation",
       description:
         "Mediate crop disputes with side-by-side OpenCV farm photo vs consumer arrival photo. MeitY DPDP Act 2023 compliance monitor.",
@@ -121,7 +123,7 @@ export default function HomePage() {
               </span>{" "}
               Highway.
             </h1>
-            <p className="mx-auto max-w-2xl text-base sm:text-lg text-slate-600">
+            <p className="mx-auto max-w-2xl text-base sm:text-lg text-slate-700">
               Disintermediating agricultural trade. Connect smallholder farmers directly with urban consumers,
               retail grocers, and HoReCa buyers with client-side OpenCV pre-checks, PostGIS proximity matching, and
               instant UPI escrow settlement.
@@ -149,39 +151,39 @@ export default function HomePage() {
           {/* 360° Value Metrics Banner (SIH Presentation Deck) */}
           <div className="grid grid-cols-2 gap-3 pt-6 sm:grid-cols-4 max-w-4xl mx-auto">
             <div className="glass rounded-2xl p-3.5 border border-emerald-200/70 text-left">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800">
                 <TrendingUp className="size-3.5" />
                 <span>Farmer Realization</span>
               </div>
               <p className="mt-1 text-2xl font-extrabold text-slate-900">+15% to +20%</p>
-              <p className="text-[10px] text-slate-500">Recovers 35-50% middlemen cuts</p>
+              <p className="text-[10px] text-slate-600">Recovers 35-50% middlemen cuts</p>
             </div>
 
             <div className="glass rounded-2xl p-3.5 border border-emerald-200/70 text-left">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-teal-700">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-teal-800">
                 <Clock className="size-3.5" />
                 <span>Compressed Transit</span>
               </div>
               <p className="mt-1 text-2xl font-extrabold text-slate-900">&lt;12 to 24 Hrs</p>
-              <p className="text-[10px] text-slate-500">PostGIS radius &lt;25km matching</p>
+              <p className="text-[10px] text-slate-600">PostGIS radius &lt;25km matching</p>
             </div>
 
             <div className="glass rounded-2xl p-3.5 border border-emerald-200/70 text-left">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-700">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-800">
                 <ShieldAlert className="size-3.5" />
                 <span>Spoilage Saved</span>
               </div>
               <p className="mt-1 text-2xl font-extrabold text-slate-900">20% to 30%</p>
-              <p className="text-[10px] text-slate-500">Direct farm-gate cold dispatch</p>
+              <p className="text-[10px] text-slate-600">Direct farm-gate cold dispatch</p>
             </div>
 
             <div className="glass rounded-2xl p-3.5 border border-emerald-200/70 text-left">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-800">
                 <Layers className="size-3.5" />
                 <span>Escrow Protection</span>
               </div>
               <p className="mt-1 text-2xl font-extrabold text-slate-900">100% Locked</p>
-              <p className="text-[10px] text-slate-500">Released only upon PIN handover</p>
+              <p className="text-[10px] text-slate-600">Released only upon PIN handover</p>
             </div>
           </div>
         </section>
@@ -226,8 +228,8 @@ export default function HomePage() {
 
                     <div>
                       <h3 className="text-xl font-bold text-slate-900">{card.title}</h3>
-                      <p className="text-xs font-semibold text-emerald-700 mt-0.5">{card.tagline}</p>
-                      <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                      <p className="text-xs font-semibold text-emerald-800 mt-0.5">{card.tagline}</p>
+                      <p className="text-xs text-slate-700 mt-2 leading-relaxed">
                         {card.description}
                       </p>
                     </div>
@@ -243,8 +245,8 @@ export default function HomePage() {
                   </div>
 
                   <div className="pt-6">
-                    <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-xs">
-                      <Link href={card.href}>
+                    <Button asChild className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold gap-2 shadow-xs">
+                      <Link href={card.href} aria-label={`Enter as ${card.title.split(" ")[0]}`}>
                         <span>Enter as {card.title.split(" ")[0]}</span>
                         <ArrowRight className="size-4" />
                       </Link>
@@ -274,19 +276,19 @@ export default function HomePage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-base font-bold text-slate-900">{card.title}</h4>
-                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                           {card.badge}
                         </span>
                       </div>
-                      <p className="text-xs font-medium text-emerald-700 mt-0.5">{card.tagline}</p>
-                      <p className="text-xs text-slate-500 mt-1 max-w-sm leading-relaxed">
+                      <p className="text-xs font-semibold text-emerald-800 mt-0.5">{card.tagline}</p>
+                      <p className="text-xs text-slate-700 mt-1 max-w-sm leading-relaxed">
                         {card.description}
                       </p>
                     </div>
                   </div>
 
-                  <Button asChild variant="outline" size="sm" className="shrink-0 border-slate-300 text-slate-800 hover:bg-slate-100 gap-1.5 ml-2">
-                    <Link href={card.href}>
+                  <Button asChild variant="outline" size="sm" className="shrink-0 border-slate-300 text-slate-900 hover:bg-slate-100 gap-1.5 ml-2">
+                    <Link href={card.href} aria-label={card.ariaLabel}>
                       <span>Explore</span>
                       <ArrowRight className="size-3.5" />
                     </Link>

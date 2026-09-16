@@ -77,7 +77,11 @@ export function RatingModal({
             <h2 className="font-display font-bold text-lg">Rate Farmer & Produce</h2>
             <p className="text-xs text-muted-foreground">{crop} from {farmerName}</p>
           </div>
-          <button onClick={onClose} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
+          <button
+            onClick={onClose}
+            aria-label="Close rating modal"
+            className="rounded-full p-1 text-muted-foreground hover:bg-muted"
+          >
             <X className="size-5" />
           </button>
         </div>
@@ -92,6 +96,7 @@ export function RatingModal({
                 <button
                   key={star}
                   type="button"
+                  aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   onClick={() => setRating(star)}

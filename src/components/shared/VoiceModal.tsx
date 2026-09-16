@@ -225,7 +225,8 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
             </button>
             <button
               onClick={onClose}
-              className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              aria-label="Close voice intake"
+              className="rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             >
               <X className="size-5" />
             </button>
@@ -240,6 +241,7 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
             )}
             <button
               onClick={toggleListen}
+              aria-label={isListening ? "Stop listening" : "Start voice recording"}
               className={`relative flex size-24 items-center justify-center rounded-full text-white shadow-xl transition-all duration-300 ${
                 isListening
                   ? "bg-red-500 ring-8 ring-red-200 scale-105"

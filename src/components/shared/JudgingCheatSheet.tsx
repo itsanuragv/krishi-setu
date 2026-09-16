@@ -116,7 +116,8 @@ export function JudgingCheatSheet({ isOpen, onClose }: { isOpen: boolean; onClos
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            aria-label="Close walkthrough guide"
+            className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
           >
             <X className="size-5" />
           </button>

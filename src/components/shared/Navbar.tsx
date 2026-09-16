@@ -106,6 +106,7 @@ export function Navbar() {
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
+              aria-label="Toggle language between Hindi and English"
               className="flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
               title="Toggle Vernacular Hindi / English"
             >
@@ -126,6 +127,7 @@ export function Navbar() {
             {/* Mobile menu hamburger */}
             <button
               onClick={() => setMobileMenuOpen((o) => !o)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               className="md:hidden rounded-lg p-1.5 text-slate-600 hover:bg-slate-100"
             >
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
