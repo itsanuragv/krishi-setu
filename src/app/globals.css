@@ -2,26 +2,30 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #f6f3ec;
-  --foreground: #1c1917;
-  --card: #fffcf7;
-  --card-foreground: #1c1917;
-  --popover: #fffcf7;
-  --popover-foreground: #1c1917;
-  --primary: #166534;
-  --primary-foreground: #f7fee7;
-  --secondary: #e8dfd0;
-  --secondary-foreground: #3f2e1e;
-  --muted: #efe8db;
-  --muted-foreground: #57534e;
-  --accent: #ca8a04;
-  --accent-foreground: #1c1917;
-  --destructive: #b91c1c;
-  --destructive-foreground: #fef2f2;
-  --border: #e4d8c4;
-  --input: #e4d8c4;
-  --ring: #166534;
-  --radius: 0.9rem;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #059669; /* Emerald Green */
+  --primary-foreground: #ffffff;
+  --secondary: #ecfdf5;
+  --secondary-foreground: #064e3b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b; /* Slate */
+  --accent: #10b981; /* Mint */
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #059669;
+  --radius: 0.875rem;
+
+  --emerald-deep: #064e3b;
+  --emerald-primary: #059669;
+  --mint-accent: #10b981;
 }
 
 @theme inline {
@@ -44,8 +48,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-dm-sans);
-  --font-serif: var(--font-fraunces);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -58,12 +60,74 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-dm-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
-h1,
-h2,
-h3,
-.font-display {
-  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+/* Glassmorphism Classes (Masterplan Phase 1) */
+.glass {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  box-shadow: 0 8px 32px 0 rgba(5, 150, 105, 0.06);
 }
+
+.glass-emerald {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  box-shadow: 0 10px 30px -10px rgba(5, 150, 105, 0.15);
+}
+
+.glass-dark {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Subtle SVG Grid Overlay (Masterplan Phase 2) */
+.bg-grid-subtle {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(5, 150, 105, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(5, 150, 105, 0.05) 1px, transparent 1px);
+}
+
+/* OpenCV Laser Scanner Animation (Masterplan Phase 3) */
+@keyframes laserSweep {
+  0% {
+    top: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 96%;
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 0.8;
+  }
+}
+
+.animate-laser {
+  animation: laserSweep 2.2s ease-in-out infinite;
+}
+
+/* Soft Emerald Pulse Glow */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 6px rgba(16, 185, 129, 0.2);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s infinite;
+}
+
