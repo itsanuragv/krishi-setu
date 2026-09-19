@@ -93,32 +93,32 @@ export default function DeliveryPortalPage() {
     <div className="min-h-screen bg-[radial-gradient(at_top_left,#ecfdf5,#ffffff)] bg-grid-subtle">
       <Navbar />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Fleet & Route Header */}
-        <section className="glass rounded-3xl border border-purple-200/80 p-6 shadow-sm">
+        <section className="glass rounded-3xl border border-purple-200/80 p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-md">
-                <Truck className="size-7" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-md shrink-0">
+                <Truck className="size-6 sm:size-7" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 leading-tight">
                     {route.transporterName}
                   </h1>
                   <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-bold text-purple-800">
                     Google OR-Tools Active
                   </span>
                 </div>
-                <p className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                <p className="flex items-center gap-1 text-xs text-slate-500 mt-1">
                   Vehicle: {route.vehicleNumber} • Active Multi-Stop VRP Route #{route.id}
                 </p>
               </div>
             </div>
 
             {/* OR-Tools Optimization Metrics Banner */}
-            <div className="flex flex-wrap items-center gap-3 text-xs">
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-3 shadow-xs min-w-[120px]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 text-xs w-full md:w-auto">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-3 shadow-xs flex-1 min-w-[110px]">
                 <div className="flex items-center gap-1 text-[10px] font-bold uppercase text-emerald-800">
                   <TrendingDown className="size-3" />
                   <span>Distance Saved</span>
@@ -127,7 +127,7 @@ export default function DeliveryPortalPage() {
                 <span className="text-[10px] text-emerald-600">OR-Tools VRP Solver</span>
               </div>
 
-              <div className="rounded-2xl border border-purple-200 bg-purple-50/80 p-3 shadow-xs min-w-[120px]">
+              <div className="rounded-2xl border border-purple-200 bg-purple-50/80 p-3 shadow-xs flex-1 min-w-[110px]">
                 <div className="flex items-center gap-1 text-[10px] font-bold uppercase text-purple-800">
                   <Fuel className="size-3" />
                   <span>Fuel Reduced</span>
@@ -136,7 +136,7 @@ export default function DeliveryPortalPage() {
                 <span className="text-[10px] text-purple-600">Zero Empty Deadheads</span>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white/80 p-3 shadow-xs min-w-[120px]">
+              <div className="rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-xs col-span-2 sm:col-span-1 min-w-[110px]">
                 <span className="text-[10px] uppercase font-bold text-slate-400">Escrow On-Hold</span>
                 <p className="text-lg font-black text-slate-900">₹{route.totalPayoutAmount.toLocaleString("en-IN")}</p>
                 <span className="text-[10px] text-slate-500">Auto-Releases on PIN</span>
@@ -255,11 +255,13 @@ export default function DeliveryPortalPage() {
                       <Input
                         id="pin-input"
                         type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         maxLength={4}
                         value={pinInput}
-                        onChange={(e) => setPinInput(e.target.value)}
+                        onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))}
                         placeholder="••••"
-                        className="h-14 w-44 text-center font-mono text-3xl font-extrabold tracking-widest border-2 border-emerald-300 focus:border-emerald-600 rounded-2xl shadow-inner"
+                        className="h-14 w-44 text-center font-mono text-3xl font-extrabold tracking-widest border-2 border-emerald-300 focus:border-emerald-600 rounded-2xl shadow-inner touch-target"
                       />
                     </div>
                     <p className="text-[11px] text-slate-500">
@@ -267,14 +269,14 @@ export default function DeliveryPortalPage() {
                     </p>
                   </div>
 
-                  {/* Demo helper button for judges */}
+                  {/* One-Click Auto-Fill PIN Helper */}
                   <div className="flex justify-center">
                     <button
                       type="button"
                       onClick={() => setPinInput("7429")}
-                      className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors border border-emerald-200"
+                      className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors border border-emerald-200 touch-target flex items-center gap-1"
                     >
-                      💡 Auto-Fill PIN &ldquo;7429&rdquo;
+                      <span>💡 Auto-Fill PIN &ldquo;7429&rdquo;</span>
                     </button>
                   </div>
 

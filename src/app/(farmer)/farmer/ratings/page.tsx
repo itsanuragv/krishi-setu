@@ -122,7 +122,7 @@ export default function FarmerRatingsPage() {
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <AlertCircle className="size-4 text-primary" />
-            Transparent Scoring Formula (SIH Governance)
+            Transparent Scoring Formula (Platform Trust Governance)
           </CardTitle>
         </CardHeader>
         <CardContent className="text-xs text-muted-foreground space-y-2">

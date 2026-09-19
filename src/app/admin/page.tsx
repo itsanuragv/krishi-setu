@@ -31,32 +31,32 @@ export default function AdminGovernancePage() {
     <div className="min-h-screen bg-[radial-gradient(at_top_left,#ecfdf5,#ffffff)] bg-grid-subtle">
       <Navbar />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Header & DPDP Act 2023 Compliance Pill */}
-        <section className="glass rounded-3xl border border-rose-200/80 p-6 shadow-sm">
+        <section className="glass rounded-3xl border border-rose-200/80 p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-600 to-red-800 text-white shadow-md">
-                <ShieldCheck className="size-7" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-600 to-red-800 text-white shadow-md shrink-0">
+                <ShieldCheck className="size-6 sm:size-7" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 leading-tight">
                     Admin Governance & Dispute Mediation Control Room
                   </h1>
                   <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800">
                     Super-Admin
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 mt-1">
                   Real-time escrow oversight, automated AI evidence mediation, and DPDP Act 2023 compliance
                 </p>
               </div>
             </div>
 
             {/* DPDP Act Compliance Badge */}
-            <div className="flex items-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 shadow-xs text-xs">
-              <FileCheck className="size-4 text-emerald-600" />
+            <div className="flex items-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 shadow-xs text-xs self-start md:self-auto">
+              <FileCheck className="size-4 text-emerald-600 shrink-0" />
               <div>
                 <span className="text-[10px] uppercase font-bold text-emerald-800">Data Governance</span>
                 <p className="font-bold text-slate-900">DPDP Act 2023 Compliant</p>
@@ -65,47 +65,47 @@ export default function AdminGovernancePage() {
           </div>
         </section>
 
-        {/* Phase 6 Metrics Dashboard (Glass Cards Grid) */}
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="glass rounded-3xl border border-emerald-200 p-5 shadow-xs space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+        {/* Platform Governance & Impact Metrics Dashboard */}
+        <section className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+          <div className="glass rounded-2xl sm:rounded-3xl border border-emerald-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
               <span>Total Escrow GMV</span>
-              <Lock className="size-4 text-emerald-600" />
+              <Lock className="size-3.5 sm:size-4 text-emerald-600" />
             </div>
-            <p className="text-3xl font-black text-slate-900">{ADMIN_KPIS.totalEscrowGmv}</p>
-            <p className="text-xs font-semibold text-emerald-700">100% Financial Protection</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900">{ADMIN_KPIS.totalEscrowGmv}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-emerald-700">100% Financial Protection</p>
           </div>
 
-          <div className="glass rounded-3xl border border-teal-200 p-5 shadow-xs space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-              <span>Perishable Spoilage Saved</span>
-              <TrendingUp className="size-4 text-teal-600" />
+          <div className="glass rounded-2xl sm:rounded-3xl border border-teal-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
+              <span>Spoilage Saved</span>
+              <TrendingUp className="size-3.5 sm:size-4 text-teal-600" />
             </div>
-            <p className="text-3xl font-black text-slate-900">{ADMIN_KPIS.spoilageReductionPct}</p>
-            <p className="text-xs font-semibold text-teal-700">&lt;12h Farm-Gate Transit</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900">{ADMIN_KPIS.spoilageReductionPct}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-teal-700">&lt;12h Farm-Gate Transit</p>
           </div>
 
-          <div className="glass rounded-3xl border border-blue-200 p-5 shadow-xs space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-              <span>Active Proximity Nodes</span>
-              <Sparkles className="size-4 text-blue-600" />
+          <div className="glass rounded-2xl sm:rounded-3xl border border-blue-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
+              <span>Proximity Nodes</span>
+              <Sparkles className="size-3.5 sm:size-4 text-blue-600" />
             </div>
-            <p className="text-3xl font-black text-slate-900">{ADMIN_KPIS.activeProximityNodes}</p>
-            <p className="text-xs font-semibold text-blue-700">PostGIS Hyperlocal Clusters</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900">{ADMIN_KPIS.activeProximityNodes}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-blue-700">PostGIS Hyperlocal Clusters</p>
           </div>
 
-          <div className="glass rounded-3xl border border-purple-200 p-5 shadow-xs space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-              <span>Avg Dispatch Speed</span>
-              <Clock className="size-4 text-purple-600" />
+          <div className="glass rounded-2xl sm:rounded-3xl border border-purple-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
+              <span>Dispatch Speed</span>
+              <Clock className="size-3.5 sm:size-4 text-purple-600" />
             </div>
-            <p className="text-3xl font-black text-slate-900">{ADMIN_KPIS.avgDispatchHours}</p>
-            <p className="text-xs font-semibold text-purple-700">Farm-to-Fork Direct</p>
+            <p className="text-2xl sm:text-3xl font-black text-slate-900">{ADMIN_KPIS.avgDispatchHours}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-purple-700">Farm-to-Fork Direct</p>
           </div>
         </section>
 
-        {/* Phase 6 Dispute Workspace: Split-Screen View */}
-        <section className="glass rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-sm space-y-6">
+        {/* Dispute Workspace: Split-Screen Evidence View */}
+        <section className="glass rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-8 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <div className="flex items-center gap-2">

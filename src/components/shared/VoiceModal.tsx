@@ -26,16 +26,159 @@ interface VoiceModalProps {
   }) => void;
 }
 
-const PRESET_UTTERANCES = [
+interface CropDefinition {
+  canonical: string;
+  hindiName: string;
+  defaultVariety: string;
+  patterns: RegExp[];
+}
+
+const CROP_DEFINITIONS: CropDefinition[] = [
   {
-    label: "Tomatoes (English)",
-    text: "Selling 50kg Tomatoes at 40 rupees per kg",
-    data: { crop: "Tomatoes", quantity: 50, unit: "kg", price: 40, variety: "Desi Hybrid" },
+    canonical: "Rice",
+    hindiName: "चावल",
+    defaultVariety: "Basmati Grade-A",
+    patterns: [
+      /\b(?:rice|chawal|chaval|chaawal|dhan|paddy|basmati)\b/i,
+      /(?:चावल|चांवल|धान|बासमती)/i,
+    ],
   },
   {
-    label: "टमाटर (हिन्दी)",
-    text: "पचास किलो टमाटर चालीस रुपये किलो बेचना है",
-    data: { crop: "Tomatoes", quantity: 50, unit: "kg", price: 40, variety: "देसी ताजा" },
+    canonical: "Wheat",
+    hindiName: "गेहूं",
+    defaultVariety: "Sharbati Golden",
+    patterns: [
+      /\b(?:wheat|gehu|gehun|gehoon|kanak|sharbati)\b/i,
+      /(?:गेहूं|गेंहू|गेहू|कनक|शरबती)/i,
+    ],
+  },
+  {
+    canonical: "Tomatoes",
+    hindiName: "टमाटर",
+    defaultVariety: "Desi Hybrid",
+    patterns: [
+      /\b(?:tomato|tomatoes|tamatar|tamater)\b/i,
+      /(?:टमाटर|टमाटार)/i,
+    ],
+  },
+  {
+    canonical: "Onions",
+    hindiName: "प्याज",
+    defaultVariety: "Nashik Red Export",
+    patterns: [
+      /\b(?:onion|onions|pyaz|pyaaz|kanda)\b/i,
+      /(?:प्याज|प्यास|कांदा)/i,
+    ],
+  },
+  {
+    canonical: "Potatoes",
+    hindiName: "आलू",
+    defaultVariety: "Jyoti / Chandramukhi",
+    patterns: [
+      /\b(?:potato|potatoes|aloo|alu|batata)\b/i,
+      /(?:आलू|आलु|बटाटा)/i,
+    ],
+  },
+  {
+    canonical: "Capsicum",
+    hindiName: "शिमला मिर्च",
+    defaultVariety: "Green Bell",
+    patterns: [
+      /\b(?:capsicum|shimla\s*mirch|bell\s*pepper|mirch|chilli|mirchi)\b/i,
+      /(?:शिमला\s*मिर्च|मिर्च|मिर्ची)/i,
+    ],
+  },
+  {
+    canonical: "Soybean",
+    hindiName: "सोयाबीन",
+    defaultVariety: "Yellow Bold",
+    patterns: [
+      /\b(?:soybean|soya|soyabean)\b/i,
+      /(?:सोयाबीन|सोया)/i,
+    ],
+  },
+  {
+    canonical: "Mustard",
+    hindiName: "सरसों",
+    defaultVariety: "Pusa Bold",
+    patterns: [
+      /\b(?:mustard|sarson|sarsonn|rai)\b/i,
+      /(?:सरसों|राई|तोरी)/i,
+    ],
+  },
+  {
+    canonical: "Maize",
+    hindiName: "मक्का",
+    defaultVariety: "Sweet Corn / Hybrid",
+    patterns: [
+      /\b(?:corn|maize|makka|makai)\b/i,
+      /(?:मक्का|मकई|भुट्टा)/i,
+    ],
+  },
+  {
+    canonical: "Cotton",
+    hindiName: "कपास",
+    defaultVariety: "BT Cotton",
+    patterns: [
+      /\b(?:cotton|kapas|rui)\b/i,
+      /(?:कपास|रूई|रूं)/i,
+    ],
+  },
+  {
+    canonical: "Gram (Chana)",
+    hindiName: "चना",
+    defaultVariety: "Desi Chana",
+    patterns: [
+      /\b(?:gram|chana|chane|chickpea)\b/i,
+      /(?:चना|चने|छोले)/i,
+    ],
+  },
+  {
+    canonical: "Garlic",
+    hindiName: "लहसुन",
+    defaultVariety: "Desi Garlic",
+    patterns: [
+      /\b(?:garlic|lahsun|lehsun)\b/i,
+      /(?:लहसुन|लहसून)/i,
+    ],
+  },
+  {
+    canonical: "Ginger",
+    hindiName: "अदरक",
+    defaultVariety: "Fresh Ginger",
+    patterns: [
+      /\b(?:ginger|adrak)\b/i,
+      /(?:अदरक|आदी)/i,
+    ],
+  },
+];
+
+// Hindi & English numerical words mapping
+const NUMBER_WORDS: Record<string, number> = {
+  "दस": 10, "बीस": 20, "पच्चीस": 25, "तीस": 30, "पैंतीस": 35,
+  "चालीस": 40, "पैंतालीस": 45, "पचास": 50, "पचपन": 55, "साठ": 60,
+  "पैंसठ": 65, "सत्तर": 70, "अस्सी": 80, "अट्ठाईस": 28, "चौबीस": 24,
+  "नब्बे": 90, "सौ": 100, "दो सौ": 200, "तीन सौ": 300, "पांच सौ": 500,
+  "ten": 10, "twenty": 20, "twenty five": 25, "thirty": 30, "thirty five": 35,
+  "forty": 40, "forty five": 45, "fifty": 50, "fifty five": 55, "sixty": 60,
+  "seventy": 70, "eighty": 80, "ninety": 90, "hundred": 100, "two hundred": 200,
+};
+
+const PRESET_UTTERANCES = [
+  {
+    label: "Rice / चावल (हिन्दी)",
+    text: "पचास किलो बासमती चावल साठ रुपये किलो बेचना है",
+    data: { crop: "Rice", quantity: 50, unit: "kg", price: 60, variety: "Basmati Grade-A" },
+  },
+  {
+    label: "Rice (English)",
+    text: "Selling 60kg Rice at 55 rupees per kg",
+    data: { crop: "Rice", quantity: 60, unit: "kg", price: 55, variety: "Basmati Grade-A" },
+  },
+  {
+    label: "गेहूं / Wheat (हिन्दी)",
+    text: "सौ किलो शरबती गेहूं अट्ठाईस रुपये प्रति किलो",
+    data: { crop: "Wheat", quantity: 100, unit: "kg", price: 28, variety: "Sharbati Golden" },
   },
   {
     label: "Nashik Onions (English)",
@@ -43,21 +186,22 @@ const PRESET_UTTERANCES = [
     data: { crop: "Onions", quantity: 200, unit: "kg", price: 24, variety: "Nashik Red Export" },
   },
   {
-    label: "गेहूं (हिन्दी)",
-    text: "सौ किलो शरबती गेहूं अट्ठाईस रुपये प्रति किलो",
-    data: { crop: "Wheat", quantity: 100, unit: "kg", price: 28, variety: "Sharbati Golden" },
+    label: "Tomatoes (English)",
+    text: "Selling 50kg Tomatoes at 40 rupees per kg",
+    data: { crop: "Tomatoes", quantity: 50, unit: "kg", price: 40, variety: "Desi Hybrid" },
   },
 ];
 
 export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps) {
   const [isListening, setIsListening] = useState(false);
-  const [language, setLanguage] = useState<"hi-IN" | "en-IN">("en-IN");
+  const [language, setLanguage] = useState<"hi-IN" | "en-IN">("hi-IN");
   const [transcript, setTranscript] = useState("");
   const [extractedPreview, setExtractedPreview] = useState<{
     crop: string;
     quantity: number;
     unit: string;
     price: number;
+    variety?: string;
   } | null>(null);
 
   const recognitionRef = useRef<unknown>(null);
@@ -117,35 +261,106 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
   };
 
   const parseVoiceListing = (text: string) => {
-    const lower = text.toLowerCase();
-    let crop = "Tomatoes";
-    if (lower.includes("onion") || lower.includes("pyaz") || lower.includes("प्याज")) {
-      crop = "Onions";
-    } else if (lower.includes("wheat") || lower.includes("gehun") || lower.includes("गेहूं")) {
-      crop = "Wheat";
-    } else if (lower.includes("capsicum") || lower.includes("mirch") || lower.includes("मिर्च")) {
-      crop = "Capsicum";
-    } else if (lower.includes("potato") || lower.includes("aloo") || lower.includes("आलू")) {
-      crop = "Potatoes";
+    const rawText = text.trim();
+    const lower = rawText.toLowerCase();
+
+    // 1. Identify Crop using dictionary matching
+    let detectedCrop: string | null = null;
+    let detectedVariety: string = "Standard Farm Grade";
+
+    for (const def of CROP_DEFINITIONS) {
+      const matched = def.patterns.some((pattern) => pattern.test(lower) || pattern.test(rawText));
+      if (matched) {
+        detectedCrop = def.canonical;
+        detectedVariety = def.defaultVariety;
+        break;
+      }
     }
 
-    // Extract numbers
-    const numbers = text.match(/\d+/g);
-    const quantity = numbers && numbers[0] ? parseInt(numbers[0], 10) : 50;
-    const price = numbers && numbers[1] ? parseInt(numbers[1], 10) : 40;
+    // 2. Fallback regex extraction if not in primary crop dictionary
+    if (!detectedCrop) {
+      // Look for English patterns: "selling 50kg mangoes at 80" or "list 100kg barley"
+      const englishEntityMatch = rawText.match(/(?:selling|list|have|sell)\s+(?:\d+\s*(?:kg|quintal|crates)?\s+)?(?:of\s+)?([A-Za-z]+)\b/i);
+      if (englishEntityMatch && englishEntityMatch[1]) {
+        const candidate = englishEntityMatch[1].trim();
+        if (!["at", "for", "in", "the", "rupees", "per"].includes(candidate.toLowerCase())) {
+          detectedCrop = candidate.charAt(0).toUpperCase() + candidate.slice(1).toLowerCase();
+        }
+      }
+
+      // Look for Hindi patterns: "50 किलो बाजरा 30 रुपये" -> extract word before price / after quantity
+      const hindiEntityMatch = rawText.match(/(?:\d+|पचास|सौ|दो सौ|किलो|क्विंटल)\s+([^\d\s]+)\s+(?:\d+|रुपये|भाव|बेचना)/);
+      if (!detectedCrop && hindiEntityMatch && hindiEntityMatch[1]) {
+        const candidate = hindiEntityMatch[1].trim();
+        if (!["किलो", "क्विंटल", "रुपये", "भाव", "में", "का"].includes(candidate)) {
+          detectedCrop = candidate;
+        }
+      }
+    }
+
+    // If still undetermined, fall back to "Farm Produce" instead of hardcoding "Tomatoes"
+    if (!detectedCrop) {
+      detectedCrop = "Farm Produce";
+    }
+
+    // 3. Extract Unit
+    let unit = "kg";
+    if (lower.includes("quintal") || rawText.includes("क्विंटल") || rawText.includes("कविंटल")) {
+      unit = "quintal";
+    } else if (lower.includes("crate") || rawText.includes("क्रेट")) {
+      unit = "crates";
+    } else if (lower.includes("ton") || rawText.includes("टन")) {
+      unit = "ton";
+    }
+
+    // 4. Extract Numbers (Support digits, Devanagari numerals, and Hindi words)
+    // First check Hindi words
+    let quantity = 0;
+    let price = 0;
+
+    for (const [word, val] of Object.entries(NUMBER_WORDS)) {
+      if (rawText.includes(word) || lower.includes(word)) {
+        if (!quantity) {
+          quantity = val;
+        } else if (!price && val !== quantity) {
+          price = val;
+        }
+      }
+    }
+
+    // Convert Devanagari digits [०-९] to [0-9]
+    const devanagariMap: Record<string, string> = {
+      "०": "0", "१": "1", "२": "2", "३": "3", "४": "4",
+      "५": "5", "६": "6", "७": "7", "८": "8", "९": "9",
+    };
+    const normalizedDigitsText = rawText.replace(/[०-९]/g, (d) => devanagariMap[d] || d);
+
+    // Extract Arabic numbers
+    const numbers = normalizedDigitsText.match(/\d+/g);
+    if (numbers && numbers.length > 0) {
+      quantity = parseInt(numbers[0], 10);
+      if (numbers.length > 1) {
+        price = parseInt(numbers[1], 10);
+      }
+    }
+
+    // Sensible defaults if not spoken
+    if (!quantity) quantity = 50;
+    if (!price) price = 40;
 
     const parsed = {
-      crop,
+      crop: detectedCrop,
+      variety: detectedVariety,
       quantity,
-      unit: "kg",
+      unit,
       price,
     };
 
     setExtractedPreview(parsed);
     speakFeedback(
       language === "hi-IN"
-        ? `${quantity} किलो ${crop} ${price} रुपये प्रति किलो दर्ज किया गया`
-        : `Recorded ${quantity} kilograms of ${crop} at ₹${price} per kg`
+        ? `${quantity} ${unit === "kg" ? "किलो" : unit} ${detectedCrop} ${price} रुपये दर्ज किया गया`
+        : `Recorded ${quantity} ${unit} of ${detectedCrop} at ₹${price} per ${unit}`
     );
   };
   parseVoiceListingRef.current = parseVoiceListing;
@@ -169,9 +384,9 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
   const toggleListen = () => {
     const rec = recognitionRef.current as { start: () => void; stop: () => void } | null;
     if (!rec) {
-      // If Web Speech is unsupported or blocked, use preset 0 as a smooth demo fallback
+      // If Web Speech is unsupported or blocked, use Rice preset as the live demo
       applyPreset(PRESET_UTTERANCES[0]);
-      toast.info("Microphone unavailable; simulated live voice input loaded.");
+      toast.info("Microphone unavailable; loaded simulated vernacular voice input.");
       return;
     }
 
@@ -198,7 +413,7 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
         {/* Header */}
         <div className="flex items-center justify-between border-b border-emerald-100 pb-3">
           <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xs">
               <Sparkles className="size-4" />
             </div>
             <div>
@@ -218,7 +433,7 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
                 setLanguage(next);
                 toast.success(next === "hi-IN" ? "भाषा: हिन्दी (hi-IN)" : "Language: English (en-IN)");
               }}
-              className="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+              className="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
             >
               <Languages className="size-3 text-emerald-600" />
               <span>{language === "hi-IN" ? "हिन्दी" : "English"}</span>
@@ -226,7 +441,7 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
             <button
               onClick={onClose}
               aria-label="Close voice intake"
-              className="rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+              className="rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
             >
               <X className="size-5" />
             </button>
@@ -258,10 +473,10 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
 
           <div>
             <p className="text-sm font-semibold text-slate-800">
-              {isListening ? "Listening actively... speak your harvest details" : "Tap the mic and speak in Hindi or English"}
+              {isListening ? "Listening actively... speak harvest details" : "Tap the mic and speak in Hindi or English"}
             </p>
             <p className="text-xs text-slate-500 mt-0.5">
-              Say: &ldquo;Selling 50kg Tomatoes at 40 rupees&rdquo;
+              Say: &ldquo;50kg Rice at 60 rupees&rdquo; or &ldquo;पचास किलो गेहूं अट्ठाईस रुपये&rdquo;
             </p>
           </div>
         </div>
@@ -296,6 +511,9 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
               <div className="rounded-xl bg-white p-2 shadow-xs border border-emerald-100">
                 <span className="text-[10px] text-slate-400 uppercase">Crop</span>
                 <p className="font-bold text-slate-900">{extractedPreview.crop}</p>
+                {extractedPreview.variety && (
+                  <p className="text-[9px] text-emerald-700 truncate">{extractedPreview.variety}</p>
+                )}
               </div>
               <div className="rounded-xl bg-white p-2 shadow-xs border border-emerald-100">
                 <span className="text-[10px] text-slate-400 uppercase">Quantity</span>
@@ -317,10 +535,10 @@ export function VoiceModal({ isOpen, onClose, onExtractedData }: VoiceModalProps
           </div>
         )}
 
-        {/* Preset Prompt Buttons for Jury Demonstration */}
+        {/* Preset Prompt Buttons for Demonstration */}
         <div className="space-y-1.5 pt-1">
           <p className="text-[11px] font-semibold text-slate-500">
-            Or test instant jury presets:
+            Or test instant one-click speech samples:
           </p>
           <div className="grid grid-cols-2 gap-2">
             {PRESET_UTTERANCES.map((preset) => (

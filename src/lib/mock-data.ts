@@ -320,7 +320,7 @@ export const MOCK_DELIVERY_ROUTE: DeliveryRoute = {
 };
 
 export const MOCK_DISPUTE: DisputeCase = {
-  id: "DISP-SIH-8921",
+  id: "DISP-2026-8921",
   orderNumber: "KS-ORD-4820",
   cropName: "Fresh Desi Tomatoes (Batch #4820)",
   batchWeight: "200 kg (8 Crates)",

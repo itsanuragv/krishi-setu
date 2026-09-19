@@ -142,7 +142,7 @@ export default function ConsumerPortalPage() {
 
               <div className="flex justify-between text-[10px] font-semibold text-slate-400">
                 <span>5 km (Ultra-Local)</span>
-                <span className="text-emerald-700 font-bold">25 km (SIH Target Freshness)</span>
+                <span className="text-emerald-700 font-bold">25 km (Optimal Freshness Radius)</span>
                 <span>40 km (District Corridor)</span>
               </div>
             </div>

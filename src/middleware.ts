@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   const match = ROLE_PREFIXES.find((r) => pathname.startsWith(r.prefix));
   if (!match) return NextResponse.next();
 
-  // Allow direct access to top-level SIH showcase portals (/farmer, /consumer, /delivery, etc.)
+  // Allow direct access to top-level ecosystem showcase portals (/farmer, /consumer, /delivery, etc.)
   const isExactPortal = ROLE_PREFIXES.some((r) => pathname === r.prefix);
   const authed = request.cookies.get("ks_auth")?.value === "1";
   const role = request.cookies.get("ks_role")?.value;

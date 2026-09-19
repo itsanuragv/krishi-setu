@@ -22,9 +22,11 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/shared/Navbar";
 import { OpenCVScan } from "@/components/shared/OpenCVScan";
 import { VoiceModal } from "@/components/shared/VoiceModal";
+import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
 
 export default function FarmerPortalPage() {
+  const { t, language } = useLanguage();
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   
   // Listing Form State
@@ -84,8 +86,8 @@ export default function FarmerPortalPage() {
     const newListing: ProduceListing = {
       id: `prod-${Date.now()}`,
       name: `${cropName} (Fresh Farm Gate)`,
-      hindiName: "ताजा फसल",
-      category: "Vegetables",
+      hindiName: language === "hi" ? `${cropName} (ताजा फसल)` : "ताजा फसल",
+      category: cropName.toLowerCase().includes("rice") || cropName.toLowerCase().includes("wheat") || cropName.toLowerCase().includes("चावल") || cropName.toLowerCase().includes("गेहूं") ? "Grains" : "Vegetables",
       farmerName: "Rameshwar Patil",
       farmerPhone: "+91 98221 45019",
       village: "Khed Khurd",
@@ -117,13 +119,13 @@ export default function FarmerPortalPage() {
     toast.success("Produce Successfully Auto-Listed in Hyperlocal PostGIS Feed!");
   };
 
-  // Preload initial demo crop on load
+  // Preload initial crop for quick evaluation
   useEffect(() => {
     simulateVoiceToForm({
-      crop: "Desi Tomatoes",
-      variety: "Organic Vine-Ripened",
+      crop: "Rice",
+      variety: "Basmati Grade-A",
       quantity: 50,
-      price: 40,
+      price: 60,
       unit: "kg",
     });
   }, []);
@@ -132,51 +134,51 @@ export default function FarmerPortalPage() {
     <div className="min-h-screen bg-[radial-gradient(at_top_left,#ecfdf5,#ffffff)] bg-grid-subtle">
       <Navbar />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Farmer Profile & Ledger Bar */}
-        <section className="glass rounded-3xl border border-emerald-200 p-6 shadow-sm">
+        <section className="glass rounded-3xl border border-emerald-200 p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md">
-                <Sprout className="size-7" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md shrink-0">
+                <Sprout className="size-6 sm:size-7" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-                    Rameshwar Patil (रामेश्वर पाटिल)
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 leading-tight">
+                    {t("farmer_name")}
                   </h1>
                   <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
                     <ShieldCheck className="size-3.5 text-emerald-600" />
-                    PM-KISAN Verified
+                    {t("pm_kisan_verified")}
                   </span>
                 </div>
-                <p className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                  <MapPin className="size-3 text-emerald-600" />
-                  Khed Khurd Cluster • Pune District, Maharashtra
+                <p className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                  <MapPin className="size-3 text-emerald-600 shrink-0" />
+                  <span>{t("farmer_location")}</span>
                 </p>
               </div>
             </div>
 
             {/* Live Financial & Trust Telemetry */}
-            <div className="flex flex-wrap items-center gap-3 text-xs">
-              <div className="rounded-2xl border border-emerald-200 bg-white/80 p-3 shadow-xs min-w-[130px]">
-                <span className="text-[10px] uppercase font-bold text-slate-400">Escrow Balance</span>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 text-xs w-full md:w-auto">
+              <div className="rounded-2xl border border-emerald-200 bg-white/90 p-3 shadow-xs flex-1 min-w-[120px]">
+                <span className="text-[10px] uppercase font-bold text-slate-400">{t("escrow_balance_label")}</span>
                 <p className="text-lg font-black text-emerald-700">₹42,500</p>
-                <span className="text-[10px] text-emerald-600">Locked in Razorpay</span>
+                <span className="text-[10px] text-emerald-600">{t("locked_in_razorpay")}</span>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-white/80 p-3 shadow-xs min-w-[130px]">
-                <span className="text-[10px] uppercase font-bold text-slate-400">Trust Rating</span>
+              <div className="rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-xs flex-1 min-w-[120px]">
+                <span className="text-[10px] uppercase font-bold text-slate-400">{t("trust_rating_label")}</span>
                 <p className="text-lg font-black text-slate-900">4.9 ★</p>
-                <span className="text-[10px] text-slate-500">99.4% On-time Dispatches</span>
+                <span className="text-[10px] text-slate-500">{t("ontime_dispatches")}</span>
               </div>
               <Button
                 onClick={() => setVoiceModalOpen(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-sm h-14 px-5 rounded-2xl"
+                className="col-span-2 sm:col-span-1 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-sm h-12 sm:h-14 px-4 sm:px-5 rounded-2xl touch-target"
               >
                 <Mic className="size-5 animate-pulse" />
                 <div className="text-left leading-tight">
-                  <p className="text-xs">Vernacular Voice</p>
-                  <p className="text-[10px] text-emerald-100">बोलकर फसल जोड़ें</p>
+                  <p className="text-xs">{t("vernacular_voice_btn")}</p>
+                  <p className="text-[10px] text-emerald-100">{t("vernacular_voice_sub")}</p>
                 </div>
               </Button>
             </div>
@@ -192,36 +194,66 @@ export default function FarmerPortalPage() {
                 <div>
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700">
                     <Sparkles className="size-4" />
-                    <span>Phase 3: Vernacular Voice Listing</span>
+                    <span>{t("phase_tag")}</span>
                   </div>
                   <h2 className="text-xl font-extrabold text-slate-900 mt-1">
-                    Direct Farm-Gate Listing Engine
+                    {t("engine_title")}
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Designed for zero-learning curve accessibility in Hindi & regional dialects
+                    {t("engine_sub")}
                   </p>
                 </div>
 
                 <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-                  Web Speech API
+                  {t("speech_api_badge")}
                 </span>
               </div>
 
-              {/* Quick Preset Speech Utterances for Judges */}
+              {/* Quick Preset Speech Utterances */}
               <div className="space-y-2 rounded-2xl bg-emerald-50/70 p-3.5 border border-emerald-100">
                 <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
                   <span className="flex items-center gap-1">
                     <Zap className="size-3.5 text-amber-500" />
-                    Test One-Click Voice Simulations:
+                    {t("voice_sim_title")}
                   </span>
-                  <span className="text-[10px] text-emerald-700">Click to auto-type</span>
+                  <span className="text-[10px] text-emerald-700">{t("voice_sim_sub")}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() =>
                       simulateVoiceToForm({
-                        crop: "Desi Tomatoes",
+                        crop: "Rice",
+                        variety: "Basmati Grade-A",
+                        quantity: 60,
+                        price: 55,
+                        unit: "kg",
+                      })
+                    }
+                    className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
+                  >
+                    {t("sim_rice")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      simulateVoiceToForm({
+                        crop: "Wheat",
+                        variety: "Sharbati Golden",
+                        quantity: 100,
+                        price: 28,
+                        unit: "kg",
+                      })
+                    }
+                    className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
+                  >
+                    {t("sim_wheat")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      simulateVoiceToForm({
+                        crop: "Tomatoes",
                         variety: "Vine-Ripened Hybrid",
                         quantity: 50,
                         price: 40,
@@ -230,7 +262,7 @@ export default function FarmerPortalPage() {
                     }
                     className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
                   >
-                    🎙️ &ldquo;Selling 50kg Tomatoes at 40 rupees&rdquo;
+                    {t("sim_tomatoes")}
                   </button>
                   <button
                     type="button"
@@ -245,22 +277,7 @@ export default function FarmerPortalPage() {
                     }
                     className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
                   >
-                    🎙️ &ldquo;200 किलो नासिक प्याज 24 रुपये&rdquo;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      simulateVoiceToForm({
-                        crop: "Sharbati Wheat",
-                        variety: "Golden Lustre",
-                        quantity: 100,
-                        price: 28,
-                        unit: "kg",
-                      })
-                    }
-                    className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
-                  >
-                    🎙️ &ldquo;100kg Wheat at 28 rupees&rdquo;
+                    {t("sim_onions")}
                   </button>
                 </div>
               </div>
@@ -270,14 +287,14 @@ export default function FarmerPortalPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-1.5">
                     <Label htmlFor="crop" className="text-xs font-bold text-slate-700">
-                      Crop Name (फसल का नाम)
+                      {t("crop_name_label")}
                     </Label>
                     <div className="relative">
                       <Input
                         id="crop"
                         value={cropName}
                         onChange={(e) => setCropName(e.target.value)}
-                        placeholder="e.g. Tomatoes / प्याज"
+                        placeholder={t("crop_name_placeholder")}
                         required
                         className={`font-semibold text-slate-900 border-slate-200 ${
                           isTyping ? "border-emerald-500 ring-2 ring-emerald-200" : ""
@@ -291,13 +308,13 @@ export default function FarmerPortalPage() {
 
                   <div className="space-y-1.5">
                     <Label htmlFor="variety" className="text-xs font-bold text-slate-700">
-                      Variety / Grade (किस्म)
+                      {t("variety_label")}
                     </Label>
                     <Input
                       id="variety"
                       value={variety}
                       onChange={(e) => setVariety(e.target.value)}
-                      placeholder="e.g. Desi Hybrid / Sharbati"
+                      placeholder={t("variety_placeholder")}
                       className="text-slate-900 border-slate-200"
                     />
                   </div>
@@ -306,14 +323,14 @@ export default function FarmerPortalPage() {
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="qty" className="text-xs font-bold text-slate-700">
-                      Harvest Quantity (मात्रा)
+                      {t("quantity_label")}
                     </Label>
                     <Input
                       id="qty"
                       type="number"
                       value={quantity}
                       onChange={(e) => setQuantity(e.target.value ? Number(e.target.value) : "")}
-                      placeholder="50"
+                      placeholder={t("quantity_placeholder")}
                       required
                       className="font-bold text-slate-900 border-slate-200"
                     />
@@ -321,7 +338,7 @@ export default function FarmerPortalPage() {
 
                   <div className="space-y-1.5">
                     <Label htmlFor="unit" className="text-xs font-bold text-slate-700">
-                      Unit (इकाई)
+                      {t("unit_label")}
                     </Label>
                     <select
                       id="unit"
@@ -329,15 +346,15 @@ export default function FarmerPortalPage() {
                       onChange={(e) => setUnit(e.target.value)}
                       className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
-                      <option value="kg">Kilogram (किलो)</option>
-                      <option value="quintal">Quintal (क्विंटल)</option>
-                      <option value="crates">Crates (क्रेट्स)</option>
+                      <option value="kg">{t("unit_kg")}</option>
+                      <option value="quintal">{t("unit_quintal")}</option>
+                      <option value="crates">{t("unit_crates")}</option>
                     </select>
                   </div>
 
                   <div className="space-y-1.5">
                     <Label htmlFor="price" className="text-xs font-bold text-slate-700">
-                      Floor Price (न्यूनतम भाव ₹)
+                      {t("floor_price_label")}
                     </Label>
                     <Input
                       id="price"
@@ -357,14 +374,22 @@ export default function FarmerPortalPage() {
                     <div className="flex items-center justify-between font-bold text-emerald-900">
                       <span className="flex items-center gap-1.5">
                         <TrendingUp className="size-4 text-emerald-600" />
-                        Agmarknet Mandi Price Comparison:
+                        {t("mandi_comparison_heading")}
                       </span>
                       <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-[10px] text-emerald-800">
-                        +22% Net Realization
+                        {t("mandi_net_badge")}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-600">
-                      Your floor price is <strong>₹{floorPrice}/{unit}</strong>. Traditional Mandi agents offer ₹31/{unit} after deductions. You gain an extra <strong>₹{Math.round(Number(floorPrice) - 31)}/{unit}</strong> straight to your UPI account!
+                      {language === "hi" ? (
+                        <span>
+                          आपका न्यूनतम भाव <strong>₹{floorPrice}/{unit}</strong> है। पारंपरिक मंडी एजेंट कटौती के बाद ₹31/{unit} देते हैं। आपको अतिरिक्त <strong>₹{Math.round(Number(floorPrice) - 31)}/{unit}</strong> सीधे बैंक खाते में मिलते हैं!
+                        </span>
+                      ) : (
+                        <span>
+                          Your floor price is <strong>₹{floorPrice}/{unit}</strong>. Traditional Mandi agents offer ₹31/{unit} after deductions. You gain an extra <strong>₹{Math.round(Number(floorPrice) - 31)}/{unit}</strong> straight to your UPI account!
+                        </span>
+                      )}
                     </p>
                   </div>
                 )}
@@ -375,7 +400,7 @@ export default function FarmerPortalPage() {
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl gap-2 shadow-md"
                 >
                   <Plus className="size-4" />
-                  <span>List Harvest on Direct Hyperlocal Network</span>
+                  <span>{t("list_harvest_btn")}</span>
                 </Button>
               </form>
 
@@ -383,10 +408,10 @@ export default function FarmerPortalPage() {
                 <div className="rounded-2xl border border-emerald-400 bg-emerald-100/70 p-3 text-xs text-emerald-900 flex items-center justify-between animate-in fade-in">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-                    <span>Harvest successfully broadcast to 24 consumer & HoReCa clusters within 25km!</span>
+                    <span>{t("broadcast_success")}</span>
                   </div>
                   <Button asChild size="sm" variant="outline" className="h-7 text-xs border-emerald-400 bg-white">
-                    <Link href="/consumer">View in Consumer Feed</Link>
+                    <Link href="/consumer">{t("view_consumer_feed")}</Link>
                   </Button>
                 </div>
               )}
@@ -401,16 +426,14 @@ export default function FarmerPortalPage() {
             <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
                 <Scan className="size-4 text-emerald-600" />
-                <span>Technical Advantage: Client-Side Edge QC</span>
+                <span>{t("tech_advantage_title")}</span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
-                By performing <strong>Laplacian variance edge detection</strong> inside the client browser,
-                Krishi Setu eliminates heavy image uploads over 2G/3G rural networks, saving mobile data for smallholders
-                while ensuring quality verification before dispatch.
+                {t("tech_advantage_desc")}
               </p>
               <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500">
-                <span>Network Overhead: &lt;10 KB</span>
-                <span className="font-semibold text-emerald-700">Zero Server GPU Bill</span>
+                <span>{t("network_overhead")}</span>
+                <span className="font-semibold text-emerald-700">{t("zero_gpu_bill")}</span>
               </div>
             </div>
           </div>
@@ -421,14 +444,14 @@ export default function FarmerPortalPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-slate-900">
-                Your Active Produce Listings (सक्रिय फसलें)
+                {t("active_listings_title")}
               </h3>
               <p className="text-xs text-slate-500">
-                Live PostGIS broadcasts with automated 5-factor buyer matching
+                {t("active_listings_sub")}
               </p>
             </div>
             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-              {listings.length} Lots Active
+              {listings.length} {t("lots_active")}
             </span>
           </div>
 
@@ -450,7 +473,7 @@ export default function FarmerPortalPage() {
                     {item.category}
                   </div>
                   <div className="absolute bottom-2 right-2 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
-                    {item.matchScore}% Top Match
+                    {item.matchScore}% {t("top_match")}
                   </div>
                 </div>
 
@@ -461,7 +484,7 @@ export default function FarmerPortalPage() {
                       ₹{item.farmGatePrice}/{item.unit}
                     </span>
                     <span className="text-slate-500">
-                      Available: {item.quantityAvailable} {item.unit}
+                      {t("available")} {item.quantityAvailable} {item.unit}
                     </span>
                   </div>
                 </div>
@@ -469,9 +492,9 @@ export default function FarmerPortalPage() {
                 <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-[11px] text-slate-500">
                   <span className="flex items-center gap-1 text-emerald-700 font-medium">
                     <CheckCircle2 className="size-3" />
-                    OpenCV Verified
+                    {t("opencv_verified")}
                   </span>
-                  <span>Radius: {item.distanceKm} km</span>
+                  <span>{t("radius")} {item.distanceKm} km</span>
                 </div>
               </div>
             ))}
