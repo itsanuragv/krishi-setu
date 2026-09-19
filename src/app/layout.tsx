@@ -17,7 +17,13 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "Krishi Setu",
-  description: "Farm-to-buyer marketplace — SIH demo",
+  description:
+    "Bharat's direct farm-to-kitchen marketplace with vernacular voice listing, OpenCV quality pre-checks, PostGIS hyperlocal matching, and UPI escrow settlement.",
+  openGraph: {
+    title: "Krishi Setu",
+    description:
+      "Bharat's direct farm-to-kitchen marketplace with vernacular voice listing, OpenCV quality pre-checks, PostGIS hyperlocal matching, and UPI escrow settlement.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

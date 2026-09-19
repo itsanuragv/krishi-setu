@@ -1,0 +1,12 @@
+{
+  "name": "Krishi Setu",
+  "description": "Bharat's direct farm-to-kitchen marketplace with vernacular voice listing, OpenCV quality pre-checks, PostGIS hyperlocal matching, and UPI escrow settlement.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
