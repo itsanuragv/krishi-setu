@@ -66,21 +66,21 @@ export function Navbar() {
       <header className="sticky top-0 z-40 w-full border-b border-emerald-100/70 bg-white/90 backdrop-blur-md transition-all shadow-xs">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3.5 sm:px-6 lg:px-8">
           {/* Brand Logo */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/" className="flex items-center gap-2 group touch-target">
-              <div className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-sm transition-transform group-hover:scale-105">
-                <Sprout className="size-5 sm:size-6" />
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink min-w-0">
+            <Link href="/" className="flex items-center gap-2 group touch-target min-w-0">
+              <div className="flex size-8 sm:size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-sm transition-transform group-hover:scale-105">
+                <Sprout className="size-4.5 sm:size-6" />
               </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 leading-none">
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="font-extrabold text-sm sm:text-lg tracking-tight text-slate-900 leading-none truncate">
                     {t("brand_title")}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-semibold text-emerald-600">
+                  <span className="text-[10px] sm:text-xs font-semibold text-emerald-600 hidden xs:inline shrink-0">
                     {t("brand_hindi")}
                   </span>
                 </div>
-                <span className="text-[9px] sm:text-[10px] font-medium text-slate-500 tracking-tight leading-none mt-1 hidden xs:inline">
+                <span className="text-[9px] sm:text-[10px] font-medium text-slate-500 tracking-tight leading-none mt-0.5 hidden sm:inline truncate">
                   {t("brand_subtitle")}
                 </span>
               </div>
@@ -115,7 +115,7 @@ export function Navbar() {
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Quick Voice Assistant Mic Trigger */}
             <button
               type="button"
@@ -125,28 +125,28 @@ export function Navbar() {
                 }
               }}
               aria-label="Open Kisan Voice Assistant"
-              className="flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-gradient-to-r from-emerald-600 to-teal-700 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:from-emerald-700 hover:to-teal-800 transition-all touch-target active:scale-95"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-300 bg-gradient-to-r from-emerald-600 to-teal-700 p-2 sm:px-3 sm:py-1.5 text-xs font-bold text-white shadow-xs hover:from-emerald-700 hover:to-teal-800 transition-all touch-target active:scale-95 shrink-0"
               title="Kisan Voice Saathi (किसान वाणी)"
             >
-              <Mic className="size-3.5 text-amber-300 animate-pulse" />
-              <span className="hidden xs:inline">{language === "hi" ? "बोलकर खोजें" : "Voice AI"}</span>
+              <Mic className="size-4 sm:size-3.5 text-amber-300 animate-pulse shrink-0" />
+              <span className="hidden md:inline">{language === "hi" ? "बोलकर खोजें" : "Voice AI"}</span>
             </button>
 
             {/* Functional Language Toggle */}
             <button
               onClick={handleLanguageToggle}
               aria-label="Toggle language between Hindi and English"
-              className="flex items-center gap-1.5 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-emerald-900 hover:bg-emerald-100 transition-colors shadow-xs touch-target"
+              className="flex items-center justify-center gap-1 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-2 py-1.5 sm:px-3 text-xs font-bold text-emerald-900 hover:bg-emerald-100 transition-colors shadow-xs touch-target shrink-0"
               title="Toggle Vernacular Hindi / English"
             >
               <Languages className="size-3.5 text-emerald-600 shrink-0" />
-              <span>{language === "en" ? "हिन्दी" : "English"}</span>
+              <span className="text-[11px] sm:text-xs">{language === "en" ? "हिन्दी" : "Eng"}</span>
             </button>
 
             {/* Helpline quick link (Tablet/Desktop) */}
             <a
               href="tel:18001801551"
-              className="hidden sm:flex items-center gap-1 rounded-xl border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+              className="hidden md:flex items-center gap-1 rounded-xl border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors shrink-0"
               title="Kisan Call Center: 1800-180-1551"
             >
               <PhoneCall className="size-3 text-emerald-600" />
@@ -157,7 +157,7 @@ export function Navbar() {
             <button
               onClick={() => setMobileMenuOpen((o) => !o)}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              className="lg:hidden rounded-xl p-2 text-slate-700 hover:bg-slate-100 transition-colors touch-target"
+              className="lg:hidden rounded-xl p-2 text-slate-700 hover:bg-slate-100 transition-colors touch-target shrink-0"
             >
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
