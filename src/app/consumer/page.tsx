@@ -15,7 +15,11 @@ import {
   TrendingDown, 
   Truck, 
   Copy, 
-  X 
+  X,
+  Mic,
+  MicOff,
+  Search,
+  Radio
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -23,10 +27,13 @@ import { Navbar } from "@/components/shared/Navbar";
 import { MatchScoreModal } from "@/components/shared/MatchScoreModal";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
 import { cardHover, staggerContainer } from "@/lib/animations";
+import { getSpeechRecognition, type SpeechRecognitionEvent } from "@/lib/speech-types";
 
 export default function ConsumerPortalPage() {
   const [maxDistance, setMaxDistance] = useState(25);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isListening, setIsListening] = useState(false);
   const [selectedListingForModal, setSelectedListingForModal] = useState<ProduceListing | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -37,11 +44,71 @@ export default function ConsumerPortalPage() {
 
   const CATEGORIES = ["All", "Vegetables", "Fruits", "Grains"];
 
-  // Filter listings by dynamic PostGIS proximity slider and category
+  // Voice Search Direct Web Speech Handler
+  const startVoiceSearch = () => {
+    const SpeechRecognition = getSpeechRecognition();
+
+    if (!SpeechRecognition) {
+      window.dispatchEvent(new CustomEvent("open-voice-assistant"));
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "hi-IN";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      setIsListening(true);
+      toast.info("बोलिए... उपज का नाम जैसे 'टमाटर' या 'Mango'", { icon: "🎙️" });
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const text = event.results[0][0].transcript;
+        // Clean query of trailing punctuation
+        const clean = text.replace(/[.,!?]/g, "").trim();
+        setSearchQuery(clean);
+        setIsListening(false);
+        toast.success(`खोजा गया: "${clean}"`);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  // Filter listings by dynamic PostGIS proximity slider, category, and voice/text search
   const filteredListings = MOCK_PRODUCE_LISTINGS.filter((item) => {
     const withinDistance = item.distanceKm <= maxDistance;
     const categoryMatches = selectedCategory === "All" || item.category === selectedCategory;
-    return withinDistance && categoryMatches;
+    const query = searchQuery.trim().toLowerCase();
+    const searchMatches = !query || 
+      item.name.toLowerCase().includes(query) ||
+      (item.hindiName && item.hindiName.toLowerCase().includes(query)) ||
+      item.farmerName.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query) ||
+      (query.includes("tamatar") && item.name.toLowerCase().includes("tomato")) ||
+      (query.includes("टमाटर") && item.name.toLowerCase().includes("tomato")) ||
+      (query.includes("aam") && item.name.toLowerCase().includes("mango")) ||
+      (query.includes("आम") && item.name.toLowerCase().includes("mango")) ||
+      (query.includes("pyaz") && item.name.toLowerCase().includes("onion")) ||
+      (query.includes("प्याज") && item.name.toLowerCase().includes("onion")) ||
+      (query.includes("gehun") && item.name.toLowerCase().includes("wheat")) ||
+      (query.includes("गेहूं") && item.name.toLowerCase().includes("wheat"));
+    return withinDistance && categoryMatches && searchMatches;
   });
 
   const openMatchBreakdown = (listing: ProduceListing) => {
@@ -102,6 +169,89 @@ export default function ConsumerPortalPage() {
                 <p className="font-bold text-slate-900">
                   ST_DWithin: &lt;{maxDistance} km Radius
                 </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Voice-First Search & Discovery Banner */}
+        <section className="relative overflow-hidden rounded-3xl border border-emerald-300 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-6 text-white shadow-lg">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-lg">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
+                <Radio className="size-3.5 animate-pulse text-emerald-200" />
+                <span>Voice-First AI Discovery</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black">
+                बोलकर या लिखकर ताज़ा उपज खोजें
+              </h2>
+              <p className="text-xs text-emerald-100">
+                सीधे खेत से ताज़ा सब्जियां, फल और अनाज। माइक दबाएं और कहें &quot;ताज़ा टमाटर&quot; या &quot;अल्फांसो आम&quot;।
+              </p>
+            </div>
+
+            {/* Voice Search Input Group */}
+            <div className="w-full md:w-96 space-y-2">
+              <div className="relative flex items-center">
+                <Search className="absolute left-3.5 size-5 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="सब्जी या फल खोजें (जैसे: टमाटर, प्याज)..."
+                  className="w-full rounded-2xl border-2 border-white/30 bg-white py-3 pl-10 pr-24 text-sm font-medium text-slate-900 placeholder:text-slate-400 shadow-inner focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                />
+                <div className="absolute right-1.5 flex items-center gap-1">
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
+                      title="Clear search"
+                    >
+                      <X className="size-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={startVoiceSearch}
+                    className={`flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs font-bold transition-all ${
+                      isListening
+                        ? "bg-red-600 text-white animate-pulse shadow-md"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs"
+                    }`}
+                    title="बोलकर खोजें (Voice Search)"
+                  >
+                    {isListening ? (
+                      <>
+                        <MicOff className="size-4 animate-spin" />
+                        <span>सुन रहे हैं...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="size-4" />
+                        <span>बोलें</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Prompt Chips */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[11px] font-medium text-emerald-100">सुझाव:</span>
+                {[
+                  { label: "🍅 टमाटर", query: "टमाटर" },
+                  { label: "🌾 गेहूँ", query: "गेहूं" },
+                  { label: "🥭 आम", query: "आम" },
+                  { label: "🧅 प्याज", query: "प्याज" }
+                ].map((chip) => (
+                  <button
+                    key={chip.label}
+                    onClick={() => setSearchQuery(chip.query)}
+                    className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-semibold text-white hover:bg-white/30 transition-colors backdrop-blur-xs"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>

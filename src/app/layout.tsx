@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { MswProvider } from "@/lib/msw-provider";
 import { QueryProvider } from "@/lib/query-provider";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { VoiceAssistant } from "@/components/shared/voice-assistant";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <QueryProvider>
             <LanguageProvider>
               {children}
+              <VoiceAssistant />
               <Toaster richColors position="top-center" />
             </LanguageProvider>
           </QueryProvider>

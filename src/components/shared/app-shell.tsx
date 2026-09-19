@@ -26,7 +26,6 @@ import { ROLE_LABEL, type Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/button";
-import { VoiceAssistant } from "@/components/shared/voice-assistant";
 import { useLanguage } from "@/context/LanguageContext";
 import { toast } from "sonner";
 
@@ -313,9 +312,6 @@ export function AppShell({
           </div>
         </div>
       )}
-
-      {/* Vernacular Voice Assistant Floater */}
-      <VoiceAssistant />
     </div>
   );
 }
