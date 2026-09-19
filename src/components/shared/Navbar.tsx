@@ -46,7 +46,7 @@ export function Navbar() {
     { href: "/", label: t("nav_overview"), icon: Sparkles },
     { href: "/farmer", label: t("nav_farmer"), icon: Sprout, badge: t("nav_badge_farmer") },
     { href: "/consumer", label: t("nav_consumer"), icon: ShoppingBag, badge: "<25km" },
-    { href: "/buyer/dashboard", label: "Bulk Buyers", icon: Warehouse, badge: "FPO" },
+    { href: "/buyer/dashboard", label: t("nav_buyer"), icon: Warehouse, badge: t("nav_badge_fpo") },
     { href: "/delivery", label: t("nav_delivery"), icon: Truck, badge: "Fleet" },
     { href: "/admin", label: t("nav_admin"), icon: ShieldCheck, badge: "Escrow" },
   ];

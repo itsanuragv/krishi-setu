@@ -28,8 +28,10 @@ import { MatchScoreModal } from "@/components/shared/MatchScoreModal";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
 import { cardHover, staggerContainer } from "@/lib/animations";
 import { getSpeechRecognition, type SpeechRecognitionEvent } from "@/lib/speech-types";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ConsumerPortalPage() {
+  const { t, language } = useLanguage();
   const [maxDistance, setMaxDistance] = useState(25);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,7 +44,12 @@ export default function ConsumerPortalPage() {
   const [escrowStep, setEscrowStep] = useState<"idle" | "locking" | "locked">("idle");
   const [generatedPin, setGeneratedPin] = useState("7429");
 
-  const CATEGORIES = ["All", "Vegetables", "Fruits", "Grains"];
+  const CATEGORIES = [
+    { id: "All", label: t("cat_all") },
+    { id: "Vegetables", label: t("cat_vegetables") },
+    { id: "Fruits", label: t("cat_fruits") },
+    { id: "Grains", label: t("cat_grains") },
+  ];
 
   // Voice Search Direct Web Speech Handler
   const startVoiceSearch = () => {
@@ -147,16 +154,16 @@ export default function ConsumerPortalPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-                    Consumer & Retail Discovery Hub
+                    {t("consumer_hub_title")}
                   </h1>
                   <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-bold text-teal-800">
                     <Sparkles className="size-3 text-teal-600" />
-                    5-Factor Match Engine
+                    {t("match_engine_badge")}
                   </span>
                 </div>
                 <p className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
                   <MapPin className="size-3 text-emerald-600" />
-                  Your Delivery Zone: Baner / Aundh Corridor, Pune (&lt;12h Vine-to-Kitchen)
+                  {t("delivery_zone")}
                 </p>
               </div>
             </div>
@@ -165,9 +172,9 @@ export default function ConsumerPortalPage() {
             <div className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white/80 px-4 py-2.5 shadow-xs text-xs">
               <span className="size-2.5 rounded-full bg-emerald-500 animate-ping" />
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">PostGIS Spatial Query</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400">{t("postgis_query_badge")}</span>
                 <p className="font-bold text-slate-900">
-                  ST_DWithin: &lt;{maxDistance} km Radius
+                  {language === "hi" ? `खोज दायरा: <${maxDistance} किमी` : `ST_DWithin: <${maxDistance} km Radius`}
                 </p>
               </div>
             </div>
@@ -180,13 +187,13 @@ export default function ConsumerPortalPage() {
             <div className="space-y-2 max-w-lg">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
                 <Radio className="size-3.5 animate-pulse text-emerald-200" />
-                <span>Voice-First AI Discovery</span>
+                <span>{t("voice_first_tag")}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black">
-                बोलकर या लिखकर ताज़ा उपज खोजें
+                {t("voice_search_banner_title")}
               </h2>
               <p className="text-xs text-emerald-100">
-                सीधे खेत से ताज़ा सब्जियां, फल और अनाज। माइक दबाएं और कहें &quot;ताज़ा टमाटर&quot; या &quot;अल्फांसो आम&quot;।
+                {t("voice_search_banner_sub")}
               </p>
             </div>
 
@@ -198,7 +205,7 @@ export default function ConsumerPortalPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="सब्जी या फल खोजें (जैसे: टमाटर, प्याज)..."
+                  placeholder={t("voice_search_placeholder")}
                   className="w-full rounded-2xl border-2 border-white/30 bg-white py-3 pl-10 pr-24 text-sm font-medium text-slate-900 placeholder:text-slate-400 shadow-inner focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
                 />
                 <div className="absolute right-1.5 flex items-center gap-1">
@@ -223,12 +230,12 @@ export default function ConsumerPortalPage() {
                     {isListening ? (
                       <>
                         <MicOff className="size-4 animate-spin" />
-                        <span>सुन रहे हैं...</span>
+                        <span>{t("voice_search_listening")}</span>
                       </>
                     ) : (
                       <>
                         <Mic className="size-4" />
-                        <span>बोलें</span>
+                        <span>{t("voice_search_btn_speak")}</span>
                       </>
                     )}
                   </button>
@@ -237,7 +244,7 @@ export default function ConsumerPortalPage() {
 
               {/* Quick Prompt Chips */}
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[11px] font-medium text-emerald-100">सुझाव:</span>
+                <span className="text-[11px] font-medium text-emerald-100">{t("voice_suggestions_label")}</span>
                 {[
                   { label: "🍅 टमाटर", query: "टमाटर" },
                   { label: "🌾 गेहूँ", query: "गेहूं" },
@@ -268,13 +275,13 @@ export default function ConsumerPortalPage() {
                   className="flex items-center gap-2 text-sm font-bold text-slate-900 cursor-pointer"
                 >
                   <Sliders className="size-4 text-emerald-600" />
-                  <span>Hyperlocal Proximity Radius:</span>
+                  <span>{t("proximity_radius_label")}</span>
                   <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-800">
-                    &lt; {maxDistance} km
+                    &lt; {maxDistance} {language === "hi" ? "किमी" : "km"}
                   </span>
                 </label>
                 <span className="text-[11px] text-slate-500">
-                  {filteredListings.length} Farms Matched
+                  {filteredListings.length} {t("farms_matched_count")}
                 </span>
               </div>
 
@@ -291,9 +298,9 @@ export default function ConsumerPortalPage() {
               />
 
               <div className="flex justify-between text-[10px] font-semibold text-slate-400">
-                <span>5 km (Ultra-Local)</span>
-                <span className="text-emerald-700 font-bold">25 km (Optimal Freshness Radius)</span>
-                <span>40 km (District Corridor)</span>
+                <span>{t("ultra_local_label")}</span>
+                <span className="text-emerald-700 font-bold">{t("optimal_freshness_label")}</span>
+                <span>{t("district_corridor_label")}</span>
               </div>
             </div>
 
@@ -301,15 +308,15 @@ export default function ConsumerPortalPage() {
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((cat) => (
                 <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
                   className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-                    selectedCategory === cat
+                    selectedCategory === cat.id
                       ? "bg-emerald-600 text-white shadow-sm"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
-                  {cat}
+                  {cat.label}
                 </button>
               ))}
             </div>
@@ -351,22 +358,22 @@ export default function ConsumerPortalPage() {
                       title="Click to view 5-Factor Match Breakdown"
                     >
                       <Sparkles className="size-3.5 text-amber-300" />
-                      <span>{listing.matchScore}% Match</span>
+                      <span>{listing.matchScore}{t("card_match_suffix")}</span>
                     </button>
 
                     <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 backdrop-blur-xs">
                       <MapPin className="size-3" />
-                      <span>{listing.distanceKm} km away</span>
+                      <span>{listing.distanceKm} {t("card_away_suffix")}</span>
                     </div>
                   </div>
 
                   {/* Title & Farmer Details */}
                   <div>
                     <h3 className="font-extrabold text-slate-900 text-base">
-                      {listing.name}
+                      {language === "hi" && listing.hindiName ? listing.hindiName : listing.name}
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Farmer: {listing.farmerName} • {listing.village}
+                      {t("card_farmer_label")} {listing.farmerName} • {listing.village}
                     </p>
                   </div>
 
@@ -375,7 +382,7 @@ export default function ConsumerPortalPage() {
                     <div className="flex items-baseline justify-between">
                       <div>
                         <span className="text-[10px] uppercase font-bold text-emerald-800">
-                          Direct Farm-Gate Price
+                          {t("card_direct_price_label")}
                         </span>
                         <div className="flex items-baseline gap-1">
                           <span className="text-xl font-black text-emerald-700">
@@ -386,7 +393,7 @@ export default function ConsumerPortalPage() {
                       </div>
 
                       <div className="text-right">
-                        <span className="text-[10px] uppercase text-slate-400">APMC Mandi Rate</span>
+                        <span className="text-[10px] uppercase text-slate-400">{t("card_mandi_rate_label")}</span>
                         <p className="text-xs font-bold text-slate-400 line-through">
                           ₹{listing.mandiBenchmarkPrice}/{listing.unit}
                         </p>
@@ -396,8 +403,8 @@ export default function ConsumerPortalPage() {
                     <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 pt-0.5">
                       <TrendingDown className="size-3.5" />
                       <span>
-                        Save ₹{listing.mandiBenchmarkPrice - listing.farmGatePrice}/{listing.unit} (
-                        {Math.round(((listing.mandiBenchmarkPrice - listing.farmGatePrice) / listing.mandiBenchmarkPrice) * 100)}% Cheaper)
+                        {t("card_save_label")} ₹{listing.mandiBenchmarkPrice - listing.farmGatePrice}/{listing.unit} (
+                        {Math.round(((listing.mandiBenchmarkPrice - listing.farmGatePrice) / listing.mandiBenchmarkPrice) * 100)}% {t("card_cheaper_label")})
                       </span>
                     </div>
                   </div>
@@ -409,7 +416,7 @@ export default function ConsumerPortalPage() {
                       {listing.openCvMetrics.status.split(" - ")[0]}
                     </span>
                     <span className="font-semibold text-amber-700">
-                      {listing.breakdown.reliability.rating} ★ Trust Score
+                      {listing.breakdown.reliability.rating} ★ {t("card_trust_score")}
                     </span>
                   </div>
                 </div>
@@ -422,7 +429,7 @@ export default function ConsumerPortalPage() {
                     onClick={() => openMatchBreakdown(listing)}
                     className="text-xs border-slate-200 text-slate-700 hover:bg-slate-50"
                   >
-                    View 5 Factors
+                    <span>{t("btn_view_match")}</span>
                   </Button>
                   <Button
                     size="sm"
@@ -430,7 +437,7 @@ export default function ConsumerPortalPage() {
                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-xs"
                   >
                     <Lock className="size-3.5" />
-                    <span>Buy via Escrow</span>
+                    <span>{t("btn_secure_escrow_order")}</span>
                   </Button>
                 </div>
               </motion.div>

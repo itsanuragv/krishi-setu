@@ -29,110 +29,107 @@ import { cardHover, fadeInUp, staggerContainer } from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function HomePage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [guideModalOpen, setGuideModalOpen] = useState(false);
 
   const LIVE_TICKER_ITEMS = [
-    { crop: "Fresh Desi Tomatoes", farmGate: "₹40/kg", mandi: "₹58/kg", saving: "31% Lower" },
-    { crop: "Basmati Paddy Rice", farmGate: "₹60/kg", mandi: "₹88/kg", saving: "+46% Realization" },
-    { crop: "Nashik Red Onions", farmGate: "₹24/kg", mandi: "₹36/kg", saving: "33% Lower" },
-    { crop: "Sharbati Golden Wheat", farmGate: "₹28/kg", mandi: "₹39/kg", saving: "+39% Realization" },
-    { crop: "Green Bell Capsicum", farmGate: "₹45/kg", mandi: "₹68/kg", saving: "34% Lower" },
-    { crop: "Desi Jyoti Potatoes", farmGate: "₹18/kg", mandi: "₹26/kg", saving: "30% Lower" },
+    { crop: t("crop_tomato"), farmGate: "₹40/kg", mandi: "₹58/kg", saving: language === "hi" ? "31% सस्ता" : "31% Lower" },
+    { crop: t("crop_rice"), farmGate: "₹60/kg", mandi: "₹88/kg", saving: language === "hi" ? "+46% अधिक आय" : "+46% Realization" },
+    { crop: t("crop_onion"), farmGate: "₹24/kg", mandi: "₹36/kg", saving: language === "hi" ? "33% सस्ता" : "33% Lower" },
+    { crop: t("crop_wheat"), farmGate: "₹28/kg", mandi: "₹39/kg", saving: language === "hi" ? "+39% अधिक आय" : "+39% Realization" },
+    { crop: t("crop_capsicum"), farmGate: "₹45/kg", mandi: "₹68/kg", saving: language === "hi" ? "34% सस्ता" : "34% Lower" },
+    { crop: t("crop_potato"), farmGate: "₹18/kg", mandi: "₹26/kg", saving: language === "hi" ? "30% सस्ता" : "30% Lower" },
   ];
 
   const PRIMARY_ROLES = [
     {
       role: "farmer",
-      title: "Farmer / Producer (किसान)",
+      title: t("role_farmer_title"),
       href: "/farmer",
-      tagline: "Voice Listing + On-Device Quality QC",
-      description:
-        "Speak in Hindi or English to list crops instantly. On-device camera pre-check tests blur and brightness. Guaranteed UPI escrow payout upon delivery.",
+      tagline: t("role_farmer_tagline"),
+      description: t("role_farmer_desc"),
       icon: Sprout,
       color: "from-emerald-500 to-teal-700",
       accentBg: "bg-emerald-50 text-emerald-800 border-emerald-200",
-      features: ["Vernacular Voice-to-Form AI", "OpenCV Edge Quality QC", "Direct Farm-Gate UPI Payout"],
-      ctaText: "Enter Farmer Portal",
+      features: [t("role_farmer_f1"), t("role_farmer_f2"), t("role_farmer_f3")],
+      ctaText: t("role_farmer_cta"),
     },
     {
       role: "consumer",
-      title: "Consumer & Retail (उपभोक्ता)",
+      title: t("role_consumer_title"),
       href: "/consumer",
-      tagline: "Hyperlocal Proximity (<25km) & 5-Factor Match",
-      description:
-        "Direct vine-to-kitchen farm produce harvested <12h ago. Algorithmic transparency evaluating price, distance, grade, and farmer trust score.",
+      tagline: t("role_consumer_tagline"),
+      description: t("role_consumer_desc"),
       icon: ShoppingBag,
       color: "from-teal-600 to-cyan-700",
       accentBg: "bg-teal-50 text-teal-800 border-teal-200",
-      features: ["PostGIS <25km Proximity Slider", "5-Factor Match Scoring", "Ledger-Locked Escrow PIN"],
-      ctaText: "Shop Fresh Harvest",
+      features: [t("role_consumer_f1"), t("role_consumer_f2"), t("role_consumer_f3")],
+      ctaText: t("role_consumer_cta"),
     },
     {
       role: "bulk_buyer",
-      title: "Bulk Buyer & HoReCa (थोक खरीदार)",
+      title: t("role_buyer_title"),
       href: "/buyer/dashboard",
-      tagline: "FPO Aggregation & Commercial Lots",
-      description:
-        "Procure multi-quintal commercial lots directly from farmer collectives and FPOs with digital quality verification and standardized tax invoices.",
+      tagline: t("role_buyer_tagline"),
+      description: t("role_buyer_desc"),
       icon: Warehouse,
       color: "from-amber-600 to-orange-700",
       accentBg: "bg-amber-50 text-amber-800 border-amber-200",
-      features: ["FPO Forward Contracts", "Direct Multi-Quintal Lots", "GST Invoicing & Escrow"],
-      ctaText: "Institutional Procurement",
+      features: [t("role_buyer_f1"), t("role_buyer_f2"), t("role_buyer_f3")],
+      ctaText: t("role_buyer_cta"),
     },
   ];
 
   const SECONDARY_ROLES = [
     {
       role: "delivery",
-      title: "Delivery Transporter (परिवहन नेटवर्क)",
+      title: t("role_delivery_title"),
       href: "/delivery",
       ariaLabel: "Explore Delivery Portal",
-      tagline: "OR-Tools Optimized Multi-Stop Routing",
-      description:
-        "Multi-stop farm pickups and consumer drop-offs with distance optimization, vehicle routing algorithms, and instant 4-digit PIN verification settlement.",
+      tagline: t("role_delivery_tagline"),
+      description: t("role_delivery_desc"),
       icon: Truck,
       color: "text-purple-700 bg-purple-100",
-      badge: "VRP Multi-Stop",
+      badge: t("role_delivery_badge"),
+      ctaText: t("role_delivery_cta"),
     },
     {
       role: "admin",
-      title: "Governance & Mediation (प्रशासन व निगरानी)",
+      title: t("role_admin_title"),
       href: "/admin",
       ariaLabel: "Explore Admin Panel",
-      tagline: "Escrow GMV & Split-Screen Dispute Resolution",
-      description:
-        "Mediate produce quality disputes with side-by-side OpenCV farm photo vs consumer arrival photo. MeitY DPDP Act 2023 compliance monitor.",
+      tagline: t("role_admin_tagline"),
+      description: t("role_admin_desc"),
       icon: ShieldCheck,
       color: "text-rose-700 bg-rose-100",
-      badge: "DPDP Act 2023",
+      badge: t("role_admin_badge"),
+      ctaText: t("role_admin_cta"),
     },
   ];
 
   const TESTIMONIALS = [
     {
-      name: "Rameshwar Patil",
-      role: "Smallholder Farmer (पुणे, महाराष्ट्र)",
-      crop: "Tomatoes & Basmati Rice",
-      badge: "PM-KISAN Verified",
-      text: "Pehle APMC Mandi mein aadhitiye 30-40% commission kaat lete the. Krishi Setu par maine bolkar listing daali, aur agle hi din direct payment mere bank account mein aa gaya.",
+      name: t("test_1_name"),
+      role: t("test_1_role"),
+      crop: t("test_1_crop"),
+      badge: t("badge_pmkisan_verified"),
+      text: t("test_1_text"),
       rating: 5,
     },
     {
-      name: "Priya Sharma",
-      role: "Urban Retail Consumer (बाणेर, पुणे)",
-      crop: "Weekly Organic Kitchen Basket",
-      badge: "Verified Buyer",
-      text: "Getting fresh vegetables harvested under 12 hours ago directly from farmers within 20km is incredible. The 4-digit delivery PIN gives complete peace of mind that my money is safe.",
+      name: t("test_2_name"),
+      role: t("test_2_role"),
+      crop: t("test_2_crop"),
+      badge: t("badge_buyer_verified"),
+      text: t("test_2_text"),
       rating: 5,
     },
     {
-      name: "Siddharth Verma",
-      role: "Procurement Lead (Hotel Annapurna)",
-      crop: "Bulk Onions & Vegetables",
-      badge: "Institutional Partner",
-      text: "We procure 300kg weekly directly from FPO collectives. Consistent OpenCV quality grading and GST compliant escrow settlement saved our restaurant chain 22% in procurement costs.",
+      name: t("test_3_name"),
+      role: t("test_3_role"),
+      crop: t("test_3_crop"),
+      badge: t("badge_institutional_partner"),
+      text: t("test_3_text"),
       rating: 5,
     },
   ];
@@ -152,26 +149,24 @@ export default function HomePage() {
           >
             <span className="size-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
             <span className="text-[10px] sm:text-xs font-bold tracking-tight text-emerald-900 truncate">
-              🟢 LIVE CLUSTER: 24 ACTIVE FARMS (&lt;25KM) • AVG DISPATCH: 8.4 HRS
+              {t("live_cluster_badge")}
             </span>
           </motion.div>
 
           {/* Headline & Value Proposition */}
           <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="space-y-3 sm:space-y-4 w-full min-w-0">
             <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight sm:leading-[1.12] break-words">
-              Bharat&apos;s Direct{" "}
+              {t("hero_headline_prefix")}{" "}
               <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-800 bg-clip-text text-transparent">
-                Farm-to-Kitchen
+                {t("hero_headline_gradient")}
               </span>{" "}
-              Highway.
+              {t("hero_headline_suffix")}
             </h1>
             <p className="text-xs sm:text-base font-semibold text-emerald-800 break-words">
-              भारत का अपना डिजिटल कृषि सेतु • किसान से सीधे उपभोक्ता एवं थोक बाज़ार तक
+              {t("hero_subheadline")}
             </p>
             <p className="mx-auto max-w-2xl text-xs sm:text-base text-slate-600 leading-relaxed px-1">
-              Disintermediating agricultural trade. Connect smallholder farmers directly with urban consumers,
-              retail grocers, and HoReCa buyers with vernacular voice AI, on-device OpenCV quality pre-check,
-              PostGIS hyperlocal matching, and guaranteed UPI escrow settlement.
+              {t("hero_description")}
             </p>
           </motion.div>
 
@@ -184,7 +179,7 @@ export default function HomePage() {
             >
               <Link href="/farmer">
                 <Sprout className="size-4.5 shrink-0" />
-                <span>Start Selling (फसल बेचें)</span>
+                <span>{t("btn_start_selling")}</span>
               </Link>
             </Button>
 
@@ -196,7 +191,7 @@ export default function HomePage() {
             >
               <Link href="/consumer">
                 <ShoppingBag className="size-4.5 text-emerald-700 shrink-0" />
-                <span>Shop Fresh Produce (उपज खरीदें)</span>
+                <span>{t("btn_shop_produce")}</span>
               </Link>
             </Button>
 
@@ -207,7 +202,7 @@ export default function HomePage() {
               className="w-full sm:w-auto text-slate-700 hover:bg-slate-100 gap-2 font-semibold text-xs sm:text-sm h-12 rounded-xl"
             >
               <Compass className="size-4 text-emerald-700 shrink-0" />
-              <span>How It Works (गाइड)</span>
+              <span>{t("btn_how_it_works")}</span>
             </Button>
           </div>
 
@@ -216,37 +211,37 @@ export default function HomePage() {
             <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-emerald-800 truncate">
                 <TrendingUp className="size-3 sm:size-3.5 text-emerald-600 shrink-0" />
-                <span className="truncate">Farmer Realization</span>
+                <span className="truncate">{t("stat_farmer_realization")}</span>
               </div>
-              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">+15% to +20%</p>
-              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">Recovers 35-50% middlemen cuts</p>
+              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_farmer_realization_val")}</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_farmer_realization_sub")}</p>
             </div>
 
             <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-teal-800 truncate">
                 <Clock className="size-3 sm:size-3.5 text-teal-600 shrink-0" />
-                <span className="truncate">Compressed Transit</span>
+                <span className="truncate">{t("stat_transit")}</span>
               </div>
-              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">&lt;12 to 24 Hrs</p>
-              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">PostGIS radius &lt;25km matching</p>
+              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_transit_val")}</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_transit_sub")}</p>
             </div>
 
             <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-blue-800 truncate">
                 <ShieldAlert className="size-3 sm:size-3.5 text-blue-600 shrink-0" />
-                <span className="truncate">Perishable Spoilage</span>
+                <span className="truncate">{t("stat_spoilage")}</span>
               </div>
-              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">-25% to -30%</p>
-              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">Direct farm-gate cold dispatch</p>
+              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_spoilage_val")}</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_spoilage_sub")}</p>
             </div>
 
             <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-amber-800 truncate">
                 <Lock className="size-3 sm:size-3.5 text-amber-600 shrink-0" />
-                <span className="truncate">Smart Escrow</span>
+                <span className="truncate">{t("stat_escrow")}</span>
               </div>
-              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">100% Protected</p>
-              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">Released upon delivery PIN</p>
+              <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_escrow_val")}</p>
+              <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_escrow_sub")}</p>
             </div>
           </div>
         </section>
@@ -256,7 +251,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2 mb-2 px-1">
             <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <h3 className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-700 truncate">
-              Live Mandi Price Benchmark vs Krishi Setu Farm-Gate Rates:
+              {t("ticker_title")}
             </h3>
           </div>
           <div className="w-full max-w-full min-w-0 overflow-x-auto no-scrollbar py-1">
@@ -284,10 +279,10 @@ export default function HomePage() {
         <section className="space-y-6">
           <div className="text-center space-y-1">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-              Ecosystem Portals & Actor Gateways
+              {t("ecosystem_title")}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              Select your role to access dedicated tools engineered for farmers, buyers, fleet partners, and administrators
+              {t("ecosystem_sub")}
             </p>
           </div>
 
@@ -381,7 +376,7 @@ export default function HomePage() {
 
                   <Button asChild variant="outline" size="sm" className="shrink-0 border-slate-300 text-slate-900 hover:bg-slate-100 gap-1.5 self-start sm:self-center h-10 rounded-xl">
                     <Link href={card.href} aria-label={card.ariaLabel}>
-                      <span>Explore Portal</span>
+                      <span>{card.ctaText}</span>
                       <ArrowRight className="size-3.5" />
                     </Link>
                   </Button>
@@ -397,10 +392,10 @@ export default function HomePage() {
             <div>
               <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-emerald-800">
                 <Sparkles className="size-3.5 text-emerald-700" />
-                Decentralized Agritech Infrastructure
+                {t("tech_infra_tag")}
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
-                How Krishi Setu Disintermediates Agricultural Trade
+                {t("tech_infra_title")}
               </h3>
             </div>
             <Button
@@ -408,7 +403,7 @@ export default function HomePage() {
               className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs gap-1.5 self-start sm:self-auto rounded-xl"
             >
               <Compass className="size-3.5" />
-              <span>Interactive Architecture Guide</span>
+              <span>{t("btn_arch_tour")}</span>
             </Button>
           </div>
 
@@ -416,30 +411,30 @@ export default function HomePage() {
             <div className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2">
               <strong className="text-slate-900 font-bold flex items-center gap-2 text-sm">
                 <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-                Zero Intermediaries (Pure P2P)
+                {t("tech_card1_title")}
               </strong>
               <p className="text-slate-600 leading-relaxed">
-                Eliminates multiple commission agent cuts. Direct farm-gate pickup completed within 12-24 hours.
+                {t("tech_card1_desc")}
               </p>
             </div>
 
             <div className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2">
               <strong className="text-slate-900 font-bold flex items-center gap-2 text-sm">
                 <Scan className="size-4 text-emerald-600 shrink-0" />
-                Edge OpenCV Pre-QC
+                {t("tech_card2_title")}
               </strong>
               <p className="text-slate-600 leading-relaxed">
-                Instant blur, brightness & resolution validation at the device edge, eliminating manual assayer delays.
+                {t("tech_card2_desc")}
               </p>
             </div>
 
             <div className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2">
               <strong className="text-slate-900 font-bold flex items-center gap-2 text-sm">
                 <Lock className="size-4 text-emerald-600 shrink-0" />
-                PostGIS & UPI Smart Escrow
+                {t("tech_card3_title")}
               </strong>
               <p className="text-slate-600 leading-relaxed">
-                Hyperlocal proximity (&lt;25km) matching coupled with escrow release exclusively upon 4-digit handover PIN.
+                {t("tech_card3_desc")}
               </p>
             </div>
           </div>
@@ -449,10 +444,10 @@ export default function HomePage() {
         <section className="space-y-6">
           <div className="text-center space-y-1">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-              Verified Farmer & Buyer Impact Stories
+              {t("testimonials_title")}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              Real-world results from farmers, grocers, and consumers across Maharashtra
+              {t("testimonials_sub")}
             </p>
           </div>
 
@@ -494,24 +489,24 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <ShieldCheck className="size-8 text-emerald-600 shrink-0" />
               <div>
-                <p className="font-bold text-xs sm:text-sm text-slate-900">DPDP Act 2023 Compliant</p>
-                <p className="text-[10px] text-slate-500">Digital Personal Data Protection for farmers</p>
+                <p className="font-bold text-xs sm:text-sm text-slate-900">{t("compliance_dpdp")}</p>
+                <p className="text-[10px] text-slate-500">{t("compliance_dpdp_sub")}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <Award className="size-8 text-teal-600 shrink-0" />
               <div>
-                <p className="font-bold text-xs sm:text-sm text-slate-900">PM-KISAN ID Verified</p>
-                <p className="text-[10px] text-slate-500">Authentic smallholder farmer verification</p>
+                <p className="font-bold text-xs sm:text-sm text-slate-900">{t("compliance_pmkisan")}</p>
+                <p className="text-[10px] text-slate-500">{t("compliance_pmkisan_sub")}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <Lock className="size-8 text-amber-600 shrink-0" />
               <div>
-                <p className="font-bold text-xs sm:text-sm text-slate-900">256-Bit Escrow Protection</p>
-                <p className="text-[10px] text-slate-500">Razorpay / UPI delivery-locked settlement</p>
+                <p className="font-bold text-xs sm:text-sm text-slate-900">{t("compliance_escrow")}</p>
+                <p className="text-[10px] text-slate-500">{t("compliance_escrow_sub")}</p>
               </div>
             </div>
           </div>
@@ -531,54 +526,54 @@ export default function HomePage() {
                 <span className="font-extrabold text-base text-slate-900 truncate">Krishi Setu (कृषि सेतु)</span>
               </div>
               <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
-                Bharat&apos;s direct farm-to-buyer digital highway empowering smallholder farmers, local retail grocers, and commercial buyers with transparent pricing and escrow safety.
+                {t("footer_tagline")}
               </p>
               <div className="flex items-center gap-2 pt-1 text-emerald-800 font-semibold text-[11px] sm:text-xs">
                 <PhoneCall className="size-3.5 text-emerald-600 shrink-0" />
-                <span>Kisan Helpline: 1800-180-1551 (Toll Free 24x7)</span>
+                <span>{t("footer_helpline")}</span>
               </div>
             </div>
 
             {/* Column 2: Portals */}
             <div className="space-y-2 min-w-0">
-              <p className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Ecosystem Portals</p>
+              <p className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">{t("footer_portals")}</p>
               <ul className="space-y-1.5 text-slate-600">
-                <li><Link href="/farmer" className="hover:text-emerald-700 transition-colors">Farmer Intake Engine</Link></li>
-                <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">Consumer Discovery</Link></li>
-                <li><Link href="/buyer/dashboard" className="hover:text-emerald-700 transition-colors">FPO Bulk Contracts</Link></li>
-                <li><Link href="/delivery" className="hover:text-emerald-700 transition-colors">Logistics & Fleet</Link></li>
-                <li><Link href="/admin" className="hover:text-emerald-700 transition-colors">Governance & Escrow</Link></li>
+                <li><Link href="/farmer" className="hover:text-emerald-700 transition-colors">{t("footer_link_farmer")}</Link></li>
+                <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">{t("footer_link_consumer")}</Link></li>
+                <li><Link href="/buyer/dashboard" className="hover:text-emerald-700 transition-colors">{t("footer_link_buyer")}</Link></li>
+                <li><Link href="/delivery" className="hover:text-emerald-700 transition-colors">{t("footer_link_delivery")}</Link></li>
+                <li><Link href="/admin" className="hover:text-emerald-700 transition-colors">{t("footer_link_admin")}</Link></li>
               </ul>
             </div>
 
             {/* Column 3: Platform Features */}
             <div className="space-y-2 min-w-0">
-              <p className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Core Innovations</p>
+              <p className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">{t("footer_innovations")}</p>
               <ul className="space-y-1.5 text-slate-600">
-                <li><Link href="/farmer" className="hover:text-emerald-700 transition-colors">Vernacular Voice AI</Link></li>
-                <li><Link href="/farmer" className="hover:text-emerald-700 transition-colors">OpenCV Edge QC</Link></li>
-                <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">PostGIS Proximity (&lt;25km)</Link></li>
-                <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">5-Factor Match Algorithm</Link></li>
-                <li><button onClick={() => setGuideModalOpen(true)} className="hover:text-emerald-700 transition-colors text-left">Architecture Tour</button></li>
+                <li><Link href="/farmer" className="hover:text-emerald-700 transition-colors">{t("footer_link_voice")}</Link></li>
+                <li><Link href="/farmer" className="hover:text-emerald-700 transition-colors">{t("footer_link_opencv")}</Link></li>
+                <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">{t("footer_link_proximity")}</Link></li>
+                <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">{t("footer_link_match")}</Link></li>
+                <li><button onClick={() => setGuideModalOpen(true)} className="hover:text-emerald-700 transition-colors text-left">{t("footer_link_arch")}</button></li>
               </ul>
             </div>
 
             {/* Column 4: Legal & Compliance */}
             <div className="space-y-2 min-w-0">
-              <p className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Compliance</p>
+              <p className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">{t("footer_compliance")}</p>
               <ul className="space-y-1.5 text-slate-600">
-                <li><span className="text-slate-700 font-medium">DPDP Act 2023 Compliant</span></li>
-                <li><span className="text-slate-700 font-medium">PM-KISAN Verified Ledger</span></li>
-                <li><span className="text-slate-700 font-medium">UPI 2.0 Escrow Settlement</span></li>
-                <li><span className="text-slate-700 font-medium">GST Invoicing for HoReCa</span></li>
+                <li><span className="text-slate-700 font-medium">{t("footer_legal_dpdp")}</span></li>
+                <li><span className="text-slate-700 font-medium">{t("footer_legal_pmkisan")}</span></li>
+                <li><span className="text-slate-700 font-medium">{t("footer_legal_escrow")}</span></li>
+                <li><span className="text-slate-700 font-medium">{t("footer_legal_gst")}</span></li>
               </ul>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100 pt-6 text-[11px] text-slate-500">
-            <p>© 2026 Krishi Setu Network (कृषि सेतु). Built for Indian Agriculture (Kisan Mitra).</p>
+            <p>{t("footer_copyright")}</p>
             <div className="flex items-center gap-4">
-              <span>Hyperlocal Proximity: Baner / Pune Node</span>
+              <span>{t("footer_node")}</span>
               <span>Language: {language === "en" ? "English" : "हिन्दी"}</span>
             </div>
           </div>
