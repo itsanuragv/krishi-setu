@@ -151,41 +151,54 @@ Respond with STRICT JSON adhering exactly to this structure (no markdown fences,
   "assayerVerificationId": "KS-QC-XXXXXX"
 }`;
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest"];
+    let rawJson: string | null = null;
 
-    const geminiRes = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: prompt },
+    for (const model of candidateModels) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const geminiRes = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
               {
-                inlineData: {
-                  mimeType,
-                  data: base64Data,
-                },
+                parts: [
+                  { text: prompt },
+                  {
+                    inlineData: {
+                      mimeType,
+                      data: base64Data,
+                    },
+                  },
+                ],
               },
             ],
-          },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.1,
-        },
-      }),
-    });
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.1,
+            },
+          }),
+        });
 
-    if (!geminiRes.ok) {
-      console.warn("Gemini Vision API call failed with status:", geminiRes.status, geminiRes.statusText);
-      return NextResponse.json(fallbackGrading(cropHint, language));
+        if (geminiRes.ok) {
+          const data = await geminiRes.json();
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          const textPart = parts.find((p: { text?: string; thought?: boolean }) => p.text && !p.thought) || parts[parts.length - 1];
+          if (textPart?.text) {
+            rawJson = textPart.text;
+            break;
+          }
+        } else {
+          console.warn(`Gemini Vision model ${model} returned status:`, geminiRes.status, geminiRes.statusText);
+        }
+      } catch (callErr) {
+        console.warn(`Gemini Vision model ${model} invocation error:`, callErr);
+      }
     }
 
-    const data = await geminiRes.json();
-    const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
     if (!rawJson) {
+      console.warn("All Gemini Vision models failed or returned empty text. Using assayer fallback.");
       return NextResponse.json(fallbackGrading(cropHint, language));
     }
 

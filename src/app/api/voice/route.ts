@@ -152,35 +152,57 @@ Return STRICTLY JSON:
   }
 }`;
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest"];
+    let rawJson: string | null = null;
 
-    const geminiRes = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.1,
-        },
-      }),
-    });
+    for (const model of candidateModels) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const geminiRes = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.1,
+            },
+          }),
+        });
 
-    if (!geminiRes.ok) {
-      console.warn("Gemini API call failed, falling back to local NLP:", geminiRes.statusText);
-      const fallbackResult = fallbackRuleBased(text, language);
-      return NextResponse.json(fallbackResult);
+        if (geminiRes.ok) {
+          const data = await geminiRes.json();
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          const textPart = parts.find((p: { text?: string; thought?: boolean }) => p.text && !p.thought) || parts[parts.length - 1];
+          if (textPart?.text) {
+            rawJson = textPart.text;
+            break;
+          }
+        } else {
+          console.warn(`Gemini model ${model} returned status:`, geminiRes.status, geminiRes.statusText);
+        }
+      } catch (callErr) {
+        console.warn(`Gemini model ${model} invocation failed:`, callErr);
+      }
     }
-
-    const data = await geminiRes.json();
-    const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!rawJson) {
+      console.warn("All Gemini models failed or returned empty text. Using fallback rule-based NLP.");
       const fallbackResult = fallbackRuleBased(text, language);
       return NextResponse.json(fallbackResult);
     }
 
-    const parsed = JSON.parse(rawJson) as GeminiVoiceResponse;
+    let cleaned = rawJson.trim();
+    if (cleaned.startsWith("```")) {
+      cleaned = cleaned.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    }
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+    }
+
+    const parsed = JSON.parse(cleaned) as GeminiVoiceResponse;
     return NextResponse.json(parsed);
   } catch (error) {
     console.error("Voice assistant endpoint error:", error);
