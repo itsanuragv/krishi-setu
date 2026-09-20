@@ -234,17 +234,69 @@ export const TRANSLATIONS: Translations = {
     en: "Grade A Verified",
     hi: "ग्रेड ए सत्यापित",
   },
+  ai_crop_grading_title: {
+    en: "AI Produce Quality & Grading",
+    hi: "एआई फसल गुणवत्ता एवं ग्रेडिंग",
+  },
+  ai_crop_grading_sub: {
+    en: "Multimodal vision analyzing maturity, defects & APMC standards",
+    hi: "मल्टीमॉडल विज़न द्वारा परिपक्वता, दोष व एपीएमसी ग्रेड की जांच",
+  },
+  analyzing_produce_ai: {
+    en: "AI Assayer inspecting crop...",
+    hi: "एआई परीक्षक फसल की जांच कर रहा है...",
+  },
+  tier1_passed_tag: {
+    en: "Tier 1: Focus & Lighting OK",
+    hi: "चरण 1: शार्पनेस व प्रकाश सही",
+  },
+  tier2_graded_tag: {
+    en: "Tier 2: AI Quality Graded",
+    hi: "चरण 2: एआई गुणवत्ता जांची गई",
+  },
+  ripeness_label: {
+    en: "Ripeness",
+    hi: "पकाव स्तर",
+  },
+  defect_label: {
+    en: "Defects / Blemishes",
+    hi: "सतही दोष",
+  },
+  shelf_life_label: {
+    en: "Est. Shelf Life",
+    hi: "शेल्फ लाइफ",
+  },
+  market_fit_label: {
+    en: "Best Market Fit",
+    hi: "उपयुक्त बाज़ार",
+  },
+  assayer_notes_title: {
+    en: "AI Assayer Notes (किसान सलाह)",
+    hi: "एआई परीक्षक सलाह (किसान मित्र)",
+  },
+  btn_listen_report: {
+    en: "Listen to AI Report",
+    hi: "रिपोर्ट सुनें",
+  },
+  btn_stop_audio: {
+    en: "Stop Audio",
+    hi: "आवाज़ रोकें",
+  },
+  price_premium_label: {
+    en: "Price Premium",
+    hi: "मूल्य लाभ",
+  },
   test_sample_crops: {
     en: "Test Sample Crops:",
     hi: "नमूना फसलें जांचें:",
   },
   tech_advantage_title: {
-    en: "Technical Advantage: Client-Side Edge QC",
-    hi: "तकनीकी लाभ: क्लाइंट-साइड एज क्यूसी",
+    en: "Technical Advantage: Two-Tier Hybrid QC",
+    hi: "तकनीकी लाभ: दोहरा हाइब्रिड गुणवत्ता ढांचा",
   },
   tech_advantage_desc: {
-    en: "By performing Laplacian variance edge detection inside the client browser, Krishi Setu eliminates heavy image uploads over 2G/3G rural networks, saving mobile data for smallholders while ensuring quality verification before dispatch.",
-    hi: "ब्राउज़र में लाप्लासियन वैरियंस एज डिटेक्शन चलाकर, कृषि सेतु ग्रामीण 2G/3G नेटवर्क पर भारी इमेज अपलोड से बचाता है, जिससे किसानों का मोबाइल डेटा बचता है और गुणवत्ता सुनिश्चित होती है।",
+    en: "Tier 1 client-side OpenCV verifies camera focus and lighting on-device to save rural mobile data. Tier 2 Gemini 1.5 Flash Multimodal Vision evaluates ripeness, cosmetic blemishes, and AGMARK/APMC commercial grade.",
+    hi: "चरण 1 में क्लाइंट-साइड ओपनसीवी मोबाइल डेटा बचाने हेतु फोकस व रोशनी की तुरंत जांच करता है। चरण 2 में जेमिनी 1.5 फ्लैश विज़न एआई फसल के पकाव, दाग-धब्बे और व्यापारिक ग्रेड का सटीक मूल्यांकन करता है।",
   },
   network_overhead: {
     en: "Network Overhead: <10 KB",

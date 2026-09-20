@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Navbar } from "@/components/shared/Navbar";
-import { OpenCVScan } from "@/components/shared/OpenCVScan";
+import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan";
 import { VoiceModal } from "@/components/shared/VoiceModal";
 import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
@@ -37,6 +37,7 @@ export default function FarmerPortalPage() {
   const [floorPrice, setFloorPrice] = useState<number | "">("");
   const [isTyping, setIsTyping] = useState(false);
   const [isListed, setIsListed] = useState(false);
+  const [scannedGrade, setScannedGrade] = useState<CropGradingData | null>(null);
   
   // Listings list
   const [listings, setListings] = useState<ProduceListing[]>(MOCK_PRODUCE_LISTINGS.slice(0, 3));
@@ -76,12 +77,35 @@ export default function FarmerPortalPage() {
     }, 45);
   };
 
+  const handleScanComplete = (results: {
+    blurScore: number;
+    brightness: number;
+    resolution: string;
+    passed: boolean;
+    grading?: CropGradingData;
+  }) => {
+    if (results.grading) {
+      setScannedGrade(results.grading);
+      // Auto-populate or assist form input with AI detected crop and variety
+      setCropName(results.grading.cropName);
+      setVariety(results.grading.variety);
+      toast.success(
+        language === "hi"
+          ? `एआई ग्रेडिंग: ${results.grading.cropName} (${results.grading.grade}) फॉर्म में दर्ज हुआ!`
+          : `AI Grading: ${results.grading.cropName} (${results.grading.grade}) applied to listing form!`
+      );
+    }
+  };
+
   const handleAutoList = (e: React.FormEvent) => {
     e.preventDefault();
     if (!cropName || !quantity || !floorPrice) {
       toast.error("Please fill or voice-populate crop details");
       return;
     }
+
+    const appliedGrade = scannedGrade?.grade || "Grade A";
+    const appliedVerif = scannedGrade?.assayerVerificationId || "KS-QC-748291";
 
     const newListing: ProduceListing = {
       id: `prod-${Date.now()}`,
@@ -102,7 +126,11 @@ export default function FarmerPortalPage() {
       breakdown: {
         priceIndex: { score: 98, detail: "31% below APMC Mandi rates" },
         distance: { score: 97, detail: "5.4 km hyperlocal farm radius" },
-        qualityGrade: { score: 99, detail: "Grade A OpenCV client pre-check passed", grade: "Grade A" },
+        qualityGrade: { 
+          score: appliedGrade === "Grade A" ? 99 : appliedGrade === "Grade B" ? 93 : 84, 
+          detail: `${appliedGrade} Gemini Vision Assayed (${appliedVerif})`, 
+          grade: appliedGrade 
+        },
         quantityFit: { score: 96, detail: "Direct fit for consumer & retail batch" },
         reliability: { score: 99, detail: "4.9★ PM-KISAN Verified Ledger", rating: 4.9 },
       },
@@ -110,7 +138,7 @@ export default function FarmerPortalPage() {
         blurScore: 94,
         brightnessPct: 88,
         resolution: "1080p Verified",
-        status: "Passed Pre-Check - Auto-Listed",
+        status: `Assayed ${appliedGrade} - Auto-Listed`,
       },
     };
 
@@ -420,7 +448,7 @@ export default function FarmerPortalPage() {
 
           {/* Right Column: OpenCV Laser Scanner (5 Cols) */}
           <div className="lg:col-span-5 space-y-6">
-            <OpenCVScan />
+            <OpenCVScan onScanComplete={handleScanComplete} />
 
             {/* Edge Computing Architecture Callout Box */}
             <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3">

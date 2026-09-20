@@ -25,7 +25,7 @@ export interface ProduceListing {
     blurScore: number; // 0-100
     brightnessPct: number; // 0-100
     resolution: string;
-    status: "Passed Pre-Check - Auto-Listed" | "Review Required";
+    status: "Passed Pre-Check - Auto-Listed" | "Review Required" | string;
   };
 }
 

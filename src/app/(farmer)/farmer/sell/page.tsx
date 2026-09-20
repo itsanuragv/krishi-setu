@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { getSpeechRecognition, type SpeechRecognitionInstance, type SpeechRecognitionEvent, type SpeechRecognitionErrorEvent } from "@/lib/speech-types";
+import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan";
 
 const STEPS = ["Details", "Grade & harvest", "Photos", "Review"];
 
@@ -358,17 +359,45 @@ export default function SellPage() {
           )}
 
           {step === 2 && (
-            <div className="space-y-3">
-              <Label className="text-xs font-bold text-slate-700">Produce Verification Photos (Max 4)</Label>
-              <p className="text-xs text-muted-foreground">
-                Photos are compressed automatically on your device before upload to save mobile data.
-              </p>
-              <label className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/40 p-6 text-center cursor-pointer hover:bg-emerald-50 transition-colors">
-                <Camera className="size-8 text-emerald-600 mb-1" />
-                <span className="text-xs font-bold text-emerald-800">Take Live Photo or Upload</span>
-                <span className="text-[11px] text-slate-500">Auto-compressed at edge</span>
-                <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
-              </label>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs font-bold text-slate-700">
+                  {language === "hi" ? "फसल फोटो व एआई गुणवत्ता सत्यापन" : "Produce Photos & AI Quality Grading"}
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {language === "hi"
+                    ? "ओपनसीवी और जेमिनी एआई द्वारा फोटो से गुणवत्ता, ग्रेड और शेल्फ लाइफ का तुरंत पता लगाएं।"
+                    : "Two-tier verification: OpenCV edge focus check + Gemini Vision APMC grading."}
+                </p>
+              </div>
+
+              {/* Integrated AI Produce Scanner */}
+              <OpenCVScan 
+                onScanComplete={(res) => {
+                  if (res.grading) {
+                    const gradeVal = res.grading.grade === "Grade B" ? "B" : res.grading.grade === "Grade C" ? "C" : "A";
+                    form.setValue("grade", gradeVal);
+                    if (!form.getValues("crop")) form.setValue("crop", res.grading.cropName);
+                    if (!form.getValues("variety")) form.setValue("variety", res.grading.variety);
+                    form.setValue("description", `${language === "hi" ? res.grading.feedbackHi : res.grading.feedbackEn} [Assayed ID: ${res.grading.assayerVerificationId}]`);
+                  }
+                }}
+              />
+
+              <div className="pt-2">
+                <Label className="text-xs font-bold text-slate-700">
+                  {language === "hi" ? "अतिरिक्त तस्वीरें अपलोड करें (अधिकतम 4)" : "Upload Additional Produce Photos (Max 4)"}
+                </Label>
+                <label className="mt-2 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/40 p-4 text-center cursor-pointer hover:bg-emerald-50 transition-colors">
+                  <Camera className="size-6 text-emerald-600 mb-1" />
+                  <span className="text-xs font-bold text-emerald-800">
+                    {language === "hi" ? "गैलरी से चुनें या फोटो खींचें" : "Choose from Gallery or Camera"}
+                  </span>
+                  <span className="text-[11px] text-slate-500">Auto-compressed at edge (&lt;400KB)</span>
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
+                </label>
+              </div>
+
               {photos.length > 0 && (
                 <div className="grid grid-cols-3 gap-2">
                   {photos.map((u, i) => (
