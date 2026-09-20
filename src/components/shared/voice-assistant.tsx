@@ -10,7 +10,11 @@ import {
   Languages, 
   Sparkles, 
   X, 
-  Bot 
+  Bot,
+  RotateCcw,
+  Radio,
+  ArrowRight,
+  ChevronDown
 } from "lucide-react";
 import { toast } from "sonner";
 import { 
@@ -20,84 +24,280 @@ import {
   type SpeechRecognitionErrorEvent 
 } from "@/lib/speech-types";
 
+interface Message {
+  id: string;
+  role: "user" | "gemini";
+  text: string;
+  time: string;
+  intent?: string;
+  route?: string;
+  suggestedActions?: Array<{
+    label: string;
+    action: "navigate" | "speak" | "fill";
+    route?: string;
+    speakText?: string;
+  }>;
+}
+
+// Play pleasant Google-style chimes via Web Audio API without external assets
+function playAssistantChime(type: "start" | "reply" | "stop") {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    
+    if (type === "start") {
+      // Soft ascending chime: C5 (523Hz) -> E5 (659Hz)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.14);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } else if (type === "reply") {
+      // Gemini ready chime: G5 (784Hz) -> C6 (1046Hz)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0.09, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.frequency.setValueAtTime(783.99, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1046.5, ctx.currentTime + 0.16);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.36);
+    }
+  } catch {
+    // Ignore audio context autoplay restrictions
+  }
+}
+
+// Find optimal native voice for Hindi/English
+function getBestVoice(lang: "hi-IN" | "en-IN"): SpeechSynthesisVoice | null {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || voices.length === 0) return null;
+
+  if (lang === "hi-IN") {
+    // 1. Google हिन्दी or Microsoft Swara/Madhur Natural
+    const hiVoice = voices.find(v => 
+      v.lang.toLowerCase().startsWith("hi") && 
+      (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Swara") || v.name.includes("Madhur"))
+    );
+    if (hiVoice) return hiVoice;
+    const genericHi = voices.find(v => v.lang.toLowerCase().startsWith("hi"));
+    if (genericHi) return genericHi;
+  }
+
+  // English fallback or en-IN
+  const enIndian = voices.find(v => 
+    v.lang.toLowerCase().includes("en-in") || 
+    v.name.includes("Neerja") || 
+    v.name.includes("Prabhat")
+  );
+  if (enIndian) return enIndian;
+
+  const enNatural = voices.find(v => 
+    v.lang.toLowerCase().startsWith("en") && 
+    (v.name.includes("Natural") || v.name.includes("Google") || v.name.includes("Jenny"))
+  );
+  return enNatural || voices[0] || null;
+}
+
 export function VoiceAssistant() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [liveMode, setLiveMode] = useState(false); // Hands-free continuous Gemini Live
   const [language, setLanguage] = useState<"hi-IN" | "en-IN">("hi-IN");
   const [audioFeedbackEnabled, setAudioFeedbackEnabled] = useState(true);
-  const [transcript, setTranscript] = useState("");
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
   
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  // Real-time speech streaming
+  const [interimTranscript, setInterimTranscript] = useState("");
+  const [finalTranscript, setFinalTranscript] = useState("");
 
-  // Speech synthesis (TTS)
-  const speak = useCallback((text: string, lang: "hi-IN" | "en-IN") => {
-    if (!audioFeedbackEnabled || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  // Conversational message history
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "intro-1",
+      role: "gemini",
+      text: "नमस्ते! मैं आपका कृषि सेतु जेमिनी असिस्टेंट हूँ। आप फसल बेचने, खरीदने या मंडी भाव जानने के लिए बोल सकते हैं।",
+      time: "अभी",
+      suggestedActions: [
+        { label: "फसल बेचें (Sell)", action: "speak", speakText: "मुझे 50 किलो टमाटर बेचना है" },
+        { label: "मंडी भाव जानें", action: "speak", speakText: "आज के प्रमुख मंडी भाव क्या हैं?" },
+        { label: "किसान पोर्टल खोलें", action: "navigate", route: "/farmer" }
+      ]
+    }
+  ]);
+
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-scroll chat to latest message
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [messages, interimTranscript, isThinking]);
+
+  // Voice synthesis with best native voice matching
+  const speak = useCallback((text: string, lang: "hi-IN" | "en-IN", onComplete?: () => void) => {
+    if (!audioFeedbackEnabled || typeof window === "undefined" || !("speechSynthesis" in window)) {
+      if (onComplete) onComplete();
+      return;
+    }
+
     try {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
+      utterance.rate = 1.0;
+      utterance.pitch = 1.02;
+
+      const chosenVoice = getBestVoice(lang);
+      if (chosenVoice) {
+        utterance.voice = chosenVoice;
+      }
+
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+      };
+
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        if (onComplete) onComplete();
+      };
+
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        if (onComplete) onComplete();
+      };
+
       window.speechSynthesis.speak(utterance);
     } catch {
-      // Ignore audio synthesis errors on restricted environments
+      setIsSpeaking(false);
+      if (onComplete) onComplete();
     }
   }, [audioFeedbackEnabled]);
 
-  // Process speech using Gemini AI endpoint
-  const processWithGeminiAI = useCallback(async (inputText: string) => {
+  // Stop speaking on barge-in
+  const stopSpeaking = useCallback(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  }, []);
+
+  // Process speech with Gemini backend
+  const processWithGemini = useCallback(async (userText: string) => {
+    if (!userText.trim()) return;
+
+    stopSpeaking();
     setIsListening(false);
+    setInterimTranscript("");
     setIsThinking(true);
 
+    const userMsgId = `user-${Date.now()}`;
+    const userMsg: Message = {
+      id: userMsgId,
+      role: "user",
+      text: userText.trim(),
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+
     try {
+      // Build conversation history payload
+      const historyPayload = messages.slice(-5).map(m => ({
+        role: m.role === "gemini" ? "assistant" as const : "user" as const,
+        text: m.text,
+      }));
+
       const res = await fetch("/api/voice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText, language }),
+        body: JSON.stringify({
+          text: userText,
+          language,
+          history: historyPayload,
+        }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to process speech");
-      }
+      if (!res.ok) throw new Error("Gemini speech endpoint failed");
 
       const data = await res.json();
-      setAiResponse(data.spokenResponse);
-      speak(data.spokenResponse, language);
+      playAssistantChime("reply");
 
-      // Execute actionable intent
-      if (data.intent === "LIST_CROP" && data.route) {
-        toast.success(`Gemini AI: ${data.spokenResponse}`);
-        setTimeout(() => {
-          router.push(data.route);
-          setIsOpen(false);
-        }, 1200);
-      } else if (data.intent === "SEARCH_PRODUCE") {
-        const query = data.searchQuery?.query || "";
-        toast.success(`Searching: ${query}`);
-        setTimeout(() => {
-          router.push(query ? `/consumer/search?q=${encodeURIComponent(query)}` : "/consumer");
-          setIsOpen(false);
-        }, 1200);
-      } else if (data.intent === "NAVIGATE" && data.route) {
-        setTimeout(() => {
-          router.push(data.route);
-          setIsOpen(false);
-        }, 1000);
+      const geminiMsg: Message = {
+        id: `gemini-${Date.now()}`,
+        role: "gemini",
+        text: data.spokenResponse || "आदेश समझ लिया गया है।",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        intent: data.intent,
+        route: data.route,
+        suggestedActions: data.suggestedActions,
+      };
+
+      setMessages((prev) => [...prev, geminiMsg]);
+
+      // Speak response with auto-resume in liveMode
+      speak(geminiMsg.text, language, () => {
+        if (liveMode) {
+          setTimeout(() => {
+            if (recognitionRef.current && isOpen) {
+              try {
+                recognitionRef.current.start();
+                setIsListening(true);
+                playAssistantChime("start");
+              } catch {
+                // Ignore start collision
+              }
+            }
+          }, 400);
+        }
+      });
+
+      // Execute auto-action for high-confidence intents if not in multi-turn conversation mode
+      if (data.intent === "LIST_CROP" && data.route && !data.clarificationNeeded) {
+        toast.success(`Gemini: ${data.spokenResponse}`);
+      } else if (data.intent === "SEARCH_PRODUCE" && data.route) {
+        const query = data.searchQuery?.query;
+        if (query) toast.success(`खोज रहे हैं: ${query}`);
       }
     } catch (err) {
-      console.error("Gemini voice processing error:", err);
-      const fallbackMsg = language === "hi-IN" ? "आदेश समझा गया।" : "Command received.";
-      setAiResponse(fallbackMsg);
-      speak(fallbackMsg, language);
+      console.error("Gemini voice error:", err);
+      const fallbackReply = language === "hi-IN" 
+        ? "जी, आपका संदेश प्राप्त हो गया है। आप क्या सहायता चाहते हैं?" 
+        : "Message received. How can I assist you further?";
+      
+      setMessages((prev) => [
+        ...prev, 
+        {
+          id: `gemini-${Date.now()}`,
+          role: "gemini",
+          text: fallbackReply,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        }
+      ]);
+      speak(fallbackReply, language);
     } finally {
       setIsThinking(false);
     }
-  }, [language, router, speak]);
+  }, [language, liveMode, messages, speak, stopSpeaking, isOpen]);
 
-  // Listen for custom trigger event from navbar or any page button
+  // Handle external trigger event
   useEffect(() => {
     function handleOpenEvent() {
       setIsOpen(true);
@@ -108,26 +308,51 @@ export function VoiceAssistant() {
     };
   }, []);
 
-  // Initialize SpeechRecognition
+  // Initialize SpeechRecognition with streaming interim results
   useEffect(() => {
     const SpeechRecognition = getSpeechRecognition();
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.lang = language;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const text = event.results[0][0].transcript;
-      setTranscript(text);
-      processWithGeminiAI(text);
+      let interim = "";
+      let final = "";
+
+      const startIndex = event.resultIndex ?? 0;
+      for (let i = startIndex; i < event.results.length; ++i) {
+        const item = event.results[i];
+        if (item.isFinal) {
+          final += item[0].transcript;
+        } else {
+          interim += item[0].transcript;
+        }
+      }
+
+      if (interim) {
+        setInterimTranscript(interim);
+      }
+
+      if (final) {
+        setFinalTranscript(final);
+        setInterimTranscript("");
+        
+        // Auto-debounce: send after user pauses speech
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = setTimeout(() => {
+          recognition.stop();
+          processWithGemini(final);
+        }, 1100);
+      }
     };
 
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
       setIsListening(false);
       if (e.error !== "no-speech") {
-        toast.error(`Voice Error: ${e.error}`);
+        toast.error(`Mic: ${e.error}`);
       }
     };
 
@@ -139,23 +364,30 @@ export function VoiceAssistant() {
 
     return () => {
       recognition.stop();
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     };
-  }, [language, processWithGeminiAI]);
+  }, [language, processWithGemini]);
 
-  // Toggle Voice Capture
+  // Toggle voice recognition
   function toggleListening() {
+    stopSpeaking();
+
     if (!recognitionRef.current) {
-      toast.error("Web Speech Recognition is not supported by your browser. Please use Google Chrome or Edge, or select from sample prompts.");
+      toast.error("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
       return;
     }
 
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
+      if (interimTranscript) {
+        processWithGemini(interimTranscript);
+      }
     } else {
-      setTranscript("");
-      setAiResponse(null);
+      setInterimTranscript("");
+      setFinalTranscript("");
       try {
+        playAssistantChime("start");
         recognitionRef.current.start();
         setIsListening(true);
       } catch {
@@ -165,124 +397,165 @@ export function VoiceAssistant() {
     }
   }
 
-  const SAMPLE_VOICE_COMMANDS = [
-    {
-      label: "फसल बेचें (List Produce)",
-      text: "50 किलो टमाटर 40 रुपये किलो बेचना है",
-      icon: "🌾",
-    },
-    {
-      label: "ताजा सब्जी खोजें (Find Produce)",
-      text: "नासिक के ताज़ा प्याज दिखाओ",
-      icon: "🛒",
-    },
-    {
-      label: "किसान पोर्टल (Farmer Dashboard)",
-      text: "किसान पोर्टल खोलो",
-      icon: "📊",
-    },
-    {
-      label: "डिलीवरी फ्लीट (Delivery Fleet)",
-      text: "डिलीवरी रूट और पिन वेरिफिकेशन दिखाओ",
-      icon: "🚚",
-    },
-  ];
+  // Switch language
+  function handleLanguageChange(newLang: "hi-IN" | "en-IN") {
+    setLanguage(newLang);
+    if (newLang === "hi-IN") {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `sys-${Date.now()}`,
+          role: "gemini",
+          text: "भाषा हिन्दी पर सेट हो गई है। आप अपनी स्थानीय भाषा में बोल सकते हैं।",
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        }
+      ]);
+      speak("भाषा हिन्दी पर सेट हो गई है।", "hi-IN");
+    } else {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `sys-${Date.now()}`,
+          role: "gemini",
+          text: "Language switched to English. Feel free to speak your queries.",
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        }
+      ]);
+      speak("Language switched to English.", "en-IN");
+    }
+  }
 
   return (
     <>
-      {/* Global Persistent Floating Microphone Trigger */}
-      <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2 animate-in fade-in duration-300">
+      {/* 1. Floating Gemini Live Capsule Button */}
+      <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 flex items-center animate-in fade-in slide-in-from-bottom-4 duration-300">
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
-          aria-label="Open Kisan Voice Assistant"
-          className="group relative flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-xl hover:scale-105 active:scale-95 transition-transform touch-target border-2 border-white/80"
-          title="Kisan Voice Saathi (किसान वाणी)"
+          onClick={() => {
+            setIsOpen(true);
+            toggleListening();
+          }}
+          aria-label="Open Gemini Live Assistant"
+          className="group relative flex items-center gap-3 rounded-full bg-slate-950/90 text-white pl-3.5 pr-4 py-2.5 shadow-2xl border border-indigo-500/30 hover:border-indigo-400 backdrop-blur-md hover:scale-105 active:scale-95 transition-all"
         >
-          {/* Subtle pulse ripple */}
-          <span className="absolute -inset-1 rounded-full bg-emerald-500/30 animate-ping pointer-events-none" />
-          <Mic className="size-6 text-white group-hover:scale-110 transition-transform" />
-          <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-amber-400 text-[9px] font-black text-slate-900 border border-white">
-            AI
-          </span>
+          {/* Iridescent Aurora Glow Ring */}
+          <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-violet-600 via-cyan-500 to-emerald-500 opacity-60 blur-xs group-hover:opacity-90 transition-opacity" />
+
+          {/* Glowing Animated Gemini Core */}
+          <div className="relative flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 via-violet-600 to-cyan-500 text-white shadow-inner">
+            <Sparkles className="size-4 animate-pulse text-amber-200" />
+          </div>
+
+          <div className="relative text-left">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-black tracking-wide text-white">Gemini Live</span>
+              <span className="flex size-2 rounded-full bg-emerald-400 animate-ping" />
+            </div>
+            <p className="text-[10px] text-slate-300 font-medium leading-none">किसान वाणी</p>
+          </div>
         </button>
       </div>
 
-      {/* Voice Assistant Sheet / Modal Dialog */}
+      {/* 2. Full-Screen / Modal Gemini Live Experience */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 sm:p-4 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-3xl border border-emerald-200 bg-white p-5 sm:p-7 shadow-2xl space-y-6">
-            {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md">
-                  <Bot className="size-5" />
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/80 p-0 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative flex flex-col w-full h-[88vh] sm:h-[620px] max-w-lg rounded-t-3xl sm:rounded-3xl border border-slate-700/60 bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white shadow-2xl overflow-hidden">
+            
+            {/* Top Bar Header */}
+            <div className="flex items-center justify-between border-b border-slate-800/80 px-5 py-4 bg-slate-900/60 backdrop-blur-md">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 shadow-md">
+                  <Sparkles className="size-5 text-white" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
-                      Kisan Voice Saathi (किसान वाणी)
+                    <h2 className="text-sm sm:text-base font-black text-white tracking-wide">
+                      Gemini Live <span className="text-cyan-400">किसान वाणी</span>
                     </h2>
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 border border-emerald-200">
-                      Gemini AI Voice
+                    <span className="rounded-full bg-cyan-950 border border-cyan-800/60 px-2 py-0.5 text-[9px] font-bold text-cyan-300 tracking-wider">
+                      3.6 FLASH
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Speak naturally in Hindi or English to list, search, or navigate
+                  <p className="text-[11px] text-slate-400">
+                    Real-time Vernacular Voice Assistant
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
-                {/* Audio readout mute/unmute toggle */}
+              {/* Controls: Mute, Live Mode, Close */}
+              <div className="flex items-center gap-1.5">
+                {/* Hands-Free Live Mode Toggle */}
                 <button
                   type="button"
-                  onClick={() => setAudioFeedbackEnabled((v) => !v)}
-                  title={audioFeedbackEnabled ? "Mute audio response" : "Enable voice audio"}
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                  onClick={() => setLiveMode(v => !v)}
+                  title={liveMode ? "Hands-free continuous mode ON" : "Turn continuous mode ON"}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] font-bold border transition-colors ${
+                    liveMode 
+                      ? "bg-emerald-950/80 border-emerald-500 text-emerald-300" 
+                      : "bg-slate-800/60 border-slate-700 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Radio className={`size-3 ${liveMode ? "animate-pulse text-emerald-400" : ""}`} />
+                  <span>Live</span>
+                </button>
+
+                {/* Audio Feedback Toggle */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isSpeaking) stopSpeaking();
+                    setAudioFeedbackEnabled(v => !v);
+                  }}
+                  className="rounded-full p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                  title={audioFeedbackEnabled ? "Mute audio" : "Unmute audio"}
                 >
                   {audioFeedbackEnabled ? (
-                    <Volume2 className="size-4.5 text-emerald-600" />
+                    <Volume2 className="size-4 text-cyan-400" />
                   ) : (
-                    <VolumeX className="size-4.5 text-slate-400" />
+                    <VolumeX className="size-4 text-slate-500" />
                   )}
                 </button>
 
+                {/* Close Button */}
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                  onClick={() => {
+                    stopSpeaking();
+                    if (recognitionRef.current) recognitionRef.current.stop();
+                    setIsOpen(false);
+                  }}
+                  className="rounded-full p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                 >
                   <X className="size-5" />
                 </button>
               </div>
             </div>
 
-            {/* Language Selector */}
-            <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2 border border-slate-200/80 text-xs">
-              <span className="text-slate-600 font-semibold px-2 flex items-center gap-1.5">
-                <Languages className="size-3.5 text-emerald-600" />
+            {/* Language Selector Strip */}
+            <div className="flex items-center justify-between px-5 py-2 bg-slate-950/70 border-b border-slate-800/40 text-xs">
+              <span className="text-slate-400 flex items-center gap-1 text-[11px]">
+                <Languages className="size-3.5 text-violet-400" />
                 Voice Language:
               </span>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => setLanguage("hi-IN")}
-                  className={`rounded-lg px-3 py-1 font-bold transition-all ${
+                  onClick={() => handleLanguageChange("hi-IN")}
+                  className={`rounded-full px-3 py-0.5 text-[11px] font-bold transition-all ${
                     language === "hi-IN"
-                      ? "bg-emerald-600 text-white shadow-xs"
-                      : "text-slate-600 hover:bg-slate-200"
+                      ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-xs"
+                      : "text-slate-400 hover:text-slate-200"
                   }`}
                 >
                   हिन्दी (Hindi)
                 </button>
                 <button
                   type="button"
-                  onClick={() => setLanguage("en-IN")}
-                  className={`rounded-lg px-3 py-1 font-bold transition-all ${
+                  onClick={() => handleLanguageChange("en-IN")}
+                  className={`rounded-full px-3 py-0.5 text-[11px] font-bold transition-all ${
                     language === "en-IN"
-                      ? "bg-emerald-600 text-white shadow-xs"
-                      : "text-slate-600 hover:bg-slate-200"
+                      ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-xs"
+                      : "text-slate-400 hover:text-slate-200"
                   }`}
                 >
                   English
@@ -290,101 +563,188 @@ export function VoiceAssistant() {
               </div>
             </div>
 
-            {/* Central Interactive Microphone & Soundwave Visualizer */}
-            <div className="flex flex-col items-center justify-center py-4 space-y-4">
-              <div className="relative flex items-center justify-center">
-                {/* Active Ripple rings */}
+            {/* Conversational Scrollable Message Feed */}
+            <div 
+              ref={chatScrollRef}
+              className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 scrollbar-thin scrollbar-thumb-slate-800"
+            >
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed shadow-md ${
+                      m.role === "user"
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-tr-xs"
+                        : "bg-slate-800/90 border border-slate-700/70 text-slate-100 rounded-tl-xs"
+                    }`}
+                  >
+                    {/* Header badge */}
+                    <div className="flex items-center gap-1.5 mb-1 opacity-70 text-[10px] font-bold uppercase tracking-wider">
+                      {m.role === "user" ? (
+                        <span>आप (You)</span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-cyan-300">
+                          <Sparkles className="size-2.5" />
+                          Gemini 3.6 Flash
+                        </span>
+                      )}
+                      <span>•</span>
+                      <span>{m.time}</span>
+                    </div>
+
+                    <p className="whitespace-pre-wrap">{m.text}</p>
+
+                    {/* Action Chips */}
+                    {m.suggestedActions && m.suggestedActions.length > 0 && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-700/60 flex flex-wrap gap-1.5">
+                        {m.suggestedActions.map((act, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              if (act.action === "navigate" && act.route) {
+                                router.push(act.route);
+                                setIsOpen(false);
+                              } else if (act.speakText) {
+                                processWithGemini(act.speakText);
+                              }
+                            }}
+                            className="flex items-center gap-1 rounded-full bg-slate-900/90 hover:bg-indigo-950 border border-slate-700 hover:border-indigo-500 px-2.5 py-1 text-[11px] font-semibold text-slate-200 hover:text-white transition-colors"
+                          >
+                            <span>{act.label}</span>
+                            <ArrowRight className="size-3 text-cyan-400" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Streaming Interim Transcript (Real-time speech feedback) */}
+              {interimTranscript && (
+                <div className="flex flex-col items-end">
+                  <div className="max-w-[85%] rounded-2xl rounded-tr-xs bg-emerald-800/60 border border-emerald-500/40 p-3.5 text-xs sm:text-sm text-emerald-100 animate-pulse">
+                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-70 block mb-1">
+                      Listening in real-time...
+                    </span>
+                    <p className="italic">
+                      &ldquo;{interimTranscript}&rdquo;
+                      <span className="inline-block w-1.5 h-3.5 bg-emerald-300 ml-1 animate-ping" />
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Thinking State Indicator */}
+              {isThinking && (
+                <div className="flex items-center gap-2 text-xs text-cyan-400 animate-pulse">
+                  <Sparkles className="size-4 animate-spin text-cyan-300" />
+                  <span>Gemini AI सोच रहा है (Reasoning produce intent)...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Interactive Gemini Orb Section */}
+            <div className="relative border-t border-slate-800/80 bg-slate-950 p-4 sm:p-5 flex flex-col items-center justify-center">
+              
+              {/* Central Glowing Gemini Orb */}
+              <div className="relative flex items-center justify-center my-2">
+                
+                {/* Iridescent Aurora Outer Rings */}
+                <div
+                  className={`absolute rounded-full transition-all duration-700 pointer-events-none ${
+                    isListening
+                      ? "size-32 bg-gradient-to-r from-violet-600/40 via-cyan-500/40 to-pink-500/40 blur-xl animate-pulse scale-125"
+                      : isThinking
+                      ? "size-28 bg-gradient-to-r from-amber-500/40 via-violet-600/40 to-cyan-500/40 blur-lg animate-spin"
+                      : isSpeaking
+                      ? "size-32 bg-gradient-to-r from-cyan-400/40 via-indigo-500/40 to-violet-500/40 blur-xl animate-ping scale-110"
+                      : "size-24 bg-violet-600/20 blur-md"
+                  }`}
+                />
+
+                {/* Live Dynamic Audio Frequency Bars (Gemini Voice Equalizer) */}
                 {isListening && (
-                  <>
-                    <span className="absolute size-28 rounded-full bg-emerald-400/20 animate-ping pointer-events-none" />
-                    <span className="absolute size-24 rounded-full bg-emerald-500/30 animate-pulse pointer-events-none" />
-                  </>
-                )}
-                {isThinking && (
-                  <span className="absolute size-24 rounded-full border-4 border-amber-400 border-t-transparent animate-spin pointer-events-none" />
+                  <div className="absolute flex items-center gap-1 -top-8 pointer-events-none">
+                    <span className="w-1 bg-cyan-400 rounded-full animate-bounce h-4" />
+                    <span className="w-1 bg-violet-400 rounded-full animate-bounce h-7 delay-75" />
+                    <span className="w-1 bg-pink-400 rounded-full animate-bounce h-5 delay-150" />
+                    <span className="w-1 bg-emerald-400 rounded-full animate-bounce h-8 delay-100" />
+                    <span className="w-1 bg-cyan-300 rounded-full animate-bounce h-3 delay-200" />
+                  </div>
                 )}
 
+                {/* Primary Core Button */}
                 <button
                   type="button"
                   onClick={toggleListening}
-                  className={`relative flex size-20 items-center justify-center rounded-full text-white shadow-2xl transition-transform active:scale-95 ${
+                  className={`group relative flex size-18 items-center justify-center rounded-full text-white shadow-2xl transition-all duration-300 active:scale-90 ${
                     isListening
-                      ? "bg-rose-600 hover:bg-rose-700"
+                      ? "bg-gradient-to-tr from-rose-600 via-pink-600 to-rose-500 shadow-rose-500/50 scale-105"
                       : isThinking
-                      ? "bg-amber-600"
-                      : "bg-emerald-600 hover:bg-emerald-700"
+                      ? "bg-gradient-to-tr from-amber-600 via-orange-600 to-violet-600 shadow-amber-500/50"
+                      : isSpeaking
+                      ? "bg-gradient-to-tr from-cyan-600 via-indigo-600 to-violet-600 shadow-cyan-500/50 scale-105"
+                      : "bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-600 hover:scale-105 shadow-indigo-500/40"
                   }`}
+                  aria-label={isListening ? "Stop listening" : "Start speaking"}
                 >
                   {isListening ? (
-                    <MicOff className="size-8 animate-pulse" />
+                    <MicOff className="size-7 animate-pulse text-white" />
+                  ) : isThinking ? (
+                    <Sparkles className="size-7 animate-spin text-amber-200" />
+                  ) : isSpeaking ? (
+                    <div className="flex flex-col items-center justify-center">
+                      <Volume2 className="size-7 animate-bounce text-white" />
+                      <span className="text-[8px] font-bold uppercase tracking-tight mt-0.5">Stop</span>
+                    </div>
                   ) : (
-                    <Mic className="size-8" />
+                    <Mic className="size-7 text-white group-hover:scale-110 transition-transform" />
                   )}
                 </button>
               </div>
 
-              <div className="text-center space-y-1">
-                <p className="text-xs font-bold text-slate-800">
+              {/* Status Hint */}
+              <div className="text-center mt-2 space-y-0.5">
+                <p className="text-xs font-bold text-slate-200">
                   {isListening
-                    ? "सुन रहे हैं... कृपया बोलें (Listening... Speak now)"
+                    ? "सुन रहे हैं... बोलिए (Listening in real-time...)"
                     : isThinking
-                    ? "Gemini AI सोच रहा है... (AI Processing...)"
-                    : "माइक बटन दबाएं और बोलें (Tap mic to speak)"}
+                    ? "जेमिनी विचार कर रहा है... (Gemini Reasoning...)"
+                    : isSpeaking
+                    ? "जेमिनी बोल रहा है (Tap to interrupt)"
+                    : "माइक दबाएं और फसल या भाव पूछें (Tap to speak)"}
                 </p>
-                <p className="text-[11px] text-slate-500">
-                  Powered by Google AI Studio Gemini 1.5 Flash
+                <p className="text-[10px] text-slate-500">
+                  {liveMode 
+                    ? "⚡ Live Hands-free Mode Enabled (निरंतर बातचीत मोड)" 
+                    : "Powered by Google AI Studio Gemini 3.6 Flash"}
                 </p>
               </div>
-            </div>
 
-            {/* Transcript & AI Response Card */}
-            {(transcript || aiResponse) && (
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 space-y-2 text-xs">
-                {transcript && (
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                      You Said:
-                    </span>
-                    <p className="font-semibold text-slate-900 mt-0.5">&ldquo;{transcript}&rdquo;</p>
-                  </div>
-                )}
-                {aiResponse && (
-                  <div className="border-t border-emerald-200/60 pt-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1">
-                      <Sparkles className="size-3 text-emerald-600" />
-                      Gemini Voice Reply:
-                    </span>
-                    <p className="font-bold text-emerald-950 mt-0.5">{aiResponse}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Quick 1-Click Sample Speech Utterances */}
-            <div className="space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                या सीधे इन आदेशों को टेस्ट करें (Or test sample commands):
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {SAMPLE_VOICE_COMMANDS.map((cmd, idx) => (
+              {/* Quick Prompt Pills Carousel */}
+              <div className="w-full mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {[
+                  { text: "50 किलो टमाटर ₹35 में बेचना है", label: "🍅 50kg टमाटर बेचें" },
+                  { text: "आज के नासिक प्याज के मंडी भाव क्या हैं?", label: "🧅 प्याज के मंडी भाव" },
+                  { text: "किसान डैशबोर्ड खोलें", label: "📊 किसान पोर्टल" },
+                  { text: "ताजा हरी मिर्च खोजें", label: "🛒 हरी मिर्च खोजें" }
+                ].map((item, idx) => (
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => {
-                      setTranscript(cmd.text);
-                      processWithGeminiAI(cmd.text);
-                    }}
-                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 text-left text-xs text-slate-700 hover:bg-emerald-50 hover:border-emerald-200 transition-colors shadow-xs"
+                    onClick={() => processWithGemini(item.text)}
+                    className="shrink-0 rounded-full border border-slate-800 bg-slate-900/80 hover:bg-slate-800 px-3 py-1 text-[11px] text-slate-300 hover:text-white transition-colors"
                   >
-                    <span className="text-base">{cmd.icon}</span>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-slate-900 truncate leading-tight">{cmd.label}</p>
-                      <p className="text-[10px] text-slate-500 truncate mt-0.5">&ldquo;{cmd.text}&rdquo;</p>
-                    </div>
+                    {item.label}
                   </button>
                 ))}
               </div>
             </div>
+
           </div>
         </div>
       )}

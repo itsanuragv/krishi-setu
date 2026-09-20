@@ -6,9 +6,11 @@ export interface SpeechRecognitionResultItem {
 export interface SpeechRecognitionResult {
   [index: number]: SpeechRecognitionResultItem;
   length: number;
+  isFinal?: boolean;
 }
 
 export interface SpeechRecognitionEvent {
+  resultIndex?: number;
   results: {
     [index: number]: SpeechRecognitionResult;
     length: number;

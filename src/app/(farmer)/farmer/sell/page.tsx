@@ -56,13 +56,34 @@ export default function SellPage() {
 
   const values = form.watch();
 
+  // Speech synthesis with optimal native voice
   const speak = useCallback((text: string) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     try {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = language === "hi" ? "hi-IN" : "en-IN";
-      utterance.rate = 0.95;
+      utterance.rate = 1.0;
+      utterance.pitch = 1.02;
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices && voices.length > 0) {
+        if (language === "hi") {
+          const hiVoice = voices.find(v => 
+            v.lang.toLowerCase().startsWith("hi") && 
+            (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Swara") || v.name.includes("Madhur"))
+          ) || voices.find(v => v.lang.toLowerCase().startsWith("hi"));
+          if (hiVoice) utterance.voice = hiVoice;
+        } else {
+          const enVoice = voices.find(v => 
+            v.lang.toLowerCase().includes("en-in") || 
+            v.name.includes("Natural") || 
+            v.name.includes("Google")
+          );
+          if (enVoice) utterance.voice = enVoice;
+        }
+      }
+
       window.speechSynthesis.speak(utterance);
     } catch {
       // Ignore on restricted web views
@@ -70,6 +91,7 @@ export default function SellPage() {
   }, [language]);
 
   const processVoiceListing = useCallback(async (text: string) => {
+    if (!text.trim()) return;
     setIsListening(false);
     setIsVoiceThinking(true);
 
@@ -92,9 +114,9 @@ export default function SellPage() {
       form.setValue("pricePerKg", price);
       form.setValue("description", `Freshly harvested ${crop} (${variety}). Listed via Kisan Voice Saathi.`);
 
-      const spokenFeedback = language === "hi"
-        ? `${qty} किलो ${crop} ₹${price} प्रति किलो ऑटो-फिल कर दिया गया है।`
-        : `Auto-filled ${qty}kg ${crop} at ₹${price}/kg.`;
+      const spokenFeedback = data.spokenResponse || (language === "hi"
+        ? `${qty} किलो ${crop} ₹${price} प्रति किलो दर्ज किया गया है।`
+        : `Auto-filled ${qty}kg ${crop} at ₹${price}/kg.`);
 
       setVoiceBannerMsg(spokenFeedback);
       speak(spokenFeedback);
@@ -107,19 +129,36 @@ export default function SellPage() {
     }
   }, [form, language, speak]);
 
-  // Speech Recognition setup
+  // Speech Recognition setup with interim live speech streaming
   useEffect(() => {
     const SpeechRecognition = getSpeechRecognition();
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.lang = language === "hi" ? "hi-IN" : "en-IN";
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const text = event.results[0][0].transcript;
-      processVoiceListing(text);
+      let interim = "";
+      let final = "";
+
+      const startIndex = event.resultIndex ?? 0;
+      for (let i = startIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+
+      if (interim) {
+        setVoiceBannerMsg(`बोल रहे हैं: "${interim}"...`);
+      }
+
+      if (final) {
+        processVoiceListing(final);
+      }
     };
 
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {

@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 
-interface GeminiVoiceResponse {
-  intent: "NAVIGATE" | "LIST_CROP" | "SEARCH_PRODUCE" | "AGRI_QUERY";
+export interface VoiceMessageHistory {
+  role: "user" | "model" | "assistant";
+  text: string;
+}
+
+export interface GeminiVoiceResponse {
+  intent: "NAVIGATE" | "LIST_CROP" | "SEARCH_PRODUCE" | "AGRI_QUERY" | "CLARIFICATION";
   spokenResponse: string;
   route?: string;
   cropData?: {
@@ -17,6 +22,12 @@ interface GeminiVoiceResponse {
     category?: string;
     distanceKm?: number;
   };
+  suggestedActions?: Array<{
+    label: string;
+    action: "navigate" | "speak" | "fill";
+    route?: string;
+    speakText?: string;
+  }>;
 }
 
 // Fallback rule-based parsing in case Gemini API is offline or key is missing
@@ -100,7 +111,11 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
 
 export async function POST(req: Request) {
   try {
-    const { text, language = "hi-IN" } = await req.json();
+    const { 
+      text, 
+      language = "hi-IN", 
+      history = [] as VoiceMessageHistory[] 
+    } = await req.json();
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Missing speech text" }, { status: 400 });
@@ -108,40 +123,42 @@ export async function POST(req: Request) {
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // If Gemini key is not configured, use the fast local fallback
+    // Fast local rule-based fallback if no API key
     if (!apiKey) {
       const fallbackResult = fallbackRuleBased(text, language);
       return NextResponse.json(fallbackResult);
     }
 
-    const prompt = `You are Krishi Setu's intelligent Vernacular Voice Assistant ("किसान वाणी").
-A user (Indian farmer, consumer, or transporter) spoke this in Hindi, Hinglish, or English:
-"${text}"
+    const systemContext = `You are "Kisan Voice Saathi" (किसान वाणी), the official real-time Gemini Voice Assistant for Krishi Setu (Bharat's Direct Farm-to-Buyer Digital Highway).
+You are speaking directly with Indian farmers, consumers, and logistics drivers via a live voice interface.
 
-Your job:
-1. Determine the user's intent:
-   - "NAVIGATE": User wants to visit a page (e.g. "Kisan portal", "Dashboard", "Orders", "Delivery", "Marketplace")
-   - "LIST_CROP": Farmer wants to sell/list agricultural produce (e.g. "50kg tamatar 40 rupaye mein bechna hai")
-   - "SEARCH_PRODUCE": Consumer wants to find or buy produce (e.g. "Nashik ke pyaaz dikhao", "Fresh tomatoes under 20km")
-   - "AGRI_QUERY": Questions about mandi rates, farming, weather, escrow, or platform help.
+Your Personality:
+- Warm, respectful, and encouraging (use "नमस्ते किसान भाई", "जी", or polite Indian English).
+- Speak concisely (1-2 sentences maximum, under 30 words) because your response is converted directly to live Text-To-Speech audio.
+- Match user's language: if they speak Hindi or Hinglish, reply in clear, sweet Devanagari Hindi. If English, reply in friendly English.
 
-2. Generate a natural, polite spoken response in the same language (${language === "hi-IN" ? "Hindi (Devanagari or simple Hindi)" : "English"}). Keep it concise (1-2 short sentences) suitable for Text-to-Speech audio.
+Your Domain Knowledge:
+- Current Mandi Benchmarks: Tomatoes (₹28-35/kg), Onions (₹25-32/kg), Potatoes (₹18-22/kg), Wheat (₹2400/quintal), Rice (₹3200/quintal).
+- Direct escrow payment: Buyers pay upfront into RBI-compliant escrow; money releases to farmer instantly upon verified QR delivery.
+- AI Quality Assayer: Farmers can take a photo of their produce to get automated AGMARK Grade A/B/C certification and a 10-15% price premium.
 
-3. Extract relevant parameters:
-   - If LIST_CROP: crop name, variety, quantityKg (numeric), pricePerKg (numeric), unit ("kg" or "quintal").
-   - If SEARCH_PRODUCE: search query, optional maxPrice, optional distanceKm.
-   - If NAVIGATE: target route (one of: "/", "/farmer", "/farmer/sell", "/farmer/orders", "/farmer/earnings", "/consumer", "/consumer/search", "/consumer/orders", "/buyer/dashboard", "/delivery", "/admin").
+Intents:
+1. "LIST_CROP": Farmer wants to sell crops (e.g. "50 किलो टमाटर बेचना है", "sell 100kg potatoes at 25"). Extract crop, variety, quantityKg (numeric), pricePerKg (numeric). Route: "/farmer/sell".
+2. "SEARCH_PRODUCE": Consumer wants to buy fresh produce. Route: "/consumer/search".
+3. "NAVIGATE": User wants to open a section. Targets: "/", "/farmer", "/farmer/sell", "/farmer/orders", "/consumer", "/consumer/search", "/delivery".
+4. "AGRI_QUERY": Farming questions, mandi prices, pest control, weather, or escrow trust questions.
+5. "CLARIFICATION": If user said something incomplete like "मुझे बेचना है" without crop name, ask politely what crop they wish to sell.
 
-Return STRICTLY JSON:
+STRICT JSON OUTPUT FORMAT:
 {
-  "intent": "NAVIGATE" | "LIST_CROP" | "SEARCH_PRODUCE" | "AGRI_QUERY",
-  "spokenResponse": "Concise spoken reply",
-  "route": "/route_path_if_navigating_or_actionable",
+  "intent": "NAVIGATE" | "LIST_CROP" | "SEARCH_PRODUCE" | "AGRI_QUERY" | "CLARIFICATION",
+  "spokenResponse": "Concise spoken reply suitable for audio playback",
+  "route": "/optional_route_path",
   "cropData": {
     "crop": "Tomato",
     "variety": "Desi Hybrid",
     "quantityKg": 50,
-    "pricePerKg": 40,
+    "pricePerKg": 35,
     "unit": "kg"
   },
   "searchQuery": {
@@ -149,8 +166,40 @@ Return STRICTLY JSON:
     "maxPrice": 30,
     "category": "Vegetables",
     "distanceKm": 25
-  }
+  },
+  "suggestedActions": [
+    { "label": "फसल लिस्टिंग फॉर्म", "action": "navigate", "route": "/farmer/sell" },
+    { "label": "मंडी भाव जानें", "action": "speak", "speakText": "आज के मंडी भाव क्या हैं?" }
+  ]
 }`;
+
+    // Build multi-turn conversational content for Gemini
+    const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+
+    // System instruction prompt as first turn
+    contents.push({
+      role: "user",
+      parts: [{ text: systemContext }],
+    });
+    contents.push({
+      role: "model",
+      parts: [{ text: '{"status":"ready","assistant":"Kisan Voice Saathi"}' }],
+    });
+
+    // Append prior conversational history (up to last 6 turns for fast context)
+    const recentHistory = history.slice(-6);
+    for (const h of recentHistory) {
+      contents.push({
+        role: h.role === "assistant" || h.role === "model" ? "model" : "user",
+        parts: [{ text: h.text }],
+      });
+    }
+
+    // Append current user voice input
+    contents.push({
+      role: "user",
+      parts: [{ text: `User Spoke (${language}): "${text}"` }],
+    });
 
     const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest"];
     let rawJson: string | null = null;
@@ -162,10 +211,15 @@ Return STRICTLY JSON:
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
+            contents,
             generationConfig: {
               responseMimeType: "application/json",
-              temperature: 0.1,
+              temperature: 0.15,
+              maxOutputTokens: 250,
+              // thinkingBudget: 0 ensures instantaneous response without chain-of-thought latency
+              thinkingConfig: {
+                thinkingBudget: 0,
+              },
             },
           }),
         });
@@ -179,15 +233,15 @@ Return STRICTLY JSON:
             break;
           }
         } else {
-          console.warn(`Gemini model ${model} returned status:`, geminiRes.status, geminiRes.statusText);
+          console.warn(`Gemini model ${model} status:`, geminiRes.status, geminiRes.statusText);
         }
       } catch (callErr) {
-        console.warn(`Gemini model ${model} invocation failed:`, callErr);
+        console.warn(`Gemini model ${model} error:`, callErr);
       }
     }
 
     if (!rawJson) {
-      console.warn("All Gemini models failed or returned empty text. Using fallback rule-based NLP.");
+      console.warn("Gemini service busy or unavailable. Engaging high-speed local voice intelligence.");
       const fallbackResult = fallbackRuleBased(text, language);
       return NextResponse.json(fallbackResult);
     }
