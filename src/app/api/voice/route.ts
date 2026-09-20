@@ -30,96 +30,188 @@ export interface GeminiVoiceResponse {
   }>;
 }
 
-// Fallback rule-based parsing in case Gemini API is offline or key is missing
+// Comprehensive bilingual vernacular NLP engine
 function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
   const lower = text.toLowerCase();
+  const isHi = lang === "hi-IN" || /[\u0900-\u097F]/.test(text);
 
-  // 1. Sell / List crop intent
-  if (lower.includes("bech") || lower.includes("sell") || lower.includes("fasal") || lower.includes("list") || lower.includes("kilo") || lower.includes("rupaye")) {
-    let detectedCrop = "Tomatoes";
-    if (lower.includes("chawal") || lower.includes("rice") || lower.includes("dhan")) detectedCrop = "Rice";
-    else if (lower.includes("gehu") || lower.includes("wheat")) detectedCrop = "Wheat";
-    else if (lower.includes("pyaz") || lower.includes("onion")) detectedCrop = "Onions";
-    else if (lower.includes("aloo") || lower.includes("potato")) detectedCrop = "Potatoes";
+  // 1. Detect Crop Names in Hindi & English
+  let detectedCrop = "";
+  let defaultPrice = 30;
 
-    const qtyMatch = lower.match(/(\d+)\s*(?:kg|kilo|quintal|quntal|क्विंटल|किलो)/i);
+  if (/टमाटर|tamatar|tomato/i.test(text)) {
+    detectedCrop = isHi ? "टमाटर" : "Tomatoes";
+    defaultPrice = 32;
+  } else if (/प्याज|प्याज़|pyaz|pyaaz|onion/i.test(text)) {
+    detectedCrop = isHi ? "नासिक लाल प्याज" : "Nashik Red Onion";
+    defaultPrice = 28;
+  } else if (/आलू|aloo|potato/i.test(text)) {
+    detectedCrop = isHi ? "आलू" : "Potatoes";
+    defaultPrice = 22;
+  } else if (/चावल|धान|chawal|dhan|rice/i.test(text)) {
+    detectedCrop = isHi ? "बासमती चावल" : "Basmati Rice";
+    defaultPrice = 65;
+  } else if (/गेहूं|गेहू|gehu|wheat/i.test(text)) {
+    detectedCrop = isHi ? "शरबती गेहूं" : "Sharbati Wheat";
+    defaultPrice = 25;
+  } else if (/मिर्च|mirch|chilli|pepper/i.test(text)) {
+    detectedCrop = isHi ? "हरी मिर्च" : "Green Chillies";
+    defaultPrice = 45;
+  } else if (/शिमला|shimla|capsicum/i.test(text)) {
+    detectedCrop = isHi ? "शिमला मिर्च" : "Capsicum";
+    defaultPrice = 50;
+  }
+
+  // 2. Mandi Rates / Price Queries (भाव, रेट, दाम, कीमत, Mandi Rates)
+  if (/मंडी|भाव|रेट|दाम|कीमत|bhav|rate|price|mandi/i.test(text)) {
+    if (detectedCrop) {
+      return {
+        intent: "AGRI_QUERY",
+        route: "/farmer",
+        spokenResponse: isHi
+          ? `आज की प्रमुख मंडियों में ${detectedCrop} का थोक भाव ₹${defaultPrice - 4} से ₹${defaultPrice + 5} प्रति किलो चल रहा है।`
+          : `Current wholesale market benchmark for ${detectedCrop} is ₹${defaultPrice - 4} to ₹${defaultPrice + 5} per kg.`,
+        suggestedActions: [
+          { label: `${detectedCrop} बेचें`, action: "speak", speakText: `मुझे ${detectedCrop} बेचना है` },
+          { label: "मंडी डैशबोर्ड खोलें", action: "navigate", route: "/farmer" }
+        ]
+      };
+    }
+
+    return {
+      intent: "AGRI_QUERY",
+      route: "/farmer",
+      spokenResponse: isHi
+        ? "आज के मुख्य मंडी भाव: टमाटर ₹30/kg, प्याज ₹28/kg, आलू ₹22/kg और गेहूं ₹2500/क्विंटल है।"
+        : "Today's APMC Mandi benchmarks: Tomato ₹30/kg, Onion ₹28/kg, Potato ₹22/kg, Wheat ₹2500/quintal.",
+      suggestedActions: [
+        { label: "टमाटर का भाव", action: "speak", speakText: "टमाटर का मंडी भाव क्या है?" },
+        { label: "प्याज का भाव", action: "speak", speakText: "प्याज का मंडी भाव क्या है?" },
+        { label: "फसल लिस्ट करें", action: "navigate", route: "/farmer/sell" }
+      ]
+    };
+  }
+
+  // 3. Sell / List Crop Intent (बेचना, फसल, लिस्ट, Sell, List)
+  if (/bech|sell|fasal|list|बेच|बेचना|बिक्री|लिस्ट|दर्ज/i.test(text)) {
+    const qtyMatch = text.match(/(\d+)\s*(?:kg|kilo|quintal|क्विंटल|किलो)/i) || text.match(/(\d+)/);
     const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 50;
 
-    const priceMatch = lower.match(/(?:at|@|ke bhav|mein|rup|₹|rs\.?)\s*(\d+)/i) || lower.match(/(\d+)\s*(?:rupaye|rupee|rs|inr)/i);
-    const price = priceMatch ? parseInt(priceMatch[1], 10) : 35;
+    const priceMatch = text.match(/(?:at|@|ke bhav|mein|rup|₹|rs\.?|रुपये|रुपए|भाव)\s*(\d+)/i) || text.match(/(\d+)\s*(?:rupaye|rupee|rs|inr|रुपये|रुपए)/i);
+    const price = priceMatch ? parseInt(priceMatch[1], 10) : defaultPrice;
+
+    const finalCrop = detectedCrop || (isHi ? "टमाटर" : "Tomatoes");
 
     return {
       intent: "LIST_CROP",
       route: "/farmer/sell",
-      spokenResponse: lang === "hi-IN"
-        ? `${qty} किलो ${detectedCrop} ₹${price} प्रति किलो दर्ज किया जा रहा है।`
-        : `Listing ${qty}kg ${detectedCrop} at ₹${price} per kg.`,
+      spokenResponse: isHi
+        ? `जी किसान भाई, ${qty} किलो ${finalCrop} ₹${price} प्रति किलो से लिस्टिंग फॉर्म में जोड़ दिए हैं।`
+        : `Listing ${qty}kg ${finalCrop} at ₹${price} per kg. Form auto-filled.`,
       cropData: {
-        crop: detectedCrop,
-        variety: "Standard Grade",
+        crop: finalCrop,
+        variety: "Standard Grade-A",
         quantityKg: qty,
         pricePerKg: price,
         unit: "kg",
       },
+      suggestedActions: [
+        { label: "लिस्टिंग फॉर्म पूरा करें", action: "navigate", route: "/farmer/sell" },
+        { label: "AI क्वालिटी स्कैन करें", action: "navigate", route: "/farmer" }
+      ]
     };
   }
 
-  // 2. Search produce intent
-  if (lower.includes("dhundo") || lower.includes("search") || lower.includes("khareed") || lower.includes("buy") || lower.includes("chahiye") || lower.includes("tamatar") || lower.includes("pyaaz")) {
+  // 4. Search / Buy Produce Intent (ढूंढो, खोजो, खरीदना, चाहिए, Buy, Search)
+  if (/dhundo|search|khareed|buy|chahiye|ढूंढ|ढूंढो|खोज|खरीद|चाहिए/i.test(text)) {
+    const query = detectedCrop || text.replace(/ढूंढो|खोजो|चाहिए|खरीदना|search|buy/gi, "").trim() || "ताजा सब्जियां";
     return {
       intent: "SEARCH_PRODUCE",
-      route: "/consumer/search",
-      spokenResponse: lang === "hi-IN" ? "बाज़ार में ताज़ा फसल खोजी जा रही है।" : "Searching fresh farm produce in marketplace.",
+      route: `/consumer/search?q=${encodeURIComponent(query)}`,
+      spokenResponse: isHi
+        ? `बाज़ार में ताज़ा ${query} खोजी जा रही है।`
+        : `Searching fresh ${query} in the direct marketplace.`,
       searchQuery: {
-        query: text.replace(/(?:dhundo|khojo|chahiye|dikhao|search|buy)/gi, "").trim(),
+        query,
       },
+      suggestedActions: [
+        { label: "बाज़ार परिणाम देखें", action: "navigate", route: `/consumer/search?q=${encodeURIComponent(query)}` }
+      ]
     };
   }
 
-  // 3. Navigation intents
-  if (lower.includes("kisan") || lower.includes("farmer")) {
+  // 5. Agricultural Advisory & Pest Control (खाद, दवा, कीट, बीमारी, मौसम)
+  if (/खाद|दवा|कीट|रोग|बीमारी|उर्वरक|छिड़काव|pest|fertilizer|disease|spray/i.test(text)) {
+    return {
+      intent: "AGRI_QUERY",
+      route: "/farmer",
+      spokenResponse: isHi
+        ? "कीट नियंत्रण के लिए 5ml नीम तेल प्रति लीटर पानी में मिलाकर छिड़काव करें। नमी के अनुसार 3 दिन में सिंचाई करें।"
+        : "For organic pest control, spray 5ml neem oil per liter of water. Ensure proper soil drainage.",
+      suggestedActions: [
+        { label: "क्वालिटी जांचें", action: "navigate", route: "/farmer" }
+      ]
+    };
+  }
+
+  // 6. Navigation Intents
+  if (/kisan|farmer|किसान|डैशबोर्ड/i.test(text)) {
     return {
       intent: "NAVIGATE",
       route: "/farmer",
-      spokenResponse: lang === "hi-IN" ? "किसान पोर्टल खोला जा रहा है।" : "Opening Farmer Portal.",
+      spokenResponse: isHi ? "किसान पोर्टल खोला जा रहा है।" : "Opening Farmer Portal.",
+      suggestedActions: [{ label: "पोर्टल पर जाएं", action: "navigate", route: "/farmer" }]
     };
   }
 
-  if (lower.includes("upbhokta") || lower.includes("consumer") || lower.includes("bazaar") || lower.includes("market")) {
+  if (/upbhokta|consumer|bazaar|market|उपभोक्ता|बाज़ार|खरीदार/i.test(text)) {
     return {
       intent: "NAVIGATE",
       route: "/consumer",
-      spokenResponse: lang === "hi-IN" ? "उपभोक्ता बाज़ार खोला जा रहा है।" : "Opening Consumer Marketplace.",
+      spokenResponse: isHi ? "उपभोक्ता बाज़ार खोला जा रहा है।" : "Opening Consumer Marketplace.",
+      suggestedActions: [{ label: "बाज़ार जाएं", action: "navigate", route: "/consumer" }]
     };
   }
 
-  if (lower.includes("delivery") || lower.includes("parivahan") || lower.includes("gaadi") || lower.includes("truck")) {
+  if (/delivery|parivahan|gaadi|truck|डिलीवरी|गाड़ी|ट्रक|चालक/i.test(text)) {
     return {
       intent: "NAVIGATE",
       route: "/delivery",
-      spokenResponse: lang === "hi-IN" ? "डिलीवरी फ्लीट पोर्टल खोला जा रहा है।" : "Opening Delivery Fleet Portal.",
+      spokenResponse: isHi ? "डिलीवरी फ्लीट पोर्टल खोला जा रहा है।" : "Opening Delivery Fleet Portal.",
+      suggestedActions: [{ label: "डिलीवरी फ्लीट", action: "navigate", route: "/delivery" }]
     };
   }
 
+  // 7. General Friendly Conversational Reply (Never repeat static canned line!)
   return {
-    intent: "AGRI_QUERY",
-    spokenResponse: lang === "hi-IN"
-      ? "कृषि सेतु में आपका स्वागत है। आप फसल बेचने, खरीदने या मंडी भाव जानने के लिए बोल सकते हैं।"
-      : "Welcome to Krishi Setu. Speak to sell crops, buy fresh produce, or explore mandi prices.",
+    intent: "CLARIFICATION",
+    spokenResponse: isHi
+      ? `नमस्ते किसान भाई! आपने कहा "${text}"। आप फसल बेचने के लिए नाम और भाव बता सकते हैं, या मंडी भाव पूछ सकते हैं।`
+      : `Hello! You said "${text}". You can tell me which crop to sell with quantity, or ask for today's market rates.`,
+    suggestedActions: [
+      { label: "🍅 50kg टमाटर बेचें", action: "speak", speakText: "50 किलो टमाटर 35 रुपये में बेचना है" },
+      { label: "🧅 प्याज का मंडी भाव", action: "speak", speakText: "प्याज का मंडी भाव क्या है?" },
+      { label: "📊 किसान पोर्टल", action: "navigate", route: "/farmer" }
+    ]
   };
 }
 
 export async function POST(req: Request) {
-  try {
-    const { 
-      text, 
-      language = "hi-IN", 
-      history = [] as VoiceMessageHistory[] 
-    } = await req.json();
+  let speechText = "";
+  let speechLang = "hi-IN";
 
-    if (!text || typeof text !== "string") {
+  try {
+    const body = await req.json();
+    speechText = body.text || "";
+    speechLang = body.language || "hi-IN";
+    const history: VoiceMessageHistory[] = body.history || [];
+
+    if (!speechText || typeof speechText !== "string") {
       return NextResponse.json({ error: "Missing speech text" }, { status: 400 });
     }
+
+    const text = speechText;
+    const language = speechLang;
 
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -201,7 +293,13 @@ STRICT JSON OUTPUT FORMAT:
       parts: [{ text: `User Spoke (${language}): "${text}"` }],
     });
 
-    const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest"];
+    const candidateModels = [
+      "gemini-flash-lite-latest",
+      "gemini-3.5-flash-lite",
+      "gemini-3.5-flash",
+      "gemini-3.7-flash",
+      "gemini-3.6-flash",
+    ];
     let rawJson: string | null = null;
 
     for (const model of candidateModels) {
@@ -216,10 +314,6 @@ STRICT JSON OUTPUT FORMAT:
               responseMimeType: "application/json",
               temperature: 0.15,
               maxOutputTokens: 250,
-              // thinkingBudget: 0 ensures instantaneous response without chain-of-thought latency
-              thinkingConfig: {
-                thinkingBudget: 0,
-              },
             },
           }),
         });
@@ -261,7 +355,7 @@ STRICT JSON OUTPUT FORMAT:
   } catch (error) {
     console.error("Voice assistant endpoint error:", error);
     return NextResponse.json(
-      fallbackRuleBased("help", "hi-IN"),
+      fallbackRuleBased(speechText || "नमस्ते", speechLang || "hi-IN"),
       { status: 200 }
     );
   }

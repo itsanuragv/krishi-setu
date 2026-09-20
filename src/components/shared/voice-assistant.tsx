@@ -143,6 +143,7 @@ export function VoiceAssistant() {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
+  const isProcessingRef = useRef(false);
 
   // Auto-scroll chat to latest message
   useEffect(() => {
@@ -201,7 +202,8 @@ export function VoiceAssistant() {
 
   // Process speech with Gemini backend
   const processWithGemini = useCallback(async (userText: string) => {
-    if (!userText.trim()) return;
+    if (!userText.trim() || isProcessingRef.current) return;
+    isProcessingRef.current = true;
 
     stopSpeaking();
     setIsListening(false);
@@ -294,6 +296,7 @@ export function VoiceAssistant() {
       speak(fallbackReply, language);
     } finally {
       setIsThinking(false);
+      isProcessingRef.current = false;
     }
   }, [language, liveMode, messages, speak, stopSpeaking, isOpen]);
 
@@ -343,9 +346,10 @@ export function VoiceAssistant() {
         // Auto-debounce: send after user pauses speech
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = setTimeout(() => {
+          if (isProcessingRef.current) return;
           recognition.stop();
           processWithGemini(final);
-        }, 1100);
+        }, 900);
       }
     };
 
