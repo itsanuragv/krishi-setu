@@ -459,15 +459,15 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center">
           {/* Take Live Photo Button */}
           <label
             htmlFor="cameraInput"
-            className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors active:scale-95 touch-target"
+            className="cursor-pointer inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 sm:py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors active:scale-95 touch-target text-center"
             title="Capture photo from mobile camera"
           >
-            <Camera className="size-3.5" />
-            <span>{t("btn_take_live_photo")}</span>
+            <Camera className="size-3.5 shrink-0" />
+            <span className="truncate">{t("btn_take_live_photo")}</span>
           </label>
 
           {/* Re-Scan Produce Button */}
@@ -476,10 +476,10 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
             variant="outline"
             onClick={() => executeScan(selectedImage)}
             disabled={isScanning}
-            className="gap-1.5 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50 touch-target rounded-xl font-semibold"
+            className="gap-1.5 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50 touch-target rounded-xl font-semibold h-full py-2 sm:py-1.5 justify-center"
           >
-            <RefreshCw className={`size-3.5 ${isScanning ? "animate-spin" : ""}`} />
-            <span>{isScanning ? t("btn_analyzing") : t("btn_rescan")}</span>
+            <RefreshCw className={`size-3.5 shrink-0 ${isScanning ? "animate-spin" : ""}`} />
+            <span className="truncate">{isScanning ? t("btn_analyzing") : t("btn_rescan")}</span>
           </Button>
         </div>
       </div>
@@ -512,22 +512,22 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
         )}
 
         {/* Top-Left Telemetry Status Pill */}
-        <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 text-[10px] font-mono text-emerald-300 backdrop-blur-md border border-emerald-500/30">
+        <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-20 flex items-center gap-1.5 rounded-full bg-black/75 px-2.5 py-1 text-[9px] sm:text-[10px] font-mono text-emerald-300 backdrop-blur-md border border-emerald-500/30">
           {scanStep === "tier1_edge" && (
             <>
-              <Eye className="size-3 animate-pulse text-emerald-400" />
-              <span>TIER_1: LAPLACIAN_EDGE_CHECK</span>
+              <Eye className="size-3 animate-pulse text-emerald-400 shrink-0" />
+              <span>TIER_1: EDGE_CHECK</span>
             </>
           )}
           {scanStep === "tier2_ai" && (
             <>
-              <Sparkles className="size-3 animate-spin text-amber-400" />
-              <span>TIER_2: GEMINI_VISION_ASSAYER</span>
+              <Sparkles className="size-3 animate-spin text-amber-400 shrink-0" />
+              <span>TIER_2: GEMINI_VISION</span>
             </>
           )}
           {(scanStep === "completed" || scanStep === "idle") && (
             <>
-              <CheckCircle2 className="size-3 text-emerald-400" />
+              <CheckCircle2 className="size-3 text-emerald-400 shrink-0" />
               <span>{grading.assayerVerificationId}</span>
             </>
           )}
@@ -535,38 +535,38 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
 
         {/* Top-Right Price Delta Pill */}
         {scanStep === "completed" && grading.recommendedPriceDeltaPct > 0 && (
-          <div className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full bg-emerald-950/80 px-2.5 py-1 text-[11px] font-bold text-emerald-300 backdrop-blur-md border border-emerald-400/40">
-            <Flame className="size-3 text-amber-400 fill-amber-400" />
+          <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-20 flex items-center gap-1 rounded-full bg-emerald-950/80 px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-emerald-300 backdrop-blur-md border border-emerald-400/40">
+            <Flame className="size-3 text-amber-400 fill-amber-400 shrink-0" />
             <span>+{grading.recommendedPriceDeltaPct}% {t("price_premium_label")}</span>
           </div>
         )}
 
         {/* Bottom Banner: Grade & Assayer Stamp */}
         {scanStep === "completed" && !isScanning && (
-          <div className={`absolute bottom-2.5 left-2.5 right-2.5 z-20 rounded-xl ${gradeTheme.bg} p-2.5 sm:p-3 text-xs text-white backdrop-blur-md border ${gradeTheme.border} ${gradeTheme.glow} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+          <div className={`absolute bottom-2 left-2 right-2 sm:bottom-2.5 sm:left-2.5 sm:right-2.5 z-20 rounded-xl ${gradeTheme.bg} p-2 sm:p-3 text-xs text-white backdrop-blur-md border ${gradeTheme.border} ${gradeTheme.glow} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <div className={`size-8 rounded-lg flex items-center justify-center ${gradeTheme.badgeBg} shrink-0 shadow-sm`}>
-                  <Award className="size-4.5" />
+                <div className={`size-7 sm:size-8 rounded-lg flex items-center justify-center ${gradeTheme.badgeBg} shrink-0 shadow-sm`}>
+                  <Award className="size-4 sm:size-4.5" />
                 </div>
                 <div className="truncate">
                   <div className="flex items-center gap-1.5">
-                    <p className={`font-extrabold text-sm ${gradeTheme.text}`}>
+                    <p className={`font-extrabold text-xs sm:text-sm ${gradeTheme.text}`}>
                       {grading.grade}
                     </p>
-                    <span className="text-[10px] text-white/70 font-medium">
+                    <span className="text-[10px] text-white/75 font-medium truncate">
                       • {grading.cropName}
                     </span>
                   </div>
-                  <p className="text-[10px] text-white/80 truncate">
-                    {grading.variety} • {grading.marketFit}
+                  <p className="text-[9px] sm:text-[10px] text-white/80 truncate">
+                    {grading.variety}
                   </p>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white border border-white/30">
-                  <CheckCircle2 className="size-2.5 text-emerald-400" />
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white border border-white/30">
+                  <CheckCircle2 className="size-2.5 text-emerald-400 shrink-0" />
                   <span>APMC Assayed</span>
                 </span>
                 <p className="text-[9px] text-white/70 mt-0.5 font-mono">
@@ -579,40 +579,40 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
       </div>
 
       {/* AI Crop Quality Breakdown Cards */}
-      <div className="grid grid-cols-3 gap-2 text-center text-xs">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-xs">
         {/* Ripeness Score */}
-        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5 flex flex-col justify-between">
-          <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-500">
-            <Gauge className="size-3 text-emerald-600" />
-            <span>{t("ripeness_label")}</span>
+        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-1.5 sm:p-2.5 flex flex-col justify-between min-w-0">
+          <div className="flex items-center justify-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 truncate">
+            <Gauge className="size-3 text-emerald-600 shrink-0" />
+            <span className="truncate">{t("ripeness_label")}</span>
           </div>
           <div className="my-1">
-            <p className="text-base font-extrabold text-slate-900">
+            <p className="text-sm sm:text-base font-extrabold text-slate-900">
               {grading.ripenessPct}%
             </p>
-            <div className="mx-auto w-full max-w-[80px] h-1.5 bg-slate-200 rounded-full overflow-hidden mt-1">
+            <div className="mx-auto w-full max-w-[65px] sm:max-w-[80px] h-1 sm:h-1.5 bg-slate-200 rounded-full overflow-hidden mt-1">
               <div 
                 className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full transition-all duration-500"
                 style={{ width: `${grading.ripenessPct}%` }}
               />
             </div>
           </div>
-          <span className="text-[10px] font-medium text-emerald-700 truncate">
+          <span className="text-[9px] sm:text-[10px] font-medium text-emerald-700 truncate">
             {grading.ripenessStage}
           </span>
         </div>
 
         {/* Defects / Blemish Index */}
-        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5 flex flex-col justify-between">
-          <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-500">
-            <AlertTriangle className="size-3 text-amber-500" />
-            <span>{t("defect_label")}</span>
+        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-1.5 sm:p-2.5 flex flex-col justify-between min-w-0">
+          <div className="flex items-center justify-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 truncate">
+            <AlertTriangle className="size-3 text-amber-500 shrink-0" />
+            <span className="truncate">{t("defect_label")}</span>
           </div>
           <div className="my-1">
-            <p className="text-base font-extrabold text-slate-900">
+            <p className="text-sm sm:text-base font-extrabold text-slate-900">
               {grading.defectPct}%
             </p>
-            <div className="mx-auto w-full max-w-[80px] h-1.5 bg-slate-200 rounded-full overflow-hidden mt-1">
+            <div className="mx-auto w-full max-w-[65px] sm:max-w-[80px] h-1 sm:h-1.5 bg-slate-200 rounded-full overflow-hidden mt-1">
               <div 
                 className={`h-full rounded-full transition-all duration-500 ${
                   grading.defectPct <= 5 ? "bg-emerald-500" : "bg-amber-500"
@@ -621,34 +621,34 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
               />
             </div>
           </div>
-          <span className="text-[10px] font-medium text-slate-600 truncate">
+          <span className="text-[9px] sm:text-[10px] font-medium text-slate-600 truncate">
             {grading.defectPct <= 5 ? "Clean (<5%)" : "Minor Blemishes"}
           </span>
         </div>
 
         {/* Ambient Shelf Life */}
-        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2.5 flex flex-col justify-between">
-          <div className="flex items-center justify-center gap-1 text-[11px] font-medium text-slate-500">
-            <Calendar className="size-3 text-blue-500" />
-            <span>{t("shelf_life_label")}</span>
+        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-1.5 sm:p-2.5 flex flex-col justify-between min-w-0">
+          <div className="flex items-center justify-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 truncate">
+            <Calendar className="size-3 text-blue-500 shrink-0" />
+            <span className="truncate">{t("shelf_life_label")}</span>
           </div>
           <div className="my-1">
-            <p className="text-base font-extrabold text-slate-900">
-              {grading.shelfLifeDays} <span className="text-xs font-normal text-slate-500">Days</span>
+            <p className="text-sm sm:text-base font-extrabold text-slate-900">
+              {grading.shelfLifeDays} <span className="text-[10px] sm:text-xs font-normal text-slate-500">Days</span>
             </p>
           </div>
-          <span className="text-[10px] font-medium text-blue-700 truncate">
+          <span className="text-[9px] sm:text-[10px] font-medium text-blue-700 truncate">
             Ambient Temp ✓
           </span>
         </div>
       </div>
 
       {/* AI Assayer Vernacular Advice & TTS Audio Readout */}
-      <div className="rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50 p-3.5 space-y-2">
+      <div className="rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50 p-3 sm:p-3.5 space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-emerald-600" />
-            <span className="text-xs font-bold text-slate-900">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Sparkles className="size-3.5 text-emerald-600 shrink-0" />
+            <span className="text-xs font-bold text-slate-900 truncate">
               {t("assayer_notes_title")}
             </span>
           </div>
@@ -658,10 +658,10 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
             size="sm"
             variant="ghost"
             onClick={toggleSpeechFeedback}
-            className={`h-7 px-2.5 text-[11px] rounded-lg gap-1.5 transition-colors ${
+            className={`h-7 px-2 sm:px-2.5 text-[10px] sm:text-[11px] rounded-lg gap-1 shrink-0 transition-colors ${
               isSpeaking
-                ? "bg-rose-100 text-rose-700 hover:bg-rose-200 animate-pulse"
-                : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                ? "bg-rose-100 text-rose-700 hover:bg-rose-200 animate-pulse font-bold"
+                : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-semibold"
             }`}
           >
             {isSpeaking ? (
@@ -672,7 +672,8 @@ export function OpenCVScan({ initialImage, onScanComplete }: OpenCVScanProps) {
             ) : (
               <>
                 <Volume2 className="size-3.5" />
-                <span>{t("btn_listen_report")}</span>
+                <span className="hidden xs:inline">{t("btn_listen_report")}</span>
+                <span className="xs:hidden">{language === "hi" ? "सुनें" : "Listen"}</span>
               </>
             )}
           </Button>

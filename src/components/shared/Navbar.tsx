@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
+import { KrishiSetuLogo } from "@/components/shared/KrishiSetuLogo";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -64,19 +65,17 @@ export function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-emerald-100/70 bg-white/90 backdrop-blur-md transition-all shadow-xs">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3.5 sm:px-6 lg:px-8">
-          {/* Brand Logo */}
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
+          {/* Brand Logo with Krishi Setu Emblem */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink min-w-0">
-            <Link href="/" className="flex items-center gap-2 group touch-target min-w-0">
-              <div className="flex size-8 sm:size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-sm transition-transform group-hover:scale-105">
-                <Sprout className="size-4.5 sm:size-6" />
-              </div>
+            <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group touch-target min-w-0">
+              <KrishiSetuLogo size={36} className="size-8 sm:size-9 shrink-0" />
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-1 min-w-0">
                   <span className="font-extrabold text-sm sm:text-lg tracking-tight text-slate-900 leading-none truncate">
                     {t("brand_title")}
                   </span>
-                  <span className="text-[10px] sm:text-xs font-semibold text-emerald-600 hidden xs:inline shrink-0">
+                  <span className="text-[10px] sm:text-xs font-bold text-emerald-600 hidden xs:inline shrink-0">
                     {t("brand_hindi")}
                   </span>
                 </div>
@@ -179,10 +178,8 @@ export function Navbar() {
             <div className="space-y-5">
               {/* Drawer Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs">
-                    <Sprout className="size-4" />
-                  </div>
+                <div className="flex items-center gap-2.5">
+                  <KrishiSetuLogo size={32} className="size-8 shrink-0" />
                   <div>
                     <p className="font-extrabold text-sm text-slate-900 leading-none">
                       {t("brand_title")}

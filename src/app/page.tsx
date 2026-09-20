@@ -27,6 +27,7 @@ import { Navbar } from "@/components/shared/Navbar";
 import { PlatformGuideModal } from "@/components/shared/PlatformGuideModal";
 import { cardHover, fadeInUp, staggerContainer } from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
+import { KrishiSetuLogo } from "@/components/shared/KrishiSetuLogo";
 
 export default function HomePage() {
   const { language, t } = useLanguage();
@@ -519,10 +520,8 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 w-full min-w-0">
             {/* Column 1: Brand Info */}
             <div className="col-span-1 sm:col-span-2 space-y-3 min-w-0">
-              <div className="flex items-center gap-2">
-                <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-xs shrink-0">
-                  <Sprout className="size-4" />
-                </div>
+              <div className="flex items-center gap-2.5">
+                <KrishiSetuLogo size={36} className="size-9 shrink-0" />
                 <span className="font-extrabold text-base text-slate-900 truncate">Krishi Setu (कृषि सेतु)</span>
               </div>
               <p className="text-xs text-slate-500 max-w-sm leading-relaxed">

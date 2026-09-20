@@ -164,49 +164,49 @@ export default function FarmerPortalPage() {
 
       <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Farmer Profile & Ledger Bar */}
-        <section className="glass rounded-3xl border border-emerald-200 p-4 sm:p-6 shadow-sm">
+        <section className="glass rounded-3xl border border-emerald-200/90 bg-white/95 p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md shrink-0">
                 <Sprout className="size-6 sm:size-7" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 leading-tight">
+                  <h1 className="text-base sm:text-2xl font-extrabold text-slate-900 leading-tight">
                     {t("farmer_name")}
                   </h1>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
-                    <ShieldCheck className="size-3.5 text-emerald-600" />
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-800 shrink-0">
+                    <ShieldCheck className="size-3 sm:size-3.5 text-emerald-600" />
                     {t("pm_kisan_verified")}
                   </span>
                 </div>
-                <p className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                <p className="flex items-center gap-1 text-[11px] sm:text-xs text-slate-500 mt-1 truncate">
                   <MapPin className="size-3 text-emerald-600 shrink-0" />
-                  <span>{t("farmer_location")}</span>
+                  <span className="truncate">{t("farmer_location")}</span>
                 </p>
               </div>
             </div>
 
             {/* Live Financial & Trust Telemetry */}
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 text-xs w-full md:w-auto">
-              <div className="rounded-2xl border border-emerald-200 bg-white/90 p-3 shadow-xs flex-1 min-w-[120px]">
-                <span className="text-[10px] uppercase font-bold text-slate-400">{t("escrow_balance_label")}</span>
-                <p className="text-lg font-black text-emerald-700">₹42,500</p>
-                <span className="text-[10px] text-emerald-600">{t("locked_in_razorpay")}</span>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 text-xs w-full md:w-auto">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-2.5 sm:p-3 shadow-xs flex-1 min-w-[110px]">
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block">{t("escrow_balance_label")}</span>
+                <p className="text-base sm:text-lg font-black text-emerald-700">₹42,500</p>
+                <span className="text-[9px] sm:text-[10px] text-emerald-600 truncate block">{t("locked_in_razorpay")}</span>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-xs flex-1 min-w-[120px]">
-                <span className="text-[10px] uppercase font-bold text-slate-400">{t("trust_rating_label")}</span>
-                <p className="text-lg font-black text-slate-900">4.9 ★</p>
-                <span className="text-[10px] text-slate-500">{t("ontime_dispatches")}</span>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-2.5 sm:p-3 shadow-xs flex-1 min-w-[110px]">
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block">{t("trust_rating_label")}</span>
+                <p className="text-base sm:text-lg font-black text-slate-900">4.9 ★</p>
+                <span className="text-[9px] sm:text-[10px] text-slate-500 truncate block">{t("ontime_dispatches")}</span>
               </div>
               <Button
                 onClick={() => setVoiceModalOpen(true)}
-                className="col-span-2 sm:col-span-1 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-sm h-12 sm:h-14 px-4 sm:px-5 rounded-2xl touch-target"
+                className="col-span-2 sm:col-span-1 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-sm h-11 sm:h-14 px-4 sm:px-5 rounded-2xl touch-target active:scale-98 transition-all"
               >
-                <Mic className="size-5 animate-pulse" />
+                <Mic className="size-4.5 sm:size-5 animate-pulse" />
                 <div className="text-left leading-tight">
-                  <p className="text-xs">{t("vernacular_voice_btn")}</p>
-                  <p className="text-[10px] text-emerald-100">{t("vernacular_voice_sub")}</p>
+                  <p className="text-xs font-bold">{t("vernacular_voice_btn")}</p>
+                  <p className="text-[9px] sm:text-[10px] text-emerald-100">{t("vernacular_voice_sub")}</p>
                 </div>
               </Button>
             </div>
@@ -214,39 +214,40 @@ export default function FarmerPortalPage() {
         </section>
 
         {/* Core Showcase: Voice-to-Form & OpenCV Laser Scanner Grid */}
-        <section className="grid gap-8 lg:grid-cols-12">
+        <section className="grid gap-6 sm:gap-8 lg:grid-cols-12">
           {/* Left Column: Voice Intake & Crop Form (7 Cols) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="glass rounded-3xl border border-emerald-200/90 bg-white/95 p-6 sm:p-7 shadow-sm space-y-6">
-              <div className="flex items-start justify-between border-b border-emerald-100 pb-4">
-                <div>
+            <div className="glass rounded-3xl border border-emerald-200/90 bg-white/95 p-4 sm:p-6 shadow-sm space-y-5">
+              {/* Responsive Header with Non-Squishing Badge */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-emerald-100 pb-4">
+                <div className="min-w-0">
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700">
-                    <Sparkles className="size-4" />
+                    <Sparkles className="size-3.5 sm:size-4" />
                     <span>{t("phase_tag")}</span>
                   </div>
-                  <h2 className="text-xl font-extrabold text-slate-900 mt-1">
+                  <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 mt-1 leading-tight">
                     {t("engine_title")}
                   </h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
                     {t("engine_sub")}
                   </p>
                 </div>
 
-                <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                <span className="self-start sm:self-auto rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 shrink-0 whitespace-nowrap shadow-2xs border border-emerald-200">
                   {t("speech_api_badge")}
                 </span>
               </div>
 
-              {/* Quick Preset Speech Utterances */}
-              <div className="space-y-2 rounded-2xl bg-emerald-50/70 p-3.5 border border-emerald-100">
+              {/* Quick Preset Speech Utterances (Responsive 2x2 Grid) */}
+              <div className="space-y-2.5 rounded-2xl bg-emerald-50/70 p-3 sm:p-3.5 border border-emerald-100">
                 <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
                   <span className="flex items-center gap-1">
                     <Zap className="size-3.5 text-amber-500" />
                     {t("voice_sim_title")}
                   </span>
-                  <span className="text-[10px] text-emerald-700">{t("voice_sim_sub")}</span>
+                  <span className="text-[10px] text-emerald-700 font-semibold">{t("voice_sim_sub")}</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() =>
@@ -258,7 +259,7 @@ export default function FarmerPortalPage() {
                         unit: "kg",
                       })
                     }
-                    className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
+                    className="rounded-xl border border-emerald-200/80 bg-white px-3 py-2 text-left text-xs font-medium text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 transition-all active:scale-98 truncate"
                   >
                     {t("sim_rice")}
                   </button>
@@ -273,7 +274,7 @@ export default function FarmerPortalPage() {
                         unit: "kg",
                       })
                     }
-                    className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
+                    className="rounded-xl border border-emerald-200/80 bg-white px-3 py-2 text-left text-xs font-medium text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 transition-all active:scale-98 truncate"
                   >
                     {t("sim_wheat")}
                   </button>
@@ -288,7 +289,7 @@ export default function FarmerPortalPage() {
                         unit: "kg",
                       })
                     }
-                    className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
+                    className="rounded-xl border border-emerald-200/80 bg-white px-3 py-2 text-left text-xs font-medium text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 transition-all active:scale-98 truncate"
                   >
                     {t("sim_tomatoes")}
                   </button>
@@ -303,7 +304,7 @@ export default function FarmerPortalPage() {
                         unit: "kg",
                       })
                     }
-                    className="rounded-xl border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-emerald-50 transition-colors"
+                    className="rounded-xl border border-emerald-200/80 bg-white px-3 py-2 text-left text-xs font-medium text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 transition-all active:scale-98 truncate"
                   >
                     {t("sim_onions")}
                   </button>
@@ -348,7 +349,7 @@ export default function FarmerPortalPage() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="qty" className="text-xs font-bold text-slate-700">
                       {t("quantity_label")}
@@ -360,7 +361,7 @@ export default function FarmerPortalPage() {
                       onChange={(e) => setQuantity(e.target.value ? Number(e.target.value) : "")}
                       placeholder={t("quantity_placeholder")}
                       required
-                      className="font-bold text-slate-900 border-slate-200"
+                      className="font-bold text-slate-900 border-slate-200 h-11 rounded-xl"
                     />
                   </div>
 
@@ -372,7 +373,7 @@ export default function FarmerPortalPage() {
                       id="unit"
                       value={unit}
                       onChange={(e) => setUnit(e.target.value)}
-                      className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                       <option value="kg">{t("unit_kg")}</option>
                       <option value="quintal">{t("unit_quintal")}</option>
@@ -380,35 +381,38 @@ export default function FarmerPortalPage() {
                     </select>
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="col-span-2 sm:col-span-1 space-y-1.5">
                     <Label htmlFor="price" className="text-xs font-bold text-slate-700">
                       {t("floor_price_label")}
                     </Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      value={floorPrice}
-                      onChange={(e) => setFloorPrice(e.target.value ? Number(e.target.value) : "")}
-                      placeholder="40"
-                      required
-                      className="font-bold text-emerald-700 border-slate-200"
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3 top-3 text-xs font-bold text-emerald-700">₹</span>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={floorPrice}
+                        onChange={(e) => setFloorPrice(e.target.value ? Number(e.target.value) : "")}
+                        placeholder="40"
+                        required
+                        className="pl-7 font-bold text-emerald-700 border-slate-200 h-11 rounded-xl"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Mandi Floor Comparison Insight Box */}
                 {floorPrice && (
-                  <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 p-3.5 text-xs text-slate-700 space-y-1 animate-in fade-in">
-                    <div className="flex items-center justify-between font-bold text-emerald-900">
+                  <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 p-3 sm:p-3.5 text-xs text-slate-700 space-y-1 animate-in fade-in">
+                    <div className="flex flex-wrap items-center justify-between gap-1.5 font-bold text-emerald-900">
                       <span className="flex items-center gap-1.5">
-                        <TrendingUp className="size-4 text-emerald-600" />
-                        {t("mandi_comparison_heading")}
+                        <TrendingUp className="size-4 text-emerald-600 shrink-0" />
+                        <span>{t("mandi_comparison_heading")}</span>
                       </span>
-                      <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-[10px] text-emerald-800">
+                      <span className="rounded-full bg-emerald-200 px-2 py-0.5 text-[10px] text-emerald-800 shrink-0">
                         {t("mandi_net_badge")}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-600">
+                    <p className="text-[11px] text-slate-600 leading-relaxed">
                       {language === "hi" ? (
                         <span>
                           आपका न्यूनतम भाव <strong>₹{floorPrice}/{unit}</strong> है। पारंपरिक मंडी एजेंट कटौती के बाद ₹31/{unit} देते हैं। आपको अतिरिक्त <strong>₹{Math.round(Number(floorPrice) - 31)}/{unit}</strong> सीधे बैंक खाते में मिलते हैं!
@@ -425,7 +429,7 @@ export default function FarmerPortalPage() {
                 <Button
                   type="submit"
                   disabled={isTyping}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl gap-2 shadow-md"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl gap-2 shadow-md active:scale-98 transition-all"
                 >
                   <Plus className="size-4" />
                   <span>{t("list_harvest_btn")}</span>
@@ -487,42 +491,54 @@ export default function FarmerPortalPage() {
             {listings.map((item) => (
               <div
                 key={item.id}
-                className="glass rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs space-y-3"
+                className="group rounded-2xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all space-y-3"
               >
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-slate-100">
+                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-slate-950">
                   <Image
                     src={item.imageUrl}
                     alt={item.name}
                     fill
                     sizes="(max-width: 768px) 100vw, 350px"
-                    className="object-cover"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-2 left-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-xs">
+                  <div className="absolute top-2 left-2 rounded-full bg-black/70 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-xs border border-white/20">
                     {item.category}
                   </div>
-                  <div className="absolute bottom-2 right-2 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
-                    {item.matchScore}% {t("top_match")}
+                  <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-emerald-600/95 px-2.5 py-0.5 text-[10px] font-extrabold text-white shadow-xs backdrop-blur-xs">
+                    <Sparkles className="size-2.5 text-amber-300" />
+                    <span>{item.matchScore}% {t("top_match")}</span>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-bold text-slate-900 text-sm">{item.name}</h4>
-                  <div className="flex items-center justify-between text-xs mt-1">
-                    <span className="font-extrabold text-emerald-700">
-                      ₹{item.farmGatePrice}/{item.unit}
+                  <div className="flex items-center justify-between gap-1">
+                    <h4 className="font-extrabold text-slate-900 text-sm truncate">{item.name}</h4>
+                    <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 border border-emerald-200">
+                      {item.breakdown?.qualityGrade?.grade || "Grade A"}
                     </span>
-                    <span className="text-slate-500">
-                      {t("available")} {item.quantityAvailable} {item.unit}
+                  </div>
+                  <div className="flex items-baseline justify-between text-xs mt-1.5">
+                    <div>
+                      <span className="text-base font-black text-emerald-700">
+                        ₹{item.farmGatePrice}
+                      </span>
+                      <span className="text-[11px] font-medium text-slate-500">/{item.unit}</span>
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-500">
+                      {t("available")} <strong className="text-slate-700">{item.quantityAvailable} {item.unit}</strong>
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-[11px] text-slate-500">
-                  <span className="flex items-center gap-1 text-emerald-700 font-medium">
-                    <CheckCircle2 className="size-3" />
-                    {t("opencv_verified")}
+                <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 text-[11px] text-slate-500">
+                  <span className="flex items-center gap-1 text-emerald-700 font-semibold truncate">
+                    <CheckCircle2 className="size-3 shrink-0" />
+                    <span className="truncate">{t("opencv_verified")}</span>
                   </span>
-                  <span>{t("radius")} {item.distanceKm} km</span>
+                  <span className="font-medium shrink-0 flex items-center gap-0.5">
+                    <MapPin className="size-3 text-slate-400" />
+                    <span>{item.distanceKm} km</span>
+                  </span>
                 </div>
               </div>
             ))}

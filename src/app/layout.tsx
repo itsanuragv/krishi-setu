@@ -28,6 +28,14 @@ export const metadata: Metadata = {
   title: "Krishi Setu (कृषि सेतु) | Bharat's Direct Farm-to-Buyer Digital Highway",
   description:
     "Direct farm-to-kitchen digital marketplace connecting smallholder farmers with consumers, retail grocers, and HoReCa buyers with vernacular voice AI, OpenCV quality pre-check, and smart escrow payments.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/krishi-setu-logo.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/krishi-setu-logo.svg",
+  },
   keywords: [
     "Krishi Setu",
     "कृषि सेतु",
