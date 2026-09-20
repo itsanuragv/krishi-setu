@@ -28,6 +28,7 @@ import { PlatformGuideModal } from "@/components/shared/PlatformGuideModal";
 import { cardHover, fadeInUp, staggerContainer } from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
 import { KrishiSetuLogo } from "@/components/shared/KrishiSetuLogo";
+import { RATING_CONFIG } from "@/config/rating-config";
 
 export default function HomePage() {
   const { language, t } = useLanguage();
@@ -443,10 +444,18 @@ export default function HomePage() {
 
         {/* Verified Farmer & Buyer Testimonials */}
         <section className="space-y-6">
-          <div className="text-center space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-              {t("testimonials_title")}
-            </h2>
+          <div className="text-center space-y-1.5">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                {t("testimonials_title")}
+              </h2>
+              {RATING_CONFIG.SHOW_PROTOTYPE_DISCLAIMER && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200/90 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 shadow-2xs">
+                  <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  {t("dummy_rating_disclaimer")}
+                </span>
+              )}
+            </div>
             <p className="text-xs sm:text-sm text-slate-600">
               {t("testimonials_sub")}
             </p>
@@ -460,11 +469,20 @@ export default function HomePage() {
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-amber-500">
-                      {[...Array(tItem.rating)].map((_, rIdx) => (
-                        <Star key={rIdx} className="size-3.5 fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
+                    {RATING_CONFIG.SHOW_STAR_RATINGS && (
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-0.5 text-amber-500">
+                          {[...Array(tItem.rating)].map((_, rIdx) => (
+                            <Star key={rIdx} className="size-3.5 fill-amber-400 text-amber-400" />
+                          ))}
+                        </div>
+                        {RATING_CONFIG.SHOW_DUMMY_RATING_BADGE && (
+                          <span className="rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[9px] font-bold text-amber-800 tracking-wide">
+                            {t("dummy_rating_badge")}
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
                       {tItem.badge}
                     </span>

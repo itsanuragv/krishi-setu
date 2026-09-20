@@ -480,6 +480,11 @@ export const TRANSLATIONS: Translations = {
   badge_pmkisan_verified: { en: "PM-KISAN Verified", hi: "पीएम-किसान सत्यापित" },
   badge_buyer_verified: { en: "Verified Buyer", hi: "सत्यापित खरीदार" },
   badge_institutional_partner: { en: "Institutional Partner", hi: "व्यावसायिक भागीदार" },
+  dummy_rating_badge: { en: "Sample Demo Rating", hi: "डमी रेटिंग (डेमो)" },
+  dummy_rating_disclaimer: { 
+    en: "Prototype Showcase · Simulated demonstration ratings & feedback", 
+    hi: "प्रोटोटाइप प्रदर्शन · प्रदर्शन हेतु नमूना डमी रेटिंग व अनुभव" 
+  },
 
   test_1_name: { en: "Rameshwar Patil", hi: "रामेश्वर पाटिल" },
   test_1_role: { en: "Smallholder Farmer (Pune, Maharashtra)", hi: "छोटे किसान (पुणे, महाराष्ट्र)" },

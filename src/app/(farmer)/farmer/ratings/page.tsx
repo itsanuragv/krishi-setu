@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShieldCheck, CheckCircle2, TrendingUp, AlertCircle, Award } from "lucide-react";
+import { RATING_CONFIG } from "@/config/rating-config";
 
 const REVIEWS = [
   {
@@ -152,12 +153,21 @@ export default function FarmerRatingsPage() {
                   </div>
                   <span className="text-xs text-muted-foreground">{rev.date}</span>
                 </div>
-                <div className="flex items-center gap-1 text-amber-500">
-                  {Array.from({ length: rev.rating }).map((_, i) => (
-                    <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                  <span className="ml-2 text-xs font-medium text-muted-foreground">Crop: {rev.crop}</span>
-                </div>
+                {RATING_CONFIG.SHOW_STAR_RATINGS && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-0.5 text-amber-500">
+                      {Array.from({ length: rev.rating }).map((_, i) => (
+                        <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    {RATING_CONFIG.SHOW_DUMMY_RATING_BADGE && (
+                      <span className="rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[9px] font-bold text-amber-800 tracking-wide">
+                        Sample Rating (डमी)
+                      </span>
+                    )}
+                    <span className="ml-2 text-xs font-medium text-muted-foreground">Crop: {rev.crop}</span>
+                  </div>
+                )}
                 <p className="text-xs text-foreground/90">{rev.comment}</p>
               </CardContent>
             </Card>
