@@ -41,8 +41,8 @@ export const TRANSLATIONS: Translations = {
     hi: "पीएम-किसान सत्यापित",
   },
   farmer_location: {
-    en: "Khed Khurd Cluster • Pune District, Maharashtra",
-    hi: "खेड खुर्द क्लस्टर • पुणे जिला, महाराष्ट्र",
+    en: "Sanwer Cluster • Indore District, Madhya Pradesh",
+    hi: "सांवेर क्लस्टर • इंदौर जिला, मध्य प्रदेश",
   },
   escrow_balance_label: {
     en: "Escrow Balance",
@@ -476,7 +476,7 @@ export const TRANSLATIONS: Translations = {
 
   // Testimonials
   testimonials_title: { en: "Verified Farmer & Buyer Impact Stories", hi: "सत्यापित किसान और खरीदारों के अनुभव" },
-  testimonials_sub: { en: "Real-world results from farmers, grocers, and consumers across Maharashtra", hi: "महाराष्ट्र और भारत के किसानों, खुदरा विक्रेताओं और परिवारों के वास्तविक अनुभव" },
+  testimonials_sub: { en: "Real-world results from farmers, grocers, and consumers across Madhya Pradesh", hi: "मध्य प्रदेश और भारत के किसानों, खुदरा विक्रेताओं और परिवारों के वास्तविक अनुभव" },
   badge_pmkisan_verified: { en: "PM-KISAN Verified", hi: "पीएम-किसान सत्यापित" },
   badge_buyer_verified: { en: "Verified Buyer", hi: "सत्यापित खरीदार" },
   badge_institutional_partner: { en: "Institutional Partner", hi: "व्यावसायिक भागीदार" },
@@ -487,7 +487,7 @@ export const TRANSLATIONS: Translations = {
   },
 
   test_1_name: { en: "Rameshwar Patil", hi: "रामेश्वर पाटिल" },
-  test_1_role: { en: "Smallholder Farmer (Pune, Maharashtra)", hi: "छोटे किसान (पुणे, महाराष्ट्र)" },
+  test_1_role: { en: "Smallholder Farmer (Indore, Madhya Pradesh)", hi: "छोटे किसान (इंदौर, मध्य प्रदेश)" },
   test_1_crop: { en: "Tomatoes & Basmati Rice", hi: "टमाटर एवं बासमती धान" },
   test_1_text: {
     en: "Earlier at APMC Mandi, commission agents cut 30-40% of my earnings. On Krishi Setu, I just spoke to create my listing, and direct payment reached my bank the next day.",
@@ -495,7 +495,7 @@ export const TRANSLATIONS: Translations = {
   },
 
   test_2_name: { en: "Priya Sharma", hi: "प्रिया शर्मा" },
-  test_2_role: { en: "Urban Retail Consumer (Baner, Pune)", hi: "शहरी उपभोक्ता (बाणेर, पुणे)" },
+  test_2_role: { en: "Urban Retail Consumer (Vijay Nagar, Indore)", hi: "शहरी उपभोक्ता (विजय नगर, इंदौर)" },
   test_2_crop: { en: "Weekly Fresh Kitchen Basket", hi: "साप्ताहिक ताज़ी सब्जी बास्केट" },
   test_2_text: {
     en: "Getting fresh vegetables harvested under 12 hours ago directly from farmers within 20km is incredible. The 4-digit delivery PIN gives complete peace of mind.",

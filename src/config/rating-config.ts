@@ -18,7 +18,7 @@ export const RATING_CONFIG = {
    * When true, displays a subtle prototype demonstration notice in the section header.
    * To remove it later: simply change this to `false`.
    */
-  SHOW_PROTOTYPE_DISCLAIMER: true,
+  SHOW_PROTOTYPE_DISCLAIMER: false,
 
   /**
    * When true, displays the 5-star rating icons on testimonials.
