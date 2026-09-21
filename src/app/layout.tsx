@@ -66,7 +66,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <LanguageProvider>
               {children}
               <VoiceAssistant />
-              <Toaster richColors position="top-center" />
+              <Toaster
+                richColors
+                position="top-center"
+                offset="80px"
+                mobileOffset="76px"
+              />
             </LanguageProvider>
           </QueryProvider>
         </MswProvider>
