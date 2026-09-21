@@ -44,11 +44,11 @@ export function Navbar() {
 
   const navItems = [
     { href: "/", label: t("nav_overview"), icon: Sparkles },
-    { href: "/farmer", label: t("nav_farmer"), icon: Sprout, badge: t("nav_badge_farmer") },
-    { href: "/consumer", label: t("nav_consumer"), icon: ShoppingBag, badge: "<25km" },
-    { href: "/buyer/dashboard", label: t("nav_buyer"), icon: Warehouse, badge: t("nav_badge_fpo") },
-    { href: "/delivery", label: t("nav_delivery"), icon: Truck, badge: "Fleet" },
-    { href: "/admin", label: t("nav_admin"), icon: ShieldCheck, badge: "Escrow" },
+    { href: "/farmer", label: t("nav_farmer"), icon: Sprout },
+    { href: "/consumer", label: t("nav_consumer"), icon: ShoppingBag },
+    { href: "/buyer/dashboard", label: t("nav_buyer"), icon: Warehouse },
+    { href: "/delivery", label: t("nav_delivery"), icon: Truck },
+    { href: "/admin", label: t("nav_admin"), icon: ShieldCheck },
   ];
 
   const handleLanguageToggle = () => {
@@ -86,7 +86,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop / Large Tablet Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -94,19 +94,22 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
+                  className={`group relative flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs transition-all duration-150 ${
                     isActive
-                      ? "bg-emerald-50 text-emerald-800 font-bold shadow-xs"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      ? "bg-emerald-600 text-white font-bold border border-emerald-600 shadow-xs shadow-emerald-700/20"
+                      : "bg-slate-50/90 border border-slate-200/90 text-slate-800 font-semibold shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-950 hover:shadow-xs hover:-translate-y-0.5"
                   }`}
                 >
-                  <Icon className={`size-3.5 ${isActive ? "text-emerald-600" : "text-slate-400"}`} />
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <span className="rounded-full bg-emerald-100 px-1.5 py-0.2 text-[9px] font-semibold text-emerald-700">
-                      {item.badge}
-                    </span>
-                  )}
+                  <span
+                    className={`flex size-5 items-center justify-center rounded-md transition-all ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : "bg-emerald-100/90 text-emerald-700 group-hover:bg-emerald-200 group-hover:scale-105"
+                    }`}
+                  >
+                    <Icon className="size-3 shrink-0" />
+                  </span>
+                  <span className="whitespace-nowrap">{item.label}</span>
                 </Link>
               );
             })}
@@ -186,7 +189,7 @@ export function Navbar() {
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-2">
                   {language === "hi" ? "इकोसिस्टम पोर्टल" : "Ecosystem Portals"}
                 </p>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = pathname === item.href;
@@ -195,26 +198,29 @@ export function Navbar() {
                         key={item.href}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                        className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all ${
                           isActive
-                            ? "bg-emerald-50 text-emerald-900 font-bold border border-emerald-200"
-                            : "text-slate-700 hover:bg-slate-50"
+                            ? "bg-emerald-600 text-white font-bold border border-emerald-600 shadow-xs"
+                            : "bg-slate-50 border border-slate-200/90 text-slate-800 font-semibold hover:bg-emerald-50 hover:border-emerald-200"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`flex size-8 items-center justify-center rounded-lg ${isActive ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+                          <div
+                            className={`flex size-8 items-center justify-center rounded-lg transition-colors ${
+                              isActive
+                                ? "bg-white/20 text-white"
+                                : "bg-white border border-slate-200 text-emerald-600 shadow-2xs"
+                            }`}
+                          >
                             <Icon className="size-4" />
                           </div>
                           <span>{item.label}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          {item.badge && (
-                            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                              {item.badge}
-                            </span>
-                          )}
-                          <ChevronRight className="size-4 text-slate-400" />
-                        </div>
+                        <ChevronRight
+                          className={`size-4 ${
+                            isActive ? "text-white/80" : "text-slate-400"
+                          }`}
+                        />
                       </Link>
                     );
                   })}
