@@ -176,27 +176,28 @@ export default function FarmerPortalPage() {
 
   // Listen for real-time voice listing confirmed events while already on this page
   useEffect(() => {
-    const handleVoiceList = (e: CustomEvent<{
-      crop: string;
-      variety: string;
-      quantityKg: number;
-      pricePerKg: number;
-      unit: string;
-    }>) => {
-      if (e.detail) {
+    const handleVoiceList = (e: Event) => {
+      const customEvent = e as CustomEvent<{
+        crop: string;
+        variety: string;
+        quantityKg: number;
+        pricePerKg: number;
+        unit: string;
+      }>;
+      if (customEvent.detail) {
         simulateVoiceToForm({
-          crop: e.detail.crop,
-          variety: e.detail.variety || "Standard Grade-A",
-          quantity: e.detail.quantityKg,
-          price: e.detail.pricePerKg,
-          unit: e.detail.unit || "kg",
+          crop: customEvent.detail.crop,
+          variety: customEvent.detail.variety || "Standard Grade-A",
+          quantity: customEvent.detail.quantityKg,
+          price: customEvent.detail.pricePerKg,
+          unit: customEvent.detail.unit || "kg",
         });
       }
     };
 
-    window.addEventListener("krishi-voice-list-crop" as any, handleVoiceList as any);
+    window.addEventListener("krishi-voice-list-crop", handleVoiceList);
     return () => {
-      window.removeEventListener("krishi-voice-list-crop" as any, handleVoiceList as any);
+      window.removeEventListener("krishi-voice-list-crop", handleVoiceList);
     };
   }, []);
 

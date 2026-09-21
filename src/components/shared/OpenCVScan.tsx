@@ -9,16 +9,13 @@ import {
   Sparkles, 
   Eye, 
   Gauge, 
-  SunMedium, 
-  Maximize2,
   Camera,
   Volume2,
   VolumeX,
   Award,
   Calendar,
   AlertTriangle,
-  Flame,
-  ArrowUpRight
+  Flame
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";

@@ -387,13 +387,14 @@ export function VoiceAssistant() {
 
     recognitionRef.current = recognition;
 
+    const activeSilenceTimer = silenceTimerRef.current;
     return () => {
       try {
         recognition.abort?.();
       } catch {
         // Ignore
       }
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      if (activeSilenceTimer) clearTimeout(activeSilenceTimer);
     };
   }, [language, processWithGemini]);
 
