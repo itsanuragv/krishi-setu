@@ -30,11 +30,11 @@ export const metadata: Metadata = {
     "Direct farm-to-kitchen digital marketplace connecting smallholder farmers with consumers, retail grocers, and HoReCa buyers with vernacular voice AI, OpenCV quality pre-check, and smart escrow payments.",
   icons: {
     icon: [
+      { url: "/kisan-setu-emblem.png", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/krishi-setu-logo.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/icon.svg",
-    apple: "/krishi-setu-logo.svg",
+    shortcut: "/kisan-setu-emblem.png",
+    apple: "/kisan-setu-emblem.png",
   },
   keywords: [
     "Krishi Setu",

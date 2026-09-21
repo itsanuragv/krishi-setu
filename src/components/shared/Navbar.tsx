@@ -113,34 +113,37 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Functional Language Toggle */}
-            <button
-              onClick={handleLanguageToggle}
-              aria-label="Toggle language between Hindi and English"
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-3 py-2 sm:px-3.5 sm:py-2 text-xs sm:text-[13px] font-bold text-emerald-900 hover:bg-emerald-100 transition-colors shadow-xs touch-target shrink-0"
-              title="Toggle Vernacular Hindi / English"
-            >
-              <Languages className="size-4 text-emerald-600 shrink-0" />
-              <span>{language === "en" ? "हिन्दी" : "Eng"}</span>
-            </button>
+          {/* Action CTAs: Separated & Subtle */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Utility Strip: Language + Helpline (Subtle & Separated from portal links) */}
+            <div className="flex items-center gap-1 sm:gap-1.5 pl-2 sm:pl-3 border-l border-slate-200 shrink-0">
+              {/* Functional Language Toggle - Subtle Style */}
+              <button
+                onClick={handleLanguageToggle}
+                aria-label="Toggle language between Hindi and English"
+                className="flex items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-emerald-700 hover:bg-slate-100/90 transition-colors touch-target shrink-0"
+                title="Toggle Vernacular Hindi / English"
+              >
+                <Languages className="size-3.5 text-slate-400 shrink-0" />
+                <span className="font-semibold text-slate-700">{language === "en" ? "हिन्दी" : "Eng"}</span>
+              </button>
 
-            {/* Helpline quick link (XL Desktop) */}
-            <a
-              href="tel:18001801551"
-              className="hidden xl:flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs sm:text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors shrink-0"
-              title="Kisan Call Center: 1800-180-1551"
-            >
-              <PhoneCall className="size-3.5 text-emerald-600" />
-              <span className="font-semibold">1800-180-1551</span>
-            </a>
+              {/* Helpline quick link - Subtle Style */}
+              <a
+                href="tel:18001801551"
+                className="hidden xl:flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-slate-400 hover:text-slate-800 hover:bg-slate-100/90 transition-colors shrink-0"
+                title="Kisan Call Center: 1800-180-1551"
+              >
+                <PhoneCall className="size-3 text-slate-400" />
+                <span className="font-medium text-slate-500">1800-180-1551</span>
+              </a>
+            </div>
 
             {/* Mobile / Tablet Menu Button */}
             <button
               onClick={() => setMobileMenuOpen((o) => !o)}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              className="lg:hidden rounded-xl p-2.5 text-slate-700 hover:bg-slate-100 transition-colors touch-target shrink-0"
+              className="lg:hidden rounded-xl p-2 text-slate-700 hover:bg-slate-100 transition-colors touch-target shrink-0"
             >
               {mobileMenuOpen ? <X className="size-5 sm:size-6" /> : <Menu className="size-5 sm:size-6" />}
             </button>

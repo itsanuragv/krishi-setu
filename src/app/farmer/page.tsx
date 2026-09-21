@@ -144,8 +144,27 @@ export default function FarmerPortalPage() {
     toast.success("Produce Successfully Auto-Listed in Hyperlocal PostGIS Feed!");
   };
 
-  // Preload initial crop for quick evaluation
+  // Preload initial crop or handle incoming voice listing
   useEffect(() => {
+    // Check if voice assistant set a pending crop
+    const stored = typeof window !== "undefined" ? sessionStorage.getItem("krishi_pending_voice_crop") : null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        sessionStorage.removeItem("krishi_pending_voice_crop");
+        simulateVoiceToForm({
+          crop: parsed.crop || "टमाटर",
+          variety: parsed.variety || "Standard Grade-A",
+          quantity: parsed.quantityKg || 50,
+          price: parsed.pricePerKg || 40,
+          unit: parsed.unit || "kg",
+        });
+        return;
+      } catch (err) {
+        console.error("Failed to parse voice crop:", err);
+      }
+    }
+
     simulateVoiceToForm({
       crop: "Rice",
       variety: "Basmati Grade-A",
@@ -153,6 +172,32 @@ export default function FarmerPortalPage() {
       price: 60,
       unit: "kg",
     });
+  }, []);
+
+  // Listen for real-time voice listing confirmed events while already on this page
+  useEffect(() => {
+    const handleVoiceList = (e: CustomEvent<{
+      crop: string;
+      variety: string;
+      quantityKg: number;
+      pricePerKg: number;
+      unit: string;
+    }>) => {
+      if (e.detail) {
+        simulateVoiceToForm({
+          crop: e.detail.crop,
+          variety: e.detail.variety || "Standard Grade-A",
+          quantity: e.detail.quantityKg,
+          price: e.detail.pricePerKg,
+          unit: e.detail.unit || "kg",
+        });
+      }
+    };
+
+    window.addEventListener("krishi-voice-list-crop" as any, handleVoiceList as any);
+    return () => {
+      window.removeEventListener("krishi-voice-list-crop" as any, handleVoiceList as any);
+    };
   }, []);
 
   return (
