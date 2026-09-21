@@ -69,8 +69,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Toaster
                 richColors
                 position="top-center"
-                offset="80px"
-                mobileOffset="76px"
+                offset="92px"
+                mobileOffset="86px"
               />
             </LanguageProvider>
           </QueryProvider>

@@ -61,22 +61,22 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-emerald-100/70 bg-white/90 backdrop-blur-md transition-all shadow-xs">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 w-full border-b border-emerald-100/70 bg-white/95 backdrop-blur-md transition-all shadow-xs">
+        <div className="mx-auto flex h-[72px] sm:h-[76px] max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
           {/* Brand Logo with Krishi Setu Emblem */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink min-w-0">
-            <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group touch-target min-w-0">
-              <KrishiSetuLogo size={36} className="size-8 sm:size-9 shrink-0" />
+          <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group touch-target min-w-0">
+              <KrishiSetuLogo size={42} className="size-9 sm:size-11 shrink-0" />
               <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1 min-w-0">
-                  <span className="font-extrabold text-sm sm:text-lg tracking-tight text-slate-900 leading-none truncate">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="font-black text-base sm:text-xl tracking-tight text-slate-900 leading-none truncate">
                     {t("brand_title")}
                   </span>
-                  <span className="text-[10px] sm:text-xs font-bold text-emerald-600 hidden xs:inline shrink-0">
+                  <span className="text-[11px] sm:text-xs font-bold text-emerald-600 hidden xs:inline shrink-0">
                     {t("brand_hindi")}
                   </span>
                 </div>
-                <span className="text-[9px] sm:text-[10px] font-medium text-slate-500 tracking-tight leading-none mt-0.5 hidden sm:inline truncate">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-500 tracking-tight leading-none mt-1 hidden sm:inline truncate">
                   {t("brand_subtitle")}
                 </span>
               </div>
@@ -84,7 +84,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop / Large Tablet Navigation */}
-          <nav className="hidden lg:flex items-center gap-1.5">
+          <nav className="hidden lg:flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -92,20 +92,20 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group relative flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs transition-all duration-150 ${
+                  className={`group relative flex items-center gap-2.5 rounded-xl px-3.5 py-2 text-xs sm:text-[13px] transition-all duration-150 ${
                     isActive
                       ? "bg-emerald-600 text-white font-bold border border-emerald-600 shadow-xs shadow-emerald-700/20"
-                      : "bg-slate-50/90 border border-slate-200/90 text-slate-800 font-semibold shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-950 hover:shadow-xs hover:-translate-y-0.5"
+                      : "bg-slate-50/95 border border-slate-200/90 text-slate-800 font-semibold shadow-2xs hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-950 hover:shadow-xs hover:-translate-y-0.5"
                   }`}
                 >
                   <span
-                    className={`flex size-5 items-center justify-center rounded-md transition-all ${
+                    className={`flex size-6 items-center justify-center rounded-lg transition-all ${
                       isActive
                         ? "bg-white/20 text-white"
                         : "bg-emerald-100/90 text-emerald-700 group-hover:bg-emerald-200 group-hover:scale-105"
                     }`}
                   >
-                    <Icon className="size-3 shrink-0" />
+                    <Icon className="size-3.5 shrink-0" />
                   </span>
                   <span className="whitespace-nowrap">{item.label}</span>
                 </Link>
@@ -114,35 +114,35 @@ export function Navbar() {
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Functional Language Toggle */}
             <button
               onClick={handleLanguageToggle}
               aria-label="Toggle language between Hindi and English"
-              className="flex items-center justify-center gap-1 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-2 py-1.5 sm:px-3 text-xs font-bold text-emerald-900 hover:bg-emerald-100 transition-colors shadow-xs touch-target shrink-0"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-3 py-2 sm:px-3.5 sm:py-2 text-xs sm:text-[13px] font-bold text-emerald-900 hover:bg-emerald-100 transition-colors shadow-xs touch-target shrink-0"
               title="Toggle Vernacular Hindi / English"
             >
-              <Languages className="size-3.5 text-emerald-600 shrink-0" />
-              <span className="text-[11px] sm:text-xs">{language === "en" ? "हिन्दी" : "Eng"}</span>
+              <Languages className="size-4 text-emerald-600 shrink-0" />
+              <span>{language === "en" ? "हिन्दी" : "Eng"}</span>
             </button>
 
-            {/* Helpline quick link (Tablet/Desktop) */}
+            {/* Helpline quick link (XL Desktop) */}
             <a
               href="tel:18001801551"
-              className="hidden md:flex items-center gap-1 rounded-xl border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors shrink-0"
+              className="hidden xl:flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs sm:text-[13px] font-medium text-slate-600 hover:bg-slate-50 transition-colors shrink-0"
               title="Kisan Call Center: 1800-180-1551"
             >
-              <PhoneCall className="size-3 text-emerald-600" />
-              <span className="text-[11px] font-semibold">1800-180-1551</span>
+              <PhoneCall className="size-3.5 text-emerald-600" />
+              <span className="font-semibold">1800-180-1551</span>
             </a>
 
             {/* Mobile / Tablet Menu Button */}
             <button
               onClick={() => setMobileMenuOpen((o) => !o)}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              className="lg:hidden rounded-xl p-2 text-slate-700 hover:bg-slate-100 transition-colors touch-target shrink-0"
+              className="lg:hidden rounded-xl p-2.5 text-slate-700 hover:bg-slate-100 transition-colors touch-target shrink-0"
             >
-              {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+              {mobileMenuOpen ? <X className="size-5 sm:size-6" /> : <Menu className="size-5 sm:size-6" />}
             </button>
           </div>
         </div>

@@ -167,17 +167,6 @@ export default function ConsumerPortalPage() {
                 </p>
               </div>
             </div>
-
-            {/* Hyperlocal Filter Badge */}
-            <div className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white/80 px-4 py-2.5 shadow-xs text-xs">
-              <span className="size-2.5 rounded-full bg-emerald-500 animate-ping" />
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">{t("postgis_query_badge")}</span>
-                <p className="font-bold text-slate-900">
-                  {language === "hi" ? `खोज दायरा: <${maxDistance} किमी` : `ST_DWithin: <${maxDistance} km Radius`}
-                </p>
-              </div>
-            </div>
           </div>
         </section>
 

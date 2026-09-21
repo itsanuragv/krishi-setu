@@ -556,7 +556,7 @@ export const TRANSLATIONS: Translations = {
   // Consumer Hub
   consumer_hub_title: { en: "Consumer & Retail Discovery Hub", hi: "उपभोक्ता व खुदरा उपज खोज केंद्र" },
   match_engine_badge: { en: "5-Factor Match Engine", hi: "5-कारक स्मार्ट मैच इंजन" },
-  delivery_zone: { en: "Your Delivery Zone: Baner / Aundh Corridor, Pune (<12h Vine-to-Kitchen)", hi: "डिलीवरी क्षेत्र: बाणेर / औंध कॉरिडोर, पुणे (<12 घंटे में खेत से रसोई)" },
+  delivery_zone: { en: "Your Delivery Zone: Vijay Nagar / Palasia Corridor, Indore, MP (<12h Vine-to-Kitchen)", hi: "डिलीवरी क्षेत्र: विजय नगर / पलासिया कॉरिडोर, इंदौर, म.प्र. (<12 घंटे में खेत से रसोई)" },
   postgis_query_badge: { en: "PostGIS Spatial Query", hi: "पोस्टजीआईएस दूरी खोज" },
   postgis_radius: { en: "ST_DWithin: <25 km Radius", hi: "खोज दायरा: <25 किमी" },
   voice_first_tag: { en: "Voice-First AI Discovery", hi: "वॉइस-फर्स्ट AI खोज" },
