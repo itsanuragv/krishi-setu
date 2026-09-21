@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   Sprout, 
-  Mic, 
   Scan, 
   Sparkles, 
   CheckCircle2, 
@@ -21,13 +20,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Navbar } from "@/components/shared/Navbar";
 import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan";
-import { VoiceModal } from "@/components/shared/VoiceModal";
 import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
 
 export default function FarmerPortalPage() {
   const { t, language } = useLanguage();
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   
   // Listing Form State
   const [cropName, setCropName] = useState("");
@@ -199,16 +196,6 @@ export default function FarmerPortalPage() {
                 <p className="text-base sm:text-lg font-black text-slate-900">4.9 ★</p>
                 <span className="text-[9px] sm:text-[10px] text-slate-500 truncate block">{t("ontime_dispatches")}</span>
               </div>
-              <Button
-                onClick={() => setVoiceModalOpen(true)}
-                className="col-span-2 sm:col-span-1 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 shadow-sm h-11 sm:h-14 px-4 sm:px-5 rounded-2xl touch-target active:scale-98 transition-all"
-              >
-                <Mic className="size-4.5 sm:size-5 animate-pulse" />
-                <div className="text-left leading-tight">
-                  <p className="text-xs font-bold">{t("vernacular_voice_btn")}</p>
-                  <p className="text-[9px] sm:text-[10px] text-emerald-100">{t("vernacular_voice_sub")}</p>
-                </div>
-              </Button>
             </div>
           </div>
         </section>
@@ -546,20 +533,6 @@ export default function FarmerPortalPage() {
         </section>
       </main>
 
-      {/* Vernacular Voice Modal */}
-      <VoiceModal
-        isOpen={voiceModalOpen}
-        onClose={() => setVoiceModalOpen(false)}
-        onExtractedData={(data) => {
-          simulateVoiceToForm({
-            crop: data.crop,
-            variety: data.variety || "Verified Produce",
-            quantity: data.quantity,
-            price: data.price,
-            unit: data.unit,
-          });
-        }}
-      />
     </div>
   );
 }

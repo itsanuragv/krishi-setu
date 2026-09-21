@@ -9,7 +9,6 @@ import {
   Truck, 
   ShieldCheck, 
   Languages, 
-  Sparkles, 
   Menu, 
   X,
   PhoneCall,
@@ -43,7 +42,6 @@ export function Navbar() {
   }, [pathname]);
 
   const navItems = [
-    { href: "/", label: t("nav_overview"), icon: Sparkles },
     { href: "/farmer", label: t("nav_farmer"), icon: Sprout },
     { href: "/consumer", label: t("nav_consumer"), icon: ShoppingBag },
     { href: "/buyer/dashboard", label: t("nav_buyer"), icon: Warehouse },
