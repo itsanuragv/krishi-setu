@@ -14,8 +14,7 @@ import {
   X,
   PhoneCall,
   Warehouse,
-  ChevronRight,
-  Mic
+  ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
@@ -115,22 +114,6 @@ export function Navbar() {
 
           {/* Action CTAs */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            {/* Quick Voice Assistant Mic Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.dispatchEvent(new CustomEvent("open-voice-assistant"));
-                }
-              }}
-              aria-label="Open Kisan Voice Assistant"
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-300 bg-gradient-to-r from-emerald-600 to-teal-700 p-2 sm:px-3 sm:py-1.5 text-xs font-bold text-white shadow-xs hover:from-emerald-700 hover:to-teal-800 transition-all touch-target active:scale-95 shrink-0"
-              title="Kisan Voice Saathi (किसान वाणी)"
-            >
-              <Mic className="size-4 sm:size-3.5 text-amber-300 animate-pulse shrink-0" />
-              <span className="hidden md:inline">{language === "hi" ? "बोलकर खोजें" : "Voice AI"}</span>
-            </button>
-
             {/* Functional Language Toggle */}
             <button
               onClick={handleLanguageToggle}
@@ -238,34 +221,6 @@ export function Navbar() {
                 </div>
               </div>
 
-              {/* Kisan Voice Saathi Shortcut Card */}
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  if (typeof window !== "undefined") {
-                    window.dispatchEvent(new CustomEvent("open-voice-assistant"));
-                  }
-                }}
-                className="w-full flex items-center justify-between rounded-2xl border border-emerald-300 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-3.5 text-white shadow-md active:scale-98 transition-all"
-              >
-                <div className="flex items-center gap-3 text-left">
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-white/20 text-white">
-                    <Mic className="size-5 animate-pulse" />
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-xs leading-none">
-                      {language === "hi" ? "किसान वाणी (Voice AI)" : "Kisan Voice Saathi"}
-                    </p>
-                    <p className="text-[10px] text-emerald-100 mt-1">
-                      {language === "hi" ? "बोलकर फसल बेचें या खोजें" : "Speak to sell or search produce"}
-                    </p>
-                  </div>
-                </div>
-                <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[9px] font-black text-slate-900">
-                  TAP
-                </span>
-              </button>
 
               {/* Language Switch Card */}
               <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3.5 space-y-2">
