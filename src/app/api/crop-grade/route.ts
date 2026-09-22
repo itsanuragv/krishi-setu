@@ -425,6 +425,6 @@ Respond with STRICT JSON adhering exactly to this structure (no markdown fences,
     }
   } catch (error) {
     console.error("AI crop grading endpoint error:", error);
-    return NextResponse.json(fallbackGrading("Tomato", "hi"), { status: 200 });
+    return NextResponse.json(fallbackGrading("Wheat", "hi"), { status: 200 });
   }
 }

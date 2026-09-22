@@ -103,10 +103,10 @@ export default function SellPage() {
       });
 
       const data = await res.json();
-      const crop = data.cropData?.crop || "Tomatoes";
-      const variety = data.cropData?.variety || "Desi Grade-A";
-      const qty = data.cropData?.quantityKg || 50;
-      const price = data.cropData?.pricePerKg || 35;
+      const crop = data.cropData?.crop || "Sharbati Wheat";
+      const variety = data.cropData?.variety || "MP Sharbati Golden A+";
+      const qty = data.cropData?.quantityKg || 5000;
+      const price = data.cropData?.pricePerKg || 34;
 
       form.setValue("crop", crop);
       form.setValue("variety", variety);
@@ -353,11 +353,11 @@ export default function SellPage() {
             <>
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-slate-700">Crop Name (फसल का नाम)</Label>
-                <Input {...form.register("crop")} placeholder="e.g. Tomato, Rice, Wheat" className="rounded-xl h-11" />
+                <Input {...form.register("crop")} placeholder="e.g. Sharbati Wheat, Soyabean, Bajra" className="rounded-xl h-11" />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-slate-700">Variety (किस्म)</Label>
-                <Input {...form.register("variety")} placeholder="e.g. Desi Hybrid, Basmati" className="rounded-xl h-11" />
+                <Input {...form.register("variety")} placeholder="e.g. MP Sharbati Golden, JS-9560, Pusa 1121" className="rounded-xl h-11" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">

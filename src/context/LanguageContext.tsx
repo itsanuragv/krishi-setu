@@ -493,26 +493,26 @@ export const TRANSLATIONS: Translations = {
 
   test_1_name: { en: "Rameshwar Patil", hi: "रामेश्वर पाटिल" },
   test_1_role: { en: "Smallholder Farmer (Indore, Madhya Pradesh)", hi: "छोटे किसान (इंदौर, मध्य प्रदेश)" },
-  test_1_crop: { en: "Tomatoes & Basmati Rice", hi: "टमाटर एवं बासमती धान" },
+  test_1_crop: { en: "MP Sharbati Wheat & Basmati Paddy", hi: "शरबती गेहूं एवं बासमती धान" },
   test_1_text: {
-    en: "Earlier at APMC Mandi, commission agents cut 30-40% of my earnings. On Krishi Setu, I just spoke to create my listing, and direct payment reached my bank the next day.",
-    hi: "पहले APMC मंडी में आढ़तिये 30-40% कमीशन काट लेते थे। कृषि सेतु पर मैंने बस बोलकर अपनी फसल जोड़ी, और अगले ही दिन पूरा पैसा सीधे मेरे बैंक खाते में आ गया।",
+    en: "Earlier at APMC Mandi, commission agents cut 30-40% of my earnings. On Krishi Setu, I just spoke to create my grain listing, and direct payment reached my bank the next day.",
+    hi: "पहले APMC मंडी में आढ़तिये 30-40% कमीशन काट लेते थे। कृषि सेतु पर मैंने बस बोलकर अपनी गेहूं व धान की फ़सल जोड़ी, और अगले ही दिन पूरा पैसा सीधे मेरे बैंक खाते में आ गया।",
   },
 
   test_2_name: { en: "Priya Sharma", hi: "प्रिया शर्मा" },
   test_2_role: { en: "Urban Retail Consumer (Vijay Nagar, Indore)", hi: "शहरी उपभोक्ता (विजय नगर, इंदौर)" },
-  test_2_crop: { en: "Weekly Fresh Kitchen Basket", hi: "साप्ताहिक ताज़ी सब्जी बास्केट" },
+  test_2_crop: { en: "Pure Whole Grain & Millet Basket", hi: "शुद्ध खाद्यान्न व श्री अन्न बास्केट" },
   test_2_text: {
-    en: "Getting fresh vegetables harvested under 12 hours ago directly from farmers within 20km is incredible. The 4-digit delivery PIN gives complete peace of mind.",
-    hi: "12 घंटे पहले तोड़ी गई ताज़ा सब्जियां सीधे 20 किमी के भीतर के किसान से मिलना अद्भुत है। 4-अंकीय डिलीवरी पिन से विश्वास रहता है कि पैसा तभी कटेगा जब माल सही मिलेगा।",
+    en: "Getting pure stone-ground Sharbati wheat and organic millets directly from farmers within 20km is incredible. The 4-digit delivery PIN gives complete peace of mind.",
+    hi: "खेत से सीधे 20 किमी के भीतर के किसान से शुद्ध शरबती गेहूं और जैविक श्री अन्न मिलना अद्भुत है। 4-अंकीय डिलीवरी पिन से विश्वास रहता है कि भुगतान तभी होगा जब माल सही मिलेगा।",
   },
 
   test_3_name: { en: "Siddharth Verma", hi: "सिद्धार्थ वर्मा" },
-  test_3_role: { en: "Procurement Lead (Hotel Annapurna)", hi: "खरीद प्रमुख (होटल अन्नपूर्णा)" },
-  test_3_crop: { en: "Bulk Onions & Seasonal Vegetables", hi: "थोक प्याज व मौसमी सब्जियां" },
+  test_3_role: { en: "Procurement Lead (Malwa Agro Mills)", hi: "खरीद प्रमुख (मालवा एग्रो मिल्स)" },
+  test_3_crop: { en: "Bulk Soyabean & Certified Grain Lots", hi: "थोक सोयाबीन व प्रमाणित खाद्यान्न लॉट्स" },
   test_3_text: {
-    en: "We procure 300kg weekly directly from FPO collectives. Consistent OpenCV quality grading and GST compliant escrow settlement saved our restaurant chain 22% in procurement costs.",
-    hi: "हम हर हफ्ते 300 किलो माल सीधे किसान समूहों (FPO) से मंगाते हैं। कैमरे से प्रमाणित गुणवत्ता और पक्के जीएसटी बिल के साथ हमारे होटल की खरीद लागत में 22% की बचत हुई है।",
+    en: "We procure 30 quintals weekly directly from FPO collectives. Consistent OpenCV moisture & grain grading with GST compliant escrow settlement saved our processing unit 18% in procurement costs.",
+    hi: "हम हर हफ्ते 30 क्विंटल अनाज व सोयाबीन सीधे किसान उत्पादक संगठनों (FPO) से मंगाते हैं। कैमरे से प्रमाणित नमी व ग्रेडिंग और पक्के जीएसटी बिल से हमारे प्रोसेसिंग प्लांट की खरीद लागत में 18% की बचत हुई है।",
   },
 
   // Compliance

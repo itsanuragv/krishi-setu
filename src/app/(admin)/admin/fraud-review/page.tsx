@@ -13,7 +13,7 @@ export default function FraudReviewPage() {
           <CardTitle>Duplicate listing cluster</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <p>Two onion listings from the same GPS cell with identical photos — flagged for review.</p>
+          <p>Two Sharbati wheat listings from the same GPS cell with identical photos — flagged for review.</p>
           <Button
             variant="destructive"
             onClick={() => {

@@ -107,7 +107,7 @@ function SearchContent() {
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
           <Input 
-            placeholder="Search crop name (e.g. Tomato, Rice, Onion) or tap mic..." 
+            placeholder="Search field crop name (e.g. Sharbati Wheat, Soyabean, Bajra, Basmati) or tap mic..." 
             value={crop} 
             onChange={(e) => setCrop(e.target.value)}
             className="pl-10 pr-12 h-12 rounded-2xl border-slate-300 focus:border-emerald-600 shadow-xs text-sm" 

@@ -47,7 +47,7 @@ export const productHandlers = [
         lat: 19.99,
         lng: 73.78,
         area: farmer?.village ?? "Village",
-        district: body.district ?? farmer?.district ?? "Nashik",
+        district: body.district ?? farmer?.district ?? "Sehore",
       },
       status: "listed",
       description: body.description,
