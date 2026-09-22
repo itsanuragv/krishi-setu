@@ -7,16 +7,11 @@ import {
   CheckCircle2, 
   RefreshCw, 
   Sparkles, 
-  Eye, 
-  Gauge, 
   Camera,
   Upload,
   Volume2,
   VolumeX,
   Award,
-  Calendar,
-  AlertTriangle,
-  ArrowRight,
   ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -512,48 +507,43 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
         }}
       />
 
-      {/* Main HUD Card */}
+      {/* Main HUD Card - Minimal & Clean */}
       <div 
         id="opencv-scanner"
         className={`relative rounded-3xl border transition-all duration-300 ${
           isVoiceHighlighted 
-            ? "border-emerald-400 ring-4 ring-emerald-400/80 shadow-[0_0_35px_rgba(16,185,129,0.4)] scale-[1.01]" 
+            ? "border-emerald-400 ring-4 ring-emerald-400/80 shadow-[0_0_35px_rgba(16,185,129,0.3)] scale-[1.01]" 
             : "border-slate-800 shadow-xl"
-        } bg-slate-950 p-4 sm:p-5 text-white overflow-hidden`}
+        } bg-slate-950 p-3.5 sm:p-4 text-white overflow-hidden`}
       >
-        {/* Iridescent Aurora Top Glow */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500" />
+        {/* Subtle Iridescent Top Glow */}
+        <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500" />
 
         {/* Voice AI Prompt Banner when highlighted */}
         {isVoiceHighlighted && (
-          <div className="mb-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-3.5 py-2.5 text-xs text-white font-bold flex items-center gap-2 shadow-md animate-in fade-in slide-in-from-top-2">
-            <Camera className="size-4 text-emerald-200 animate-pulse shrink-0" />
+          <div className="mb-2.5 rounded-xl bg-emerald-600/90 border border-emerald-400/50 px-3 py-2 text-xs text-white font-medium flex items-center gap-2 shadow-sm animate-in fade-in slide-in-from-top-1">
+            <Camera className="size-3.5 text-emerald-200 animate-pulse shrink-0" />
             <span>
               {language === "hi"
-                ? "📸 Voice AI: फसल की जानकारी भर दी गई है! अब कृपया यहाँ अपनी फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।"
-                : "📸 Voice AI: Crop details captured! Please upload a produce photo or scan with the AI camera."}
+                ? "📸 Voice AI: फसल भर दी गई है! कृपया फोटो अपलोड या AI कैमरा स्कैन करें।"
+                : "📸 Voice AI: Crop captured! Please upload photo or scan with AI camera."}
             </span>
           </div>
         )}
 
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-3">
+        {/* Top Header Bar - Minimal */}
+        <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-800/80">
           <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 text-slate-950 shadow-md">
-              <Scan className="size-4" />
+            <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-400">
+              <Scan className="size-3.5" />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h3 className="text-xs sm:text-sm font-black tracking-wide text-white">
-                  {t("opencv_ai_quality_lab")}
-                </h3>
-                <span className="rounded-full bg-emerald-950 border border-emerald-700/80 px-1.5 py-0.2 text-[9px] font-bold text-emerald-300">
-                  GEMINI 2.0 VISION
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-400">
-                {t("opencv_ai_grading_sub")}
-              </p>
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-xs font-bold tracking-tight text-white">
+                {t("opencv_ai_quality_lab")}
+              </h3>
+              <span className="rounded bg-emerald-950/80 border border-emerald-700/60 px-1.5 py-0.5 text-[8px] font-mono font-bold text-emerald-300">
+                GEMINI 2.0
+              </span>
             </div>
           </div>
 
@@ -562,8 +552,8 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
             <button
               type="button"
               onClick={toggleSpeechFeedback}
-              className="flex items-center gap-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 px-2.5 py-1 text-[10px] font-medium text-slate-300 hover:text-white transition-colors"
-              title={language === "hi" ? "रिपोर्ट सुनें (Voice Readout)" : "Listen to Report (Voice Readout)"}
+              className="flex items-center gap-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700/80 px-2 py-1 text-[10px] font-medium text-slate-300 hover:text-white transition-colors"
+              title={language === "hi" ? "रिपोर्ट सुनें" : "Listen to Report"}
             >
               {isSpeaking ? (
                 <>
@@ -583,16 +573,16 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
               type="button"
               onClick={() => executeScan(selectedImage, currentCropHint)}
               disabled={isScanning}
-              className="rounded-full p-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+              className="rounded-full p-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-colors"
               title={language === "hi" ? "दोबारा स्कैन करें" : "Re-scan Produce"}
             >
-              <RefreshCw className={`size-3.5 ${isScanning ? "animate-spin text-cyan-400" : ""}`} />
+              <RefreshCw className={`size-3 ${isScanning ? "animate-spin text-cyan-400" : ""}`} />
             </button>
           </div>
         </div>
 
-        {/* Viewport Box (Image + Laser HUD Overlay) */}
-        <div className="relative aspect-video sm:aspect-4/3 w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner group">
+        {/* Viewport Box (Image + Reticle Overlay) */}
+        <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner group">
           <Image
             src={selectedImage}
             alt="Scanned Crop"
@@ -605,36 +595,36 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
           {/* Laser Scanning Line Animation */}
           {isScanning && (
             <div className="absolute inset-0 pointer-events-none">
-              <div className="w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-laser-down" />
+              <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-laser-down" />
               <div className="absolute inset-0 bg-cyan-500/10 backdrop-contrast-125" />
             </div>
           )}
 
-          {/* Camera Corner Reticles */}
-          <div className="absolute top-2 left-2 size-4 border-t-2 border-l-2 border-emerald-400" />
-          <div className="absolute top-2 right-2 size-4 border-t-2 border-r-2 border-emerald-400" />
-          <div className="absolute bottom-2 left-2 size-4 border-b-2 border-l-2 border-emerald-400" />
-          <div className="absolute bottom-2 right-2 size-4 border-b-2 border-r-2 border-emerald-400" />
+          {/* Subtle Corner Reticles */}
+          <div className="absolute top-2 left-2 size-3 border-t-2 border-l-2 border-emerald-400/80" />
+          <div className="absolute top-2 right-2 size-3 border-t-2 border-r-2 border-emerald-400/80" />
+          <div className="absolute bottom-2 left-2 size-3 border-b-2 border-l-2 border-emerald-400/80" />
+          <div className="absolute bottom-2 right-2 size-3 border-b-2 border-r-2 border-emerald-400/80" />
 
           {/* Verification Watermark Badge */}
-          <div className="absolute top-3 left-3 flex items-center gap-1 rounded-md bg-slate-950/80 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono text-emerald-300 border border-emerald-500/40">
-            <ShieldCheck className="size-3 text-emerald-400" />
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1 rounded bg-slate-950/80 backdrop-blur-sm px-1.5 py-0.5 text-[9px] font-mono text-emerald-300 border border-emerald-500/30">
+            <ShieldCheck className="size-2.5 text-emerald-400" />
             <span>{grading.assayerVerificationId}</span>
           </div>
 
-          {/* Current Grade Floating Pill */}
-          <div className={`absolute bottom-3 right-3 rounded-full px-3 py-1 text-xs font-black tracking-wider flex items-center gap-1.5 backdrop-blur-md shadow-lg ${theme.badgeBg}`}>
-            <Award className="size-3.5" />
+          {/* Grade Badge */}
+          <div className={`absolute bottom-2.5 right-2.5 rounded-lg px-2.5 py-0.5 text-xs font-black tracking-wide flex items-center gap-1 backdrop-blur-md shadow-md ${theme.badgeBg}`}>
+            <Award className="size-3" />
             <span>{grading.grade}</span>
           </div>
         </div>
 
         {/* Action Controls: Live Camera Snap & Gallery File Picker */}
-        <div className="grid grid-cols-2 gap-2 mt-3">
+        <div className="grid grid-cols-2 gap-2 mt-2.5">
           <button
             type="button"
             onClick={() => cameraInputRef.current?.click()}
-            className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white py-2 px-3 text-xs font-bold shadow-md transition-all"
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white py-2 px-3 text-xs font-bold shadow-sm transition-all"
           >
             <Camera className="size-3.5" />
             <span>{t("btn_camera_snap")}</span>
@@ -642,29 +632,28 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 hover:text-white py-2 px-3 text-xs font-bold border border-slate-700 transition-all"
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-200 hover:text-white py-2 px-3 text-xs font-bold border border-slate-700/80 transition-all"
           >
             <Upload className="size-3.5" />
             <span>{t("btn_gallery_upload")}</span>
           </button>
         </div>
 
-        {/* Quick Sample Crop Chips */}
-        <div className="mt-3 pt-2.5 border-t border-slate-800/80">
-          <div className="flex items-center gap-2 text-xs text-slate-300 mb-2">
-            <span className="font-bold text-slate-200">{t("sample_crops_label")}</span>
-            <span className="rounded-full bg-slate-800 border border-slate-700/80 px-2.5 py-0.5 text-[11px] text-emerald-400 font-medium">{t("one_click_test")}</span>
-          </div>
-          <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-none">
+        {/* Quick Sample Crop Chips - Minimal Row */}
+        <div className="mt-2.5 pt-2 border-t border-slate-800/80">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            <span className="text-[10px] text-slate-400 font-bold shrink-0 mr-0.5">
+              {t("sample_crops_label")}
+            </span>
             {SAMPLE_CROPS.map((sample, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => executeScan(sample.url, sample.hint)}
-                className={`shrink-0 min-h-[44px] inline-flex items-center justify-center rounded-full border px-4 py-2 text-xs font-bold transition-all active:scale-95 ${
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all active:scale-95 ${
                   currentCropHint.toLowerCase().includes(sample.hint.toLowerCase())
-                    ? "bg-emerald-600 text-white border-emerald-500 shadow-xs ring-2 ring-emerald-400/50"
-                    : "border-slate-800 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white hover:border-emerald-600"
+                    ? "bg-emerald-600 text-white border-emerald-500 shadow-xs"
+                    : "border-slate-800 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white"
                 }`}
               >
                 {language === "hi" ? sample.name : (sample.enName || sample.name)}
@@ -673,82 +662,52 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
           </div>
         </div>
 
-        {/* Progressive Disclosure Tabs: Quality Result vs Technical Telemetry */}
-        <div className="flex rounded-xl bg-slate-900 p-1 border border-slate-800 text-xs mt-3">
-          <button
-            type="button"
-            onClick={() => setScanStep("completed")}
-            className="flex-1 rounded-lg py-1.5 font-bold transition-all text-center flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-xs"
-          >
-            <Award className="size-3.5" />
-            <span>{t("grade_result_label")}</span>
-          </button>
-        </div>
-
-        {/* AI Horticultural Inspection Card */}
-        <div className={`mt-3 rounded-2xl border p-3.5 text-xs space-y-2.5 ${theme.bg} ${theme.border}`}>
+        {/* Minimal AI Assessment Result Card */}
+        <div className={`mt-2.5 rounded-2xl border p-3 space-y-2 ${theme.bg} ${theme.border}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="size-3.5 text-amber-300" />
-              <span className="font-extrabold text-white text-xs sm:text-sm">{grading.cropName}</span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sparkles className="size-3.5 text-amber-300 shrink-0" />
+              <span className="font-bold text-white text-xs truncate">{grading.cropName}</span>
             </div>
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${theme.badgeBg}`}>
-              {grading.grade} (+{grading.recommendedPriceDeltaPct}% {language === "hi" ? "भाव" : "Rate"})
-            </span>
+            <div className="flex items-center gap-1 shrink-0">
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${theme.badgeBg}`}>
+                {grading.grade}
+              </span>
+              <span className="text-[11px] font-bold text-emerald-400">
+                +{grading.recommendedPriceDeltaPct}% {language === "hi" ? "भाव" : "Rate"}
+              </span>
+            </div>
           </div>
 
-          <p className="text-xs text-slate-200 leading-relaxed font-medium">
+          <p className="text-xs text-slate-200 leading-relaxed line-clamp-2">
             {language === "hi" ? grading.feedbackHi : grading.feedbackEn}
           </p>
 
-          <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 pt-2 border-t border-slate-700/50">
-            <div>
-              <span className="text-slate-400 block text-[11px]">{t("ripeness_text")}</span>
-              <strong className="text-white">{grading.ripenessStage} ({grading.ripenessPct}%)</strong>
+          {/* Clean 3-stat strip (Ripeness, Defects, Shelf Life) */}
+          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-700/40 text-center text-[10px]">
+            <div className="rounded-xl bg-slate-950/60 p-1.5 border border-slate-800/60">
+              <span className="text-slate-400 block text-[9px] font-medium">{t("ripeness_text")}</span>
+              <span className="font-bold text-white text-xs">{grading.ripenessPct}%</span>
             </div>
-            <div>
-              <span className="text-slate-400 block text-[11px]">{t("defects_text")}</span>
-              <strong className="text-emerald-300">&lt; {grading.defectPct}% (Clean Surface)</strong>
+            <div className="rounded-xl bg-slate-950/60 p-1.5 border border-slate-800/60">
+              <span className="text-slate-400 block text-[9px] font-medium">{t("defects_text")}</span>
+              <span className="font-bold text-emerald-300 text-xs">&lt; {grading.defectPct}%</span>
+            </div>
+            <div className="rounded-xl bg-slate-950/60 p-1.5 border border-slate-800/60">
+              <span className="text-slate-400 block text-[9px] font-medium">{t("shelf_life_meter")}</span>
+              <span className="font-bold text-cyan-300 text-xs">{grading.shelfLifeDays} {t("days_suffix")}</span>
             </div>
           </div>
         </div>
 
-        {/* Collapsible Technical Telemetry Accordion (Progressive Disclosure) */}
-        <details className="mt-2.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 p-2.5 group">
-          <summary className="cursor-pointer text-xs font-bold text-slate-400 hover:text-emerald-400 flex items-center justify-between select-none">
-            <span className="flex items-center gap-1.5">
-              <Gauge className="size-3.5 text-cyan-400" />
-              <span>{t("telemetry_accordion_label")}</span>
-            </span>
-            <span className="text-[11px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-          </summary>
-          <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2 border-t border-slate-800 text-center">
-            <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
-              <span className="text-[11px] font-bold text-slate-400 block">{t("sharpness_meter")}</span>
-              <p className="text-xs sm:text-sm font-black text-cyan-400">{blurScore}/100</p>
-              <span className="text-[10px] text-emerald-400 block font-medium">Laplacian Pass</span>
-            </div>
-            <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
-              <span className="text-[11px] font-bold text-slate-400 block">{t("light_meter")}</span>
-              <p className="text-xs sm:text-sm font-black text-amber-400">{brightness}%</p>
-              <span className="text-[10px] text-emerald-400 block font-medium">Optimal Lux</span>
-            </div>
-            <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
-              <span className="text-[11px] font-bold text-slate-400 block">{t("shelf_life_meter")}</span>
-              <p className="text-xs sm:text-sm font-black text-emerald-400">{grading.shelfLifeDays} {t("days_suffix")}</p>
-              <span className="text-[10px] text-slate-400 block font-medium">Safe Storage</span>
-            </div>
-          </div>
-        </details>
-
         {/* Primary Action: Apply To Form Button */}
-        <div className="mt-3">
+        <div className="mt-2.5">
           <Button
             type="button"
             onClick={handleApplyToForm}
-            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold h-11 rounded-xl text-xs shadow-lg gap-1.5 transition-all active:scale-98"
+            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold h-10 rounded-xl text-xs shadow-md gap-1.5 transition-all active:scale-98"
           >
-            <CheckCircle2 className="size-4" />
+            <CheckCircle2 className="size-3.5" />
             <span>{t("btn_apply_grade")}</span>
           </Button>
         </div>

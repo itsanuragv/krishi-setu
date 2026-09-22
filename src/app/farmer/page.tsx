@@ -704,8 +704,7 @@ export default function FarmerPortalPage() {
           </div>
 
           {/* Right Column: AI Laser Scanner & Quality Lab (5 Columns) */}
-          <div className="lg:col-span-5 space-y-6">
-            
+          <div className="lg:col-span-5">
             {/* OpenCV Scanner Component */}
             <OpenCVScan 
               initialImage={attachedPhoto}
@@ -713,28 +712,6 @@ export default function FarmerPortalPage() {
               isVoiceHighlighted={highlightScanner}
               onApplyToForm={handleApplyScanResult}
             />
-
-            {/* Quality Assurance Certificate Info Box */}
-            <div className="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
-                <ShieldCheck className="size-4 text-emerald-600" />
-                <span>{t("farmer_ai_guarantee_title")}</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {t("farmer_ai_guarantee_desc")}
-              </p>
-              <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 text-[11px]">
-                <div>
-                  <span className="text-slate-400 block">{t("farmer_dispute_stat")}</span>
-                  <strong className="text-emerald-700 font-bold">&lt; 0.2%</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">{t("farmer_avg_payout_stat")}</span>
-                  <strong className="text-emerald-700 font-bold">{t("farmer_within_15min")}</strong>
-                </div>
-              </div>
-            </div>
-
           </div>
         </section>
 
