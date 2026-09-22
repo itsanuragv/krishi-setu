@@ -58,31 +58,37 @@ export interface OpenCVScanProps {
 const SAMPLE_CROPS = [
   { 
     name: "शरबती गेहूं", 
+    enName: "Sharbati Wheat",
     hint: "Wheat",
     url: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80" 
   },
   { 
     name: "बासमती चावल", 
+    enName: "Basmati Rice",
     hint: "Rice",
     url: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80" 
   },
   { 
     name: "पीला सोयाबीन", 
+    enName: "Yellow Soyabean",
     hint: "Soyabean",
     url: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=80" 
   },
   { 
     name: "देशी मक्का", 
+    enName: "Hybrid Maize",
     hint: "Corn",
     url: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80" 
   },
   { 
     name: "संकर बाजरा", 
+    enName: "Pearl Millet",
     hint: "Bajra",
     url: "https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=600&auto=format&fit=crop&q=80" 
   },
   { 
     name: "मालदांडी ज्वार", 
+    enName: "Maldandi Jowar",
     hint: "Jowar",
     url: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80" 
   },
@@ -106,7 +112,7 @@ const INITIAL_GRADING: CropGradingData = {
 };
 
 export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false, onScanComplete, onApplyToForm }: OpenCVScanProps) {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedImage, setSelectedImage] = useState(
     initialImage || SAMPLE_CROPS[0].url
   );
@@ -381,7 +387,11 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
       }
     };
     reader.onerror = () => {
-      toast.error("फोटो पढ़ने में त्रुटि हुई, कृपया दोबारा प्रयास करें");
+      toast.error(
+        language === "hi"
+          ? "फोटो पढ़ने में त्रुटि हुई, कृपया दोबारा प्रयास करें"
+          : "Error reading photo file, please try again."
+      );
     };
     reader.readAsDataURL(file);
   };
@@ -432,7 +442,11 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
         image: selectedImage,
       });
     }
-    toast.success("✓ ग्रेडिंग व फोटो लिस्टिंग फॉर्म में सफलतापूर्वक लागू हो गए!");
+    toast.success(
+      language === "hi"
+        ? "✓ ग्रेडिंग व फोटो लिस्टिंग फॉर्म में सफलतापूर्वक लागू हो गए!"
+        : "✓ Grading and photo successfully applied to listing form!"
+    );
   };
 
   // Color theme helpers based on produce grade
@@ -514,7 +528,11 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
         {isVoiceHighlighted && (
           <div className="mb-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-3.5 py-2.5 text-xs text-white font-bold flex items-center gap-2 shadow-md animate-in fade-in slide-in-from-top-2">
             <Camera className="size-4 text-emerald-200 animate-pulse shrink-0" />
-            <span>📸 Voice AI: फसल की जानकारी भर दी गई है! अब कृपया यहाँ अपनी फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।</span>
+            <span>
+              {language === "hi"
+                ? "📸 Voice AI: फसल की जानकारी भर दी गई है! अब कृपया यहाँ अपनी फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।"
+                : "📸 Voice AI: Crop details captured! Please upload a produce photo or scan with the AI camera."}
+            </span>
           </div>
         )}
 
@@ -527,14 +545,14 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
             <div>
               <div className="flex items-center gap-1.5">
                 <h3 className="text-xs sm:text-sm font-black tracking-wide text-white">
-                  OpenCV AI Quality Lab
+                  {t("opencv_ai_quality_lab")}
                 </h3>
                 <span className="rounded-full bg-emerald-950 border border-emerald-700/80 px-1.5 py-0.2 text-[9px] font-bold text-emerald-300">
                   GEMINI 2.0 VISION
                 </span>
               </div>
               <p className="text-[10px] text-slate-400">
-                फसल गुणवत्ता व एआई ग्रेडिंग जांच
+                {t("opencv_ai_grading_sub")}
               </p>
             </div>
           </div>
@@ -545,17 +563,17 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
               type="button"
               onClick={toggleSpeechFeedback}
               className="flex items-center gap-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 px-2.5 py-1 text-[10px] font-medium text-slate-300 hover:text-white transition-colors"
-              title="रिपोर्ट सुनें (Voice Readout)"
+              title={language === "hi" ? "रिपोर्ट सुनें (Voice Readout)" : "Listen to Report (Voice Readout)"}
             >
               {isSpeaking ? (
                 <>
                   <VolumeX className="size-3 text-rose-400" />
-                  <span>रोकें</span>
+                  <span>{t("btn_stop_report")}</span>
                 </>
               ) : (
                 <>
                   <Volume2 className="size-3 text-cyan-400" />
-                  <span>सुनें</span>
+                  <span>{t("btn_listen_report")}</span>
                 </>
               )}
             </button>
@@ -566,7 +584,7 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
               onClick={() => executeScan(selectedImage, currentCropHint)}
               disabled={isScanning}
               className="rounded-full p-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-colors"
-              title="दोबारा स्कैन करें"
+              title={language === "hi" ? "दोबारा स्कैन करें" : "Re-scan Produce"}
             >
               <RefreshCw className={`size-3.5 ${isScanning ? "animate-spin text-cyan-400" : ""}`} />
             </button>
@@ -619,7 +637,7 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
             className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white py-2 px-3 text-xs font-bold shadow-md transition-all"
           >
             <Camera className="size-3.5" />
-            <span>कैमरा फोटो (Camera)</span>
+            <span>{t("btn_camera_snap")}</span>
           </button>
           <button
             type="button"
@@ -627,15 +645,15 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
             className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 hover:text-white py-2 px-3 text-xs font-bold border border-slate-700 transition-all"
           >
             <Upload className="size-3.5" />
-            <span>फाइल चुनें (Gallery)</span>
+            <span>{t("btn_gallery_upload")}</span>
           </button>
         </div>
 
         {/* Quick Sample Crop Chips */}
         <div className="mt-3 pt-2.5 border-t border-slate-800/80">
           <div className="flex items-center gap-2 text-xs text-slate-300 mb-2">
-            <span className="font-bold text-slate-200">त्वरित टेस्ट फसलें (Sample Crops):</span>
-            <span className="rounded-full bg-slate-800 border border-slate-700/80 px-2.5 py-0.5 text-[11px] text-emerald-400 font-medium">1-क्लिक टेस्ट</span>
+            <span className="font-bold text-slate-200">{t("sample_crops_label")}</span>
+            <span className="rounded-full bg-slate-800 border border-slate-700/80 px-2.5 py-0.5 text-[11px] text-emerald-400 font-medium">{t("one_click_test")}</span>
           </div>
           <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-none">
             {SAMPLE_CROPS.map((sample, idx) => (
@@ -649,7 +667,7 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
                     : "border-slate-800 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white hover:border-emerald-600"
                 }`}
               >
-                {sample.name}
+                {language === "hi" ? sample.name : (sample.enName || sample.name)}
               </button>
             ))}
           </div>
@@ -663,7 +681,7 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
             className="flex-1 rounded-lg py-1.5 font-bold transition-all text-center flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-xs"
           >
             <Award className="size-3.5" />
-            <span>गुणवत्ता परिणाम (Grade Result)</span>
+            <span>{t("grade_result_label")}</span>
           </button>
         </div>
 
@@ -675,7 +693,7 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
               <span className="font-extrabold text-white text-xs sm:text-sm">{grading.cropName}</span>
             </div>
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${theme.badgeBg}`}>
-              {grading.grade} (+{grading.recommendedPriceDeltaPct}% भाव)
+              {grading.grade} (+{grading.recommendedPriceDeltaPct}% {language === "hi" ? "भाव" : "Rate"})
             </span>
           </div>
 
@@ -685,11 +703,11 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
 
           <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 pt-2 border-t border-slate-700/50">
             <div>
-              <span className="text-slate-400 block text-[11px]">परिपक्वता (Ripeness):</span>
+              <span className="text-slate-400 block text-[11px]">{t("ripeness_text")}</span>
               <strong className="text-white">{grading.ripenessStage} ({grading.ripenessPct}%)</strong>
             </div>
             <div>
-              <span className="text-slate-400 block text-[11px]">दोष दर (Defects):</span>
+              <span className="text-slate-400 block text-[11px]">{t("defects_text")}</span>
               <strong className="text-emerald-300">&lt; {grading.defectPct}% (Clean Surface)</strong>
             </div>
           </div>
@@ -700,24 +718,24 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
           <summary className="cursor-pointer text-xs font-bold text-slate-400 hover:text-emerald-400 flex items-center justify-between select-none">
             <span className="flex items-center gap-1.5">
               <Gauge className="size-3.5 text-cyan-400" />
-              <span>विस्तृत तकनीकी टेलीमेट्री (Laplacian / Lux / Shelf Life)</span>
+              <span>{t("telemetry_accordion_label")}</span>
             </span>
             <span className="text-[11px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
           </summary>
           <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2 border-t border-slate-800 text-center">
             <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
-              <span className="text-[11px] font-bold text-slate-400 block">शार्पनेस</span>
+              <span className="text-[11px] font-bold text-slate-400 block">{t("sharpness_meter")}</span>
               <p className="text-xs sm:text-sm font-black text-cyan-400">{blurScore}/100</p>
               <span className="text-[10px] text-emerald-400 block font-medium">Laplacian Pass</span>
             </div>
             <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
-              <span className="text-[11px] font-bold text-slate-400 block">प्रकाश (Light)</span>
+              <span className="text-[11px] font-bold text-slate-400 block">{t("light_meter")}</span>
               <p className="text-xs sm:text-sm font-black text-amber-400">{brightness}%</p>
               <span className="text-[10px] text-emerald-400 block font-medium">Optimal Lux</span>
             </div>
             <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
-              <span className="text-[11px] font-bold text-slate-400 block">शेल्फ लाइफ</span>
-              <p className="text-xs sm:text-sm font-black text-emerald-400">{grading.shelfLifeDays} दिन</p>
+              <span className="text-[11px] font-bold text-slate-400 block">{t("shelf_life_meter")}</span>
+              <p className="text-xs sm:text-sm font-black text-emerald-400">{grading.shelfLifeDays} {t("days_suffix")}</p>
               <span className="text-[10px] text-slate-400 block font-medium">Safe Storage</span>
             </div>
           </div>
@@ -731,7 +749,7 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
             className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold h-11 rounded-xl text-xs shadow-lg gap-1.5 transition-all active:scale-98"
           >
             <CheckCircle2 className="size-4" />
-            <span>✓ यह ग्रेड व फोटो लिस्टिंग फॉर्म में लगाएं (Apply to Form)</span>
+            <span>{t("btn_apply_grade")}</span>
           </Button>
         </div>
       </div>

@@ -17,9 +17,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Navbar } from "@/components/shared/Navbar";
+import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_DELIVERY_ROUTE, type DeliveryRoute } from "@/lib/mock-data";
 
 export default function DeliveryPortalPage() {
+  const { t, language } = useLanguage();
   const [route, setRoute] = useState<DeliveryRoute>(MOCK_DELIVERY_ROUTE);
   const [pinInput, setPinInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +31,11 @@ export default function DeliveryPortalPage() {
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (pinInput !== route.requiredPin && pinInput !== "7429" && pinInput !== "1234") {
-      toast.error("Invalid Handover PIN. Please request the 4-digit PIN from the buyer.");
+      toast.error(
+        language === "hi"
+          ? "अमान्य हैंडओवर पिन। कृपया खरीदार से 4-अंकीय पिन प्राप्त करें।"
+          : "Invalid Handover PIN. Please request the 4-digit PIN from the buyer."
+      );
       return;
     }
 
@@ -77,9 +83,12 @@ export default function DeliveryPortalPage() {
       });
 
       // Masterplan Phase 5 Toast Notification:
-      toast.success("₹14,500 released to Farmer's bank ledger via UPI.", {
-        duration: 5000,
-      });
+      toast.success(
+        language === "hi"
+          ? `₹${route.totalPayoutAmount.toLocaleString("en-IN")} सीधे किसान के बैंक खाते में UPI द्वारा जारी!`
+          : `₹${route.totalPayoutAmount.toLocaleString("en-IN")} released to Farmer's bank ledger via UPI.`,
+        { duration: 5000 }
+      );
 
       // Update route step to completed
       setRoute((prev) => ({
@@ -107,11 +116,11 @@ export default function DeliveryPortalPage() {
                     {route.transporterName}
                   </h1>
                   <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-bold text-purple-800">
-                    Google OR-Tools Active
+                    {t("delivery_or_tools_active")}
                   </span>
                 </div>
                 <p className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-                  Vehicle: {route.vehicleNumber} • Active Multi-Stop VRP Route #{route.id}
+                  {t("delivery_vehicle_label")} {route.vehicleNumber} • {t("delivery_active_vrp_route")} #{route.id}
                 </p>
               </div>
             </div>
@@ -121,25 +130,27 @@ export default function DeliveryPortalPage() {
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-3 shadow-xs flex-1 min-w-[110px]">
                 <div className="flex items-center gap-1 text-[10px] font-bold uppercase text-emerald-800">
                   <TrendingDown className="size-3" />
-                  <span>Distance Saved</span>
+                  <span>{t("delivery_dist_saved")}</span>
                 </div>
-                <p className="text-lg font-black text-emerald-700">{route.distanceSavedKm} km</p>
-                <span className="text-[10px] text-emerald-600">OR-Tools VRP Solver</span>
+                <p className="text-lg font-black text-emerald-700">
+                  {route.distanceSavedKm} {language === "hi" ? "किमी" : "km"}
+                </p>
+                <span className="text-[10px] text-emerald-600">{t("delivery_or_solver_tag")}</span>
               </div>
 
               <div className="rounded-2xl border border-purple-200 bg-purple-50/80 p-3 shadow-xs flex-1 min-w-[110px]">
                 <div className="flex items-center gap-1 text-[10px] font-bold uppercase text-purple-800">
                   <Fuel className="size-3" />
-                  <span>Fuel Reduced</span>
+                  <span>{t("delivery_fuel_reduced")}</span>
                 </div>
                 <p className="text-lg font-black text-purple-700">{route.fuelReducedPct}%</p>
-                <span className="text-[10px] text-purple-600">Zero Empty Deadheads</span>
+                <span className="text-[10px] text-purple-600">{t("delivery_zero_deadheads")}</span>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-xs col-span-2 sm:col-span-1 min-w-[110px]">
-                <span className="text-[10px] uppercase font-bold text-slate-400">Escrow On-Hold</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400">{t("delivery_escrow_hold")}</span>
                 <p className="text-lg font-black text-slate-900">₹{route.totalPayoutAmount.toLocaleString("en-IN")}</p>
-                <span className="text-[10px] text-slate-500">Auto-Releases on PIN</span>
+                <span className="text-[10px] text-slate-500">{t("delivery_auto_release_tag")}</span>
               </div>
             </div>
           </div>
@@ -153,14 +164,14 @@ export default function DeliveryPortalPage() {
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
                   <h2 className="text-lg font-extrabold text-slate-900">
-                    Google OR-Tools Optimized Multi-Stop Path
+                    {t("delivery_path_heading")}
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Algorithmic clustering combining farm pickups with door-to-door deliveries
+                    {t("delivery_path_sub")}
                   </p>
                 </div>
                 <span className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-800">
-                  4 Stops Active
+                  {route.stops.length} {t("delivery_stops_active_count")}
                 </span>
               </div>
 
@@ -194,7 +205,9 @@ export default function DeliveryPortalPage() {
                                 : "bg-blue-100 text-blue-800"
                             }`}
                           >
-                            {stop.role}
+                            {stop.role.includes("Pickup")
+                              ? language === "hi" ? "खेत से उठाव (Pickup)" : stop.role
+                              : language === "hi" ? "माल डिलीवरी (Drop-off)" : stop.role}
                           </span>
                         </div>
                         <span className="flex items-center gap-1 text-xs font-medium text-slate-500">
@@ -209,15 +222,15 @@ export default function DeliveryPortalPage() {
                       </p>
 
                       <div className="flex items-center gap-3 text-xs text-slate-500 pt-1">
-                        <span>Produce: <strong className="text-slate-800">{stop.crop}</strong></span>
+                        <span>{t("delivery_produce_label")} <strong className="text-slate-800">{stop.crop}</strong></span>
                         <span>•</span>
-                        <span>Load: {stop.quantity}</span>
+                        <span>{t("delivery_load_label")} {stop.quantity}</span>
                       </div>
 
                       {isTarget && !isSettled && (
                         <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-amber-100/70 px-2.5 py-1 text-xs font-bold text-amber-900">
                           <KeyRound className="size-3.5 text-amber-700" />
-                          <span>Action Required: Request 4-Digit PIN from Priya Sharma</span>
+                          <span>{t("delivery_action_pin_required")} Priya Sharma</span>
                         </div>
                       )}
                     </div>
@@ -236,10 +249,10 @@ export default function DeliveryPortalPage() {
                 </div>
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900">
-                    Handover PIN Settlement
+                    {t("delivery_handover_title")}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Physical delivery confirmation triggers instant UPI payout
+                    {t("delivery_handover_sub")}
                   </p>
                 </div>
               </div>
@@ -248,7 +261,7 @@ export default function DeliveryPortalPage() {
                 <form onSubmit={handlePinSubmit} className="space-y-4">
                   <div className="space-y-2 text-center">
                     <label htmlFor="pin-input" className="text-xs font-bold text-slate-700 block">
-                      Enter Consumer&apos;s 4-Digit Delivery PIN:
+                      {t("delivery_enter_pin_label")}
                     </label>
 
                     <div className="flex justify-center">
@@ -265,7 +278,7 @@ export default function DeliveryPortalPage() {
                       />
                     </div>
                     <p className="text-[11px] text-slate-500">
-                      Demo Secret PIN is: <strong className="text-emerald-700 font-mono">7429</strong>
+                      {t("delivery_demo_pin_hint")} <strong className="text-emerald-700 font-mono">7429</strong>
                     </p>
                   </div>
 
@@ -276,7 +289,7 @@ export default function DeliveryPortalPage() {
                       onClick={() => setPinInput("7429")}
                       className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors border border-emerald-200 touch-target flex items-center gap-1"
                     >
-                      <span>💡 Auto-Fill PIN &ldquo;7429&rdquo;</span>
+                      <span>{t("delivery_autofill_btn")}</span>
                     </button>
                   </div>
 
@@ -286,7 +299,7 @@ export default function DeliveryPortalPage() {
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl text-sm gap-2 shadow-md transition-transform active:scale-98"
                   >
                     <Sparkles className="size-4 text-amber-300" />
-                    <span>{isSubmitting ? "Verifying with Razorpay..." : "Verify PIN & Release UPI Escrow"}</span>
+                    <span>{isSubmitting ? t("delivery_verifying_btn") : t("delivery_verify_btn")}</span>
                   </Button>
                 </form>
               ) : (
@@ -298,28 +311,28 @@ export default function DeliveryPortalPage() {
 
                   <div className="space-y-1">
                     <span className="rounded-full bg-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-900">
-                      Settlement Confirmed
+                      {t("delivery_settlement_confirmed")}
                     </span>
                     <h4 className="text-xl font-black text-slate-900">
-                      ₹14,500 Disbursed via UPI
+                      ₹{route.totalPayoutAmount.toLocaleString("en-IN")} {t("delivery_disbursed_title")}
                     </h4>
                     <p className="text-xs text-slate-600">
-                      Escrow released to <strong>Rameshwar Patil</strong> (UPI: ramesh@oksbi)
+                      {t("delivery_escrow_released_to")} <strong>Rameshwar Patil</strong> (UPI: ramesh@oksbi)
                     </p>
                   </div>
 
                   <div className="rounded-xl bg-white p-3 border border-emerald-200 text-left text-xs space-y-1">
                     <div className="flex justify-between text-slate-500">
-                      <span>Transaction Reference:</span>
+                      <span>{t("delivery_txn_ref")}</span>
                       <span className="font-mono font-bold text-slate-800">TXN-UPI-9821804</span>
                     </div>
                     <div className="flex justify-between text-slate-500">
-                      <span>Time Elapsed:</span>
-                      <span className="font-bold text-emerald-700">&lt;2.4 seconds</span>
+                      <span>{t("delivery_time_elapsed")}</span>
+                      <span className="font-bold text-emerald-700">{language === "hi" ? "< 2.4 सेकंड" : "< 2.4 seconds"}</span>
                     </div>
                     <div className="flex justify-between text-slate-500">
-                      <span>Driver Payout Cut:</span>
-                      <span className="font-bold text-slate-800">₹850 Credited</span>
+                      <span>{t("delivery_driver_cut")}</span>
+                      <span className="font-bold text-slate-800">₹850 {t("delivery_credited")}</span>
                     </div>
                   </div>
 
@@ -331,7 +344,7 @@ export default function DeliveryPortalPage() {
                     variant="outline"
                     className="w-full text-xs border-emerald-300 text-emerald-800"
                   >
-                    Reset Demo PIN Verification
+                    {t("delivery_reset_demo")}
                   </Button>
                 </div>
               )}
@@ -340,11 +353,10 @@ export default function DeliveryPortalPage() {
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-xs text-slate-600 space-y-2">
                 <p className="font-bold text-slate-900 flex items-center gap-1.5">
                   <ShieldCheck className="size-4 text-emerald-600" />
-                  Zero-Payment-Delay Guarantee:
+                  {t("delivery_zero_delay_title")}
                 </p>
                 <p className="text-[11px] leading-relaxed">
-                  Unlike traditional mandis where farmers wait 15-45 days for middleman clearing cheques,
-                  Krishi Setu executes straight-through processing to UPI upon 4-digit PIN delivery.
+                  {t("delivery_zero_delay_desc")}
                 </p>
               </div>
             </div>
