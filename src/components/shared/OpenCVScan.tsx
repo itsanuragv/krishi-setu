@@ -43,6 +43,7 @@ export interface CropGradingData {
 export interface OpenCVScanProps {
   initialImage?: string;
   cropHint?: string;
+  isVoiceHighlighted?: boolean;
   onScanComplete?: (results: {
     blurScore: number;
     brightness: number;
@@ -99,7 +100,7 @@ const INITIAL_GRADING: CropGradingData = {
   assayerVerificationId: "KS-QC-748291",
 };
 
-export function OpenCVScan({ initialImage, cropHint, onScanComplete, onApplyToForm }: OpenCVScanProps) {
+export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false, onScanComplete, onApplyToForm }: OpenCVScanProps) {
   const { language } = useLanguage();
   const [selectedImage, setSelectedImage] = useState(
     initialImage || SAMPLE_CROPS[0].url
@@ -493,9 +494,24 @@ export function OpenCVScan({ initialImage, cropHint, onScanComplete, onApplyToFo
       />
 
       {/* Main HUD Card */}
-      <div className="relative rounded-3xl border border-slate-800 bg-slate-950 p-4 sm:p-5 text-white shadow-xl overflow-hidden">
+      <div 
+        id="opencv-scanner"
+        className={`relative rounded-3xl border transition-all duration-300 ${
+          isVoiceHighlighted 
+            ? "border-emerald-400 ring-4 ring-emerald-400/80 shadow-[0_0_35px_rgba(16,185,129,0.4)] scale-[1.01]" 
+            : "border-slate-800 shadow-xl"
+        } bg-slate-950 p-4 sm:p-5 text-white overflow-hidden`}
+      >
         {/* Iridescent Aurora Top Glow */}
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500" />
+
+        {/* Voice AI Prompt Banner when highlighted */}
+        {isVoiceHighlighted && (
+          <div className="mb-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-3.5 py-2.5 text-xs text-white font-bold flex items-center gap-2 shadow-md animate-in fade-in slide-in-from-top-2">
+            <Camera className="size-4 text-emerald-200 animate-pulse shrink-0" />
+            <span>📸 Voice AI: फसल की जानकारी भर दी गई है! अब कृपया यहाँ अपनी फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।</span>
+          </div>
+        )}
 
         {/* Top Header Bar */}
         <div className="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-3">

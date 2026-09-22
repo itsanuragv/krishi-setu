@@ -87,7 +87,7 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
       suggestedActions: [
         { label: "टमाटर का भाव", action: "speak", speakText: "टमाटर का मंडी भाव क्या है?" },
         { label: "प्याज का भाव", action: "speak", speakText: "प्याज का मंडी भाव क्या है?" },
-        { label: "फसल लिस्ट करें", action: "navigate", route: "/farmer/sell" }
+        { label: "फसल लिस्ट करें", action: "navigate", route: "/farmer" }
       ]
     };
   }
@@ -104,20 +104,20 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
 
     return {
       intent: "LIST_CROP",
-      route: "/farmer/sell",
+      route: "/farmer",
       spokenResponse: isHi
-        ? `जी किसान भाई, ${qty} किलो ${finalCrop} ₹${price} प्रति किलो से लिस्टिंग फॉर्म में जोड़ दिए हैं।`
-        : `Listing ${qty}kg ${finalCrop} at ₹${price} per kg. Form auto-filled.`,
+        ? `जी किसान भाई, मैंने ${qty} किलो ${finalCrop} ₹${price} प्रति किलो लिस्टिंग में भर दिया है! अब कृपया अपनी फसल की फोटो अपलोड करें या AI स्कैन करें।`
+        : `Added ${qty}kg ${finalCrop} at ₹${price}/kg to listing! Now please upload harvest photos or run AI quality scan.`,
       cropData: {
         crop: finalCrop,
-        variety: "Standard Grade-A",
+        variety: "Desi Hybrid (Abhinav)",
         quantityKg: qty,
         pricePerKg: price,
         unit: "kg",
       },
       suggestedActions: [
-        { label: "लिस्टिंग फॉर्म पूरा करें", action: "navigate", route: "/farmer/sell" },
-        { label: "AI क्वालिटी स्कैन करें", action: "navigate", route: "/farmer" }
+        { label: "📸 फोटो व AI स्कैन करें", action: "navigate", route: "/farmer" },
+        { label: "🌾 किसान पोर्टल", action: "navigate", route: "/farmer" }
       ]
     };
   }
@@ -127,15 +127,15 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
     const query = detectedCrop || text.replace(/ढूंढो|खोजो|चाहिए|खरीदना|search|buy/gi, "").trim() || "ताजा सब्जियां";
     return {
       intent: "SEARCH_PRODUCE",
-      route: `/consumer/search?q=${encodeURIComponent(query)}`,
+      route: `/consumer?search=${encodeURIComponent(query)}`,
       spokenResponse: isHi
-        ? `बाज़ार में ताज़ा ${query} खोजी जा रही है।`
-        : `Searching fresh ${query} in the direct marketplace.`,
+        ? `उपभोक्ता बाज़ार में ताज़ा ${query} खोजी जा रही है।`
+        : `Searching fresh ${query} in the direct consumer marketplace.`,
       searchQuery: {
         query,
       },
       suggestedActions: [
-        { label: "बाज़ार परिणाम देखें", action: "navigate", route: `/consumer/search?q=${encodeURIComponent(query)}` }
+        { label: "बाज़ार परिणाम देखें", action: "navigate", route: `/consumer?search=${encodeURIComponent(query)}` }
       ]
     };
   }
@@ -154,31 +154,58 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
     };
   }
 
-  // 6. Navigation Intents
-  if (/kisan|farmer|किसान|डैशबोर्ड/i.test(text)) {
+  // 6. Navigation Intents (Full Web Page Control)
+  if (/home|main|mukhy|होम|मुख्य/i.test(text)) {
+    return {
+      intent: "NAVIGATE",
+      route: "/",
+      spokenResponse: isHi ? "होम पेज खोला जा रहा है।" : "Opening Home Page.",
+      suggestedActions: [{ label: "होम पेज", action: "navigate", route: "/" }]
+    };
+  }
+
+  if (/kisan|farmer|किसान|डैशबोर्ड|intake/i.test(text)) {
     return {
       intent: "NAVIGATE",
       route: "/farmer",
       spokenResponse: isHi ? "किसान पोर्टल खोला जा रहा है।" : "Opening Farmer Portal.",
-      suggestedActions: [{ label: "पोर्टल पर जाएं", action: "navigate", route: "/farmer" }]
+      suggestedActions: [{ label: "किसान पोर्टल", action: "navigate", route: "/farmer" }]
     };
   }
 
-  if (/upbhokta|consumer|bazaar|market|उपभोक्ता|बाज़ार|खरीदार/i.test(text)) {
+  if (/upbhokta|consumer|bazaar|market|उपभोक्ता|बाज़ार|खरीदार|सब्जी|खरीद/i.test(text)) {
     return {
       intent: "NAVIGATE",
       route: "/consumer",
       spokenResponse: isHi ? "उपभोक्ता बाज़ार खोला जा रहा है।" : "Opening Consumer Marketplace.",
-      suggestedActions: [{ label: "बाज़ार जाएं", action: "navigate", route: "/consumer" }]
+      suggestedActions: [{ label: "उपभोक्ता बाज़ार", action: "navigate", route: "/consumer" }]
     };
   }
 
-  if (/delivery|parivahan|gaadi|truck|डिलीवरी|गाड़ी|ट्रक|चालक/i.test(text)) {
+  if (/thok|bulk|b2b|fpo|व्यापारी|थोक/i.test(text)) {
+    return {
+      intent: "NAVIGATE",
+      route: "/buyer/dashboard",
+      spokenResponse: isHi ? "थोक खरीदार एवं FPO डैशबोर्ड खोला जा रहा है।" : "Opening Bulk Buyer Portal.",
+      suggestedActions: [{ label: "थोक पोर्टल", action: "navigate", route: "/buyer/dashboard" }]
+    };
+  }
+
+  if (/delivery|parivahan|gaadi|truck|fleet|डिलीवरी|गाड़ी|ट्रक|चालक|लॉजिस्टिक्स/i.test(text)) {
     return {
       intent: "NAVIGATE",
       route: "/delivery",
       spokenResponse: isHi ? "डिलीवरी फ्लीट पोर्टल खोला जा रहा है।" : "Opening Delivery Fleet Portal.",
       suggestedActions: [{ label: "डिलीवरी फ्लीट", action: "navigate", route: "/delivery" }]
+    };
+  }
+
+  if (/admin|control|prashasan|vivad|dispute|एडमिन|प्रशासन|कंट्रोल|विवाद/i.test(text)) {
+    return {
+      intent: "NAVIGATE",
+      route: "/admin",
+      spokenResponse: isHi ? "एडमिन एवं प्रशासन पैनल खोला जा रहा है।" : "Opening Admin Control Panel.",
+      suggestedActions: [{ label: "एडमिन पैनल", action: "navigate", route: "/admin" }]
     };
   }
 
@@ -235,9 +262,9 @@ Your Domain Knowledge:
 - AI Quality Assayer: Farmers can take a photo of their produce to get automated AGMARK Grade A/B/C certification and a 10-15% price premium.
 
 Intents:
-1. "LIST_CROP": Farmer wants to sell crops (e.g. "50 किलो टमाटर बेचना है", "sell 100kg potatoes at 25"). Extract crop, variety, quantityKg (numeric), pricePerKg (numeric). Route: "/farmer/sell".
-2. "SEARCH_PRODUCE": Consumer wants to buy fresh produce. Route: "/consumer/search".
-3. "NAVIGATE": User wants to open a section. Targets: "/", "/farmer", "/farmer/sell", "/farmer/orders", "/consumer", "/consumer/search", "/delivery".
+1. "LIST_CROP": Farmer wants to sell crops (e.g. "50 किलो टमाटर बेचना है", "sell 100kg potatoes at 25"). Extract crop, variety, quantityKg (numeric), pricePerKg (numeric). Route: "/farmer". In spokenResponse, always confirm the filled crop and prompt to upload photo or run AI camera scan: "जी किसान भाई, मैंने [मात्रा] [फसल] ₹[भाव]/kg भर दिया है! अब कृपया फसल की फोटो अपलोड करें या AI स्कैन करें।"
+2. "SEARCH_PRODUCE": Consumer wants to buy fresh produce. Route: "/consumer?search=[query]".
+3. "NAVIGATE": User wants to navigate. Targets: "/" (Home), "/farmer" (Farmer Intake), "/consumer" (Consumer Market), "/buyer/dashboard" (Bulk Buyers B2B), "/delivery" (Logistics Fleet), "/admin" (Admin Dispute & Governance).
 4. "AGRI_QUERY": Farming questions, mandi prices, pest control, weather, or escrow trust questions.
 5. "CLARIFICATION": If user said something incomplete like "मुझे बेचना है" without crop name, ask politely what crop they wish to sell.
 

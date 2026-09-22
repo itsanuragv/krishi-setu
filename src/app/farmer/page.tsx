@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -23,7 +23,8 @@ import {
   Warehouse,
   ShoppingBag,
   ExternalLink,
-  Info
+  Info,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,6 +85,25 @@ export default function FarmerPortalPage() {
   // Active listings list
   const [listings, setListings] = useState<ProduceListing[]>(MOCK_PRODUCE_LISTINGS.slice(0, 3));
   const activeListingsRef = useRef<HTMLDivElement | null>(null);
+
+  // Scanner Voice Highlight & Notice State
+  const [highlightScanner, setHighlightScanner] = useState(false);
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+
+  const triggerPhotoPrompt = useCallback((cropNameHint?: string) => {
+    const textNotice = cropNameHint
+      ? `📸 वॉइस AI: ${cropNameHint} का विवरण दर्ज हो गया है! अब कृपया दाईं ओर फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।`
+      : "📸 वॉइस AI: फसल का विवरण दर्ज हो गया है! अब कृपया दाईं ओर फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।";
+    setVoiceNotice(textNotice);
+    setTimeout(() => {
+      const scannerEl = document.getElementById("opencv-scanner");
+      if (scannerEl) {
+        scannerEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      setHighlightScanner(true);
+      setTimeout(() => setHighlightScanner(false), 9000);
+    }, 1200);
+  }, []);
 
   // Handle Preset Click
   const handlePresetSelect = (preset: typeof CROP_PRESETS[0]) => {
@@ -216,13 +236,14 @@ export default function FarmerPortalPage() {
           price: parsed.pricePerKg || 40,
           unit: parsed.unit || "kg",
         });
+        triggerPhotoPrompt(parsed.crop || "फसल");
       } catch (err) {
         console.error("Failed to parse voice crop:", err);
       }
     }
-  }, []);
+  }, [triggerPhotoPrompt]);
 
-  // Listen for real-time voice listing confirmed events
+  // Listen for real-time voice listing confirmed events & photo highlight
   useEffect(() => {
     const handleVoiceList = (e: Event) => {
       const customEvent = e as CustomEvent<{
@@ -240,14 +261,21 @@ export default function FarmerPortalPage() {
           price: customEvent.detail.pricePerKg,
           unit: customEvent.detail.unit || "kg",
         });
+        triggerPhotoPrompt(customEvent.detail.crop);
       }
     };
 
+    const handleVoiceHighlight = () => {
+      triggerPhotoPrompt();
+    };
+
     window.addEventListener("krishi-voice-list-crop", handleVoiceList);
+    window.addEventListener("krishi-voice-highlight-photo", handleVoiceHighlight);
     return () => {
       window.removeEventListener("krishi-voice-list-crop", handleVoiceList);
+      window.removeEventListener("krishi-voice-highlight-photo", handleVoiceHighlight);
     };
-  }, []);
+  }, [triggerPhotoPrompt]);
 
   // Calculate Mandi Price comparison delta
   const priceNum = Number(floorPrice) || 0;
@@ -309,7 +337,23 @@ export default function FarmerPortalPage() {
             <div className="rounded-3xl border border-emerald-200/90 bg-white/95 p-5 sm:p-7 shadow-sm backdrop-blur-md space-y-6">
               
               {/* Studio Header */}
-              <div className="border-b border-slate-100 pb-4">
+              <div className="border-b border-slate-100 pb-4 space-y-2.5">
+                {voiceNotice && (
+                  <div className="rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 p-3 text-xs text-white font-bold flex items-center justify-between shadow-md animate-in fade-in slide-in-from-top-1">
+                    <div className="flex items-center gap-2">
+                      <Camera className="size-4 animate-bounce text-emerald-200 shrink-0" />
+                      <span>{voiceNotice}</span>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => setVoiceNotice(null)}
+                      className="p-1 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors shrink-0"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700">
                     <Sparkles className="size-4" />
@@ -549,6 +593,7 @@ export default function FarmerPortalPage() {
             <OpenCVScan 
               initialImage={attachedPhoto}
               cropHint={cropName}
+              isVoiceHighlighted={highlightScanner}
               onApplyToForm={handleApplyScanResult}
             />
 

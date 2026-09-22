@@ -12,7 +12,13 @@ import {
   X, 
   ArrowRight,
   CheckCircle2,
-  XCircle,
+  Camera,
+  Home,
+  Sprout,
+  ShoppingBag,
+  Warehouse,
+  Truck,
+  ShieldCheck,
   ChevronDown,
   ChevronUp
 } from "lucide-react";
@@ -41,7 +47,6 @@ function playAssistantChime(type: "start" | "reply" | "stop") {
     const ctx = new AudioCtx();
     
     if (type === "start") {
-      // Soft ascending chime: C5 (523Hz) -> E5 (659Hz)
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = "sine";
@@ -54,7 +59,6 @@ function playAssistantChime(type: "start" | "reply" | "stop") {
       osc.start();
       osc.stop(ctx.currentTime + 0.3);
     } else if (type === "reply") {
-      // Gemini ready chime: G5 (784Hz) -> C6 (1046Hz)
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = "sine";
@@ -117,11 +121,11 @@ export function VoiceAssistant() {
   const [interimTranscript, setInterimTranscript] = useState("");
   const [lastUserQuery, setLastUserQuery] = useState("");
   const [latestResponse, setLatestResponse] = useState<string>(
-    "नमस्ते! मैं आपका कृषि सेतु असिस्टेंट हूँ। फसल बेचने, खरीदने या भाव जानने के लिए नीचे दिए सुझाव चुनें या बोलें।"
+    "नमस्ते! मैं आपका कृषि सेतु असिस्टेंट हूँ। बोलिए — आप कौन से पेज पर जाना चाहते हैं या कौन सी फसल लिस्ट करनी है?"
   );
 
-  // Listing Confirmation Workflow (Yes / No)
-  const [pendingListing, setPendingListing] = useState<CropListingData | null>(null);
+  // Active or confirmed listing status
+  const [confirmedListing, setConfirmedListing] = useState<CropListingData | null>(null);
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -137,7 +141,7 @@ export function VoiceAssistant() {
 
   // Voice synthesis with safety: never listen while speaking!
   const speak = useCallback((text: string, lang: "hi-IN" | "en-IN", onComplete?: () => void) => {
-    // 1. Force stop microphone before speaking so assistant does NOT hear itself!
+    // Force stop microphone before speaking so assistant does NOT hear itself
     if (recognitionRef.current) {
       try {
         recognitionRef.current.abort?.();
@@ -156,7 +160,7 @@ export function VoiceAssistant() {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
-      utterance.rate = 1.0;
+      utterance.rate = 0.98;
       utterance.pitch = 1.02;
 
       const chosenVoice = getBestVoice(lang);
@@ -170,7 +174,6 @@ export function VoiceAssistant() {
 
       utterance.onend = () => {
         setIsSpeaking(false);
-        // Note: NEVER auto-restart speech recognition here to prevent endless loop!
         if (onComplete) onComplete();
       };
 
@@ -200,52 +203,61 @@ export function VoiceAssistant() {
     setIsSpeaking(false);
     setIsThinking(false);
     setInterimTranscript("");
-    setPendingListing(null);
     setIsOpen(false);
   }, [stopSpeaking]);
 
-  // Confirm pending produce listing (Yes)
-  const handleConfirmListing = useCallback(() => {
-    if (!pendingListing) return;
-    
+  /**
+   * Action: Execute Crop Listing, Navigate to Farmer Page, Fill Details, Prompt for Photo
+   */
+  const executeProduceListing = useCallback((cropData: CropListingData) => {
     stopSpeaking();
-    const dataToSave = { ...pendingListing };
-    setPendingListing(null);
+    setConfirmedListing(cropData);
 
-    // Save to sessionStorage so it loads if navigating
+    // Save to sessionStorage and dispatch event for immediate real-time form fill
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("krishi_pending_voice_crop", JSON.stringify(dataToSave));
-      // Dispatch real-time custom event for already open pages
-      window.dispatchEvent(new CustomEvent("krishi-voice-list-crop", { detail: dataToSave }));
+      sessionStorage.setItem("krishi_pending_voice_crop", JSON.stringify(cropData));
+      window.dispatchEvent(new CustomEvent("krishi-voice-list-crop", { detail: cropData }));
+      window.dispatchEvent(new CustomEvent("krishi-voice-highlight-photo", { detail: cropData }));
     }
 
-    const successMsg = language === "hi-IN"
-      ? `आपकी ${dataToSave.quantityKg} ${dataToSave.unit} ${dataToSave.crop} की लिस्टिंग सफलतापूर्वक दर्ज कर दी गई है!`
-      : `Your listing for ${dataToSave.quantityKg} ${dataToSave.unit} ${dataToSave.crop} is confirmed!`;
-
-    setLatestResponse(successMsg);
-    toast.success(successMsg);
-    speak(successMsg, language);
-
-    // Navigate to farmer page if not already there
+    // Always navigate to farmer page if not already there
     if (typeof window !== "undefined" && !window.location.pathname.startsWith("/farmer")) {
       router.push("/farmer");
+    } else {
+      // If already on farmer page, scroll smoothly to the OpenCV scanner and photo section
+      setTimeout(() => {
+        document.getElementById("opencv-scanner")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 800);
     }
-  }, [pendingListing, language, router, speak, stopSpeaking]);
 
-  // Cancel pending produce listing (No)
-  const handleCancelListing = useCallback(() => {
-    setPendingListing(null);
+    // Voice instruction: Confirm listing details and urge user to upload photo / run camera scan
+    const promptSpeech = language === "hi-IN"
+      ? `जी किसान भाई, मैंने ${cropData.quantityKg} ${cropData.unit} ${cropData.crop} ₹${cropData.pricePerKg} प्रति ${cropData.unit} लिस्टिंग में भर दिया है! अब कृपया अपनी फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें ताकि आपको ग्रेड A और अच्छा भाव मिल सके।`
+      : `Filled ${cropData.quantityKg} ${cropData.unit} ${cropData.crop} at ₹${cropData.pricePerKg}/${cropData.unit} into the form! Now please upload harvest photos or run AI quality scan to earn Grade A!`;
+
+    setLatestResponse(promptSpeech);
+    toast.success(`🌾 फसल विवरण फॉर्म में दर्ज: ${cropData.quantityKg} ${cropData.unit} ${cropData.crop}`);
+    speak(promptSpeech, language);
+  }, [language, router, speak, stopSpeaking]);
+
+  /**
+   * Action: Direct Web Page Navigation via Voice / Click
+   */
+  const executeNavigation = useCallback((route: string, labelHi: string, labelEn: string) => {
     stopSpeaking();
-    const cancelMsg = language === "hi-IN" 
-      ? "लिस्टिंग रद्द कर दी गई है। आप अन्य कोई सहायता पूछ सकते हैं।" 
-      : "Listing cancelled. How else can I help?";
-    setLatestResponse(cancelMsg);
-    toast.info("लिस्टिंग रद्द की गई (Listing Cancelled)");
-    speak(cancelMsg, language);
-  }, [language, speak, stopSpeaking]);
+    const spoken = language === "hi-IN" 
+      ? `${labelHi} खोला जा रहा है...` 
+      : `Opening ${labelEn}...`;
+    
+    setLatestResponse(spoken);
+    speak(spoken, language);
+    toast.info(spoken);
+    router.push(route);
+  }, [language, router, speak, stopSpeaking]);
 
-  // Process text with Gemini API
+  /**
+   * Process Natural Speech & Commands
+   */
   const processWithGemini = useCallback(async (userText: string) => {
     const trimmed = userText.trim();
     if (!trimmed || isProcessingRef.current) return;
@@ -260,27 +272,109 @@ export function VoiceAssistant() {
     setInterimTranscript("");
     setLastUserQuery(trimmed);
     setIsThinking(true);
-    setIsOpen(true); // Ensure suggestion bubble is visible
+    setIsOpen(true);
 
-    // 1. Check if user is responding to pending confirmation (Yes / No)
-    if (pendingListing) {
-      const lower = trimmed.toLowerCase();
-      // Affirmative keywords (Hindi & English)
-      if (/हाँ|हा|yes|yeah|sure|confirm|kar do|kar dijiye|list karo|sahi hai|theek hai/i.test(lower)) {
-        isProcessingRef.current = false;
-        setIsThinking(false);
-        handleConfirmListing();
-        return;
-      }
-      // Negative keywords
-      if (/नहीं|ना|no|cancel|radd|mat karo|rehne do|reject/i.test(lower)) {
-        isProcessingRef.current = false;
-        setIsThinking(false);
-        handleCancelListing();
-        return;
-      }
+    const lower = trimmed.toLowerCase();
+
+    // 1. FAST CLIENT-SIDE NAVIGATION DETECTION (Instant 0ms latency)
+    // Home Page
+    if (/^(home|main|go home|open home|होम|मुख्य पृष्ठ|होम पेज|होमपेज)/i.test(lower) || /वापस जाओ|शुरुआती पेज/i.test(lower)) {
+      isProcessingRef.current = false;
+      setIsThinking(false);
+      executeNavigation("/", "होम पेज", "Home Page");
+      return;
     }
 
+    // Consumer Marketplace
+    if (/consumer|market|bazaar|buy produce|उपभोक्ता|कंज्यूमर|बाज़ार|खरीदना|सब्जी खरीद/i.test(lower) && !/ढूंढ|खोज|search/i.test(lower)) {
+      isProcessingRef.current = false;
+      setIsThinking(false);
+      executeNavigation("/consumer", "उपभोक्ता बाज़ार", "Consumer Marketplace");
+      return;
+    }
+
+    // Bulk Buyer Portal
+    if (/bulk|buyer|b2b|fpo|थोक|थोक बाज़ार|होटल खरीद|संस्थागत/i.test(lower)) {
+      isProcessingRef.current = false;
+      setIsThinking(false);
+      executeNavigation("/buyer/dashboard", "थोक खरीदार पोर्टल", "Bulk Buyer Portal");
+      return;
+    }
+
+    // Delivery Fleet
+    if (/delivery|driver|fleet|logistics|truck|डिलीवरी|लॉजिस्टिक्स|गाड़ी|ट्रक|चालक/i.test(lower)) {
+      isProcessingRef.current = false;
+      setIsThinking(false);
+      executeNavigation("/delivery", "डिलीवरी फ्लीट", "Delivery Fleet");
+      return;
+    }
+
+    // Admin Control
+    if (/admin|dispute|fraud|control|governance|एडमिन|प्रशासन|कंट्रोल|विवाद/i.test(lower)) {
+      isProcessingRef.current = false;
+      setIsThinking(false);
+      executeNavigation("/admin", "प्रशासन नियंत्रण", "Admin Panel");
+      return;
+    }
+
+    // General Farmer Page Navigation (without crop quantity)
+    if (/^(kisan|farmer|open farmer|किसान पोर्टल|किसान पेज|फार्मर पोर्टल)/i.test(lower) && !/\d+/.test(lower)) {
+      isProcessingRef.current = false;
+      setIsThinking(false);
+      executeNavigation("/farmer", "किसान पोर्टल", "Farmer Portal");
+      return;
+    }
+
+    // 2. FAST CLIENT-SIDE CROP LISTING EXTRACTION
+    // If the user mentions selling/listing crops, parse crop, quantity, and price!
+    if (/bech|sell|fasal|list|बेच|बेचना|बिक्री|लिस्ट|दर्ज/i.test(lower) || /टमाटर|प्याज|आलू|गेहूं|चावल|मिर्च|tomato|onion|potato|wheat|chilli/i.test(lower)) {
+      let crop = "टमाटर (Tomatoes)";
+      let variety = "Desi Hybrid (Abhinav)";
+      let defaultPrice = 40;
+
+      if (/प्याज|प्याज़|pyaz|onion/i.test(lower)) {
+        crop = "नासिक लाल प्याज (Onions)";
+        variety = "Nashik Red Garwa";
+        defaultPrice = 28;
+      } else if (/आलू|aloo|potato/i.test(lower)) {
+        crop = "आलू (Potatoes)";
+        variety = "Kufri Jyoti";
+        defaultPrice = 22;
+      } else if (/गेहूं|गेहू|gehu|wheat/i.test(lower)) {
+        crop = "गेहूं (Wheat)";
+        variety = "MP Sharbati Golden";
+        defaultPrice = 28;
+      } else if (/चावल|धान|chawal|rice/i.test(lower)) {
+        crop = "बासमती चावल (Rice)";
+        variety = "Pusa 1121 Long Grain";
+        defaultPrice = 65;
+      } else if (/मिर्च|mirch|chilli/i.test(lower)) {
+        crop = "हरी मिर्च (Chillies)";
+        variety = "G-4 Spicy Hybrid";
+        defaultPrice = 45;
+      }
+
+      const qtyMatch = trimmed.match(/(\d+)\s*(?:kg|kilo|quintal|क्विंटल|किलो)/i) || trimmed.match(/(\d+)/);
+      const quantityKg = qtyMatch ? parseInt(qtyMatch[1], 10) : 50;
+
+      const priceMatch = trimmed.match(/(?:at|@|ke bhav|mein|rup|₹|rs\.?|रुपये|रुपए|भाव)\s*(\d+)/i) || trimmed.match(/(\d+)\s*(?:rupaye|rupee|rs|inr|रुपये|रुपए)/i);
+      const pricePerKg = priceMatch ? parseInt(priceMatch[1], 10) : defaultPrice;
+
+      const listingData: CropListingData = {
+        crop,
+        variety,
+        quantityKg,
+        pricePerKg,
+        unit: "kg",
+      };
+
+      isProcessingRef.current = false;
+      setIsThinking(false);
+      executeProduceListing(listingData);
+      return;
+    }
+
+    // 3. FALLBACK TO GEMINI BACKEND FOR MANDI QUERIES & CONVERSATIONS
     try {
       const res = await fetch("/api/voice", {
         method: "POST",
@@ -296,41 +390,34 @@ export function VoiceAssistant() {
       const data = await res.json();
       playAssistantChime("reply");
 
-      // 2. If intent is LIST_CROP, require explicit Yes/No confirmation!
+      // Handle Gemini listing intent
       if (data.intent === "LIST_CROP" && data.cropData) {
-        setPendingListing(data.cropData);
-        const confirmPrompt = language === "hi-IN"
-          ? `क्या आप ${data.cropData.quantityKg} ${data.cropData.unit} ${data.cropData.crop} ₹${data.cropData.pricePerKg} प्रति ${data.cropData.unit} लिस्ट करना चाहते हैं?`
-          : `Do you want to confirm listing ${data.cropData.quantityKg} ${data.cropData.unit} ${data.cropData.crop} at ₹${data.cropData.pricePerKg} per ${data.cropData.unit}?`;
-        
-        setLatestResponse(confirmPrompt);
-        speak(confirmPrompt, language);
+        executeProduceListing(data.cropData);
       } else {
-        // Normal conversational or informational response
+        // Normal informational or advisory response
         const responseText = data.spokenResponse || "जानकारी प्राप्त हो गई है।";
         setLatestResponse(responseText);
         speak(responseText, language);
 
-        // If intent is navigate/search, execute route if requested
-        if (data.intent === "SEARCH_PRODUCE" && data.route) {
-          toast.success(`खोज रहे हैं: ${data.searchQuery?.query || trimmed}`);
+        // Execute route if requested
+        if (data.intent === "NAVIGATE" && data.route) {
           router.push(data.route);
-        } else if (data.intent === "NAVIGATE" && data.route) {
+        } else if (data.intent === "SEARCH_PRODUCE" && data.route) {
           router.push(data.route);
         }
       }
     } catch (err) {
       console.error("Gemini voice error:", err);
       const fallbackReply = language === "hi-IN" 
-        ? "जी, आपका संदेश मिल गया है। आप क्या पूछना चाहते हैं?" 
-        : "Message received. How can I assist you?";
+        ? "जी, आपका संदेश मिल गया है। आप क्या बेचना या खोजना चाहते हैं?" 
+        : "Message received. What crop would you like to list or search?";
       setLatestResponse(fallbackReply);
       speak(fallbackReply, language);
     } finally {
       setIsThinking(false);
       isProcessingRef.current = false;
     }
-  }, [language, pendingListing, handleConfirmListing, handleCancelListing, router, speak, stopSpeaking]);
+  }, [language, executeNavigation, executeProduceListing, router, speak, stopSpeaking]);
 
   // Initialize SpeechRecognition with continuous = false (SINGLE UTTERANCE ONLY)
   useEffect(() => {
@@ -338,7 +425,6 @@ export function VoiceAssistant() {
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
-    // CRITICAL: continuous MUST be false so it doesn't stay open in the background!
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = language;
@@ -363,7 +449,6 @@ export function VoiceAssistant() {
 
       if (final) {
         setInterimTranscript("");
-        // Immediately abort recognition on final phrase
         try {
           recognition.abort?.();
         } catch {
@@ -472,39 +557,45 @@ export function VoiceAssistant() {
     speak(msg, newLang);
   }
 
-  // Curated Main Text Suggestions
-  const suggestions = [
-    { text: "50 किलो टमाटर ₹40/kg बेचना है", label: "🍅 50kg टमाटर बेचें" },
-    { text: "आज के नासिक प्याज के मंडी भाव क्या हैं?", label: "🧅 प्याज के मंडी भाव" },
-    { text: "गेहूं का न्यूनतम समर्थन मूल्य (MSP) बताएं", label: "🌾 गेहूं MSP भाव" },
-    { text: "किसान पोर्टल खोलें", label: "🚜 किसान पोर्टल" },
-    { text: "ताजा हरी मिर्च खोजें", label: "🛒 हरी मिर्च खोजें" },
-    { text: "फसल में कीट लगने पर क्या करें?", label: "🌿 कीट रोकथाम सलाह" },
+  // Curated Minimal Quick Prompts
+  const quickActions = [
+    { text: "50 किलो टमाटर ₹40/kg बेचना है", label: "🌾 50kg टमाटर बेचें" },
+    { text: "आज के नासिक प्याज के मंडी भाव क्या हैं?", label: "📈 प्याज के मंडी भाव" },
+    { text: "उपभोक्ता बाज़ार में ताज़ा सब्जियां दिखाओ", label: "🛒 ताज़ा फसल खरीदें" },
+    { text: "डिलीवरी फ्लीट पोर्टल खोलें", label: "🚚 डिलीवरी फ्लीट" },
+  ];
+
+  // 1-Tap Portal Navigation Row
+  const portals = [
+    { label: "🏠 होम", route: "/", nameHi: "होम पेज", nameEn: "Home" },
+    { label: "🌾 किसान", route: "/farmer", nameHi: "किसान पोर्टल", nameEn: "Farmer Intake" },
+    { label: "🛒 उपभोक्ता", route: "/consumer", nameHi: "उपभोक्ता बाज़ार", nameEn: "Consumer Market" },
+    { label: "🏢 थोक", route: "/buyer/dashboard", nameHi: "थोक खरीदार", nameEn: "Bulk Buyers" },
+    { label: "🚚 डिलीवरी", route: "/delivery", nameHi: "डिलीवरी फ्लीट", nameEn: "Delivery Fleet" },
+    { label: "🛡️ एडमिन", route: "/admin", nameHi: "प्रशासन नियंत्रण", nameEn: "Admin Panel" },
   ];
 
   return (
     <>
-      {/* 1. DOCKED SUGGESTIONS BUBBLE (Appears directly ABOVE the floating button, NO full-screen modal) */}
+      {/* 1. ULTRA-MINIMAL & SIMPLIFIED FLOATING ASSISTANT CARD */}
       {isOpen && (
         <div 
-          className="fixed bottom-36 md:bottom-22 right-4 sm:right-6 z-40 w-[350px] sm:w-[390px] max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-700/80 bg-slate-950/95 backdrop-blur-xl shadow-2xl text-white p-4 animate-in fade-in slide-in-from-bottom-3 duration-200"
+          className="fixed bottom-34 md:bottom-20 right-3 sm:right-6 z-40 w-[320px] sm:w-[350px] max-w-[calc(100vw-1.5rem)] rounded-3xl border border-emerald-500/30 bg-slate-950/92 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-white p-4 space-y-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
           role="region"
-          aria-label="Kisan Setu Voice Assistant Suggestions"
+          aria-label="Kisan Setu Voice Assistant"
         >
-          {/* Header Bar */}
-          <div className="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-3">
+          {/* Top Bar: Minimal Status & Controls */}
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
             <div className="flex items-center gap-2">
-              <div className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 text-slate-950 shadow-xs">
-                <Sparkles className="size-4" />
+              <div className="flex size-7 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 text-slate-950 shadow-xs">
+                <Sparkles className="size-3.5" />
               </div>
               <div>
                 <h3 className="text-xs font-bold text-white flex items-center gap-1.5 leading-none">
                   Gemini Live <span className="text-emerald-400">किसान वाणी</span>
-                  <span className="inline-block size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className={`inline-block size-1.5 rounded-full ${isListening ? "bg-rose-400 animate-ping" : isSpeaking ? "bg-cyan-400 animate-ping" : "bg-emerald-400"}`} />
                 </h3>
-                <p className="text-[10px] text-slate-400 leading-none mt-1">
-                  Bharat Vernacular Agri AI
-                </p>
+                <span className="text-[9px] text-slate-400">वॉयस व नेविगेशन कंट्रोल</span>
               </div>
             </div>
 
@@ -513,7 +604,7 @@ export function VoiceAssistant() {
               <button
                 type="button"
                 onClick={() => handleLanguageChange(language === "hi-IN" ? "en-IN" : "hi-IN")}
-                className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700 hover:border-slate-600 transition-colors flex items-center gap-1"
+                className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700 hover:border-slate-600 transition-colors flex items-center gap-1"
                 title="Change Voice Language"
               >
                 <Languages className="size-2.5 text-cyan-400" />
@@ -527,7 +618,7 @@ export function VoiceAssistant() {
                   if (isSpeaking) stopSpeaking();
                   setAudioFeedbackEnabled(v => !v);
                 }}
-                className="rounded-full p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="rounded-full p-1 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                 title={audioFeedbackEnabled ? "आवाज़ बंद करें (Mute)" : "आवाज़ चालू करें (Unmute)"}
               >
                 {audioFeedbackEnabled ? (
@@ -541,59 +632,65 @@ export function VoiceAssistant() {
               <button
                 type="button"
                 onClick={handleClose}
-                className="rounded-full p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                title="सुझाव बंद करें (Close)"
+                className="rounded-full p-1 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                title="बंद करें"
               >
                 <X className="size-4" />
               </button>
             </div>
           </div>
 
-          {/* Assistant Speech / Real-time Status Card */}
-          <div className="rounded-xl bg-slate-900/90 border border-slate-800 p-3 mb-3 text-xs space-y-2">
-            {/* User query if any */}
+          {/* Dynamic Live Activity Box */}
+          <div className="rounded-2xl bg-slate-900/85 border border-slate-800/90 p-3 text-xs space-y-2">
+            {/* User prompt preview if any */}
             {lastUserQuery && (
-              <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+              <div className="text-[10px] text-emerald-400 font-semibold truncate">
                 <span>आप: &ldquo;{lastUserQuery}&rdquo;</span>
               </div>
             )}
 
-            {/* Interim listening transcript */}
+            {/* Listening state with animated soundwave */}
             {isListening && (
-              <div className="flex items-center gap-2 text-rose-300 font-medium animate-pulse">
-                <span className="size-2 rounded-full bg-rose-500 animate-ping" />
-                <span>{interimTranscript ? `"${interimTranscript}..."` : "बोलिए, सुन रहे हैं..."}</span>
+              <div className="flex items-center gap-2.5 py-1">
+                <div className="flex items-center gap-1 text-rose-400 shrink-0">
+                  <span className="w-1 h-3.5 bg-rose-500 rounded-full animate-bounce" />
+                  <span className="w-1 h-5 bg-rose-400 rounded-full animate-bounce delay-100" />
+                  <span className="w-1 h-2.5 bg-rose-500 rounded-full animate-bounce delay-150" />
+                </div>
+                <p className="text-xs text-rose-200 font-medium italic truncate">
+                  {interimTranscript ? `"${interimTranscript}..."` : "बोलिए, सुन रहे हैं..."}
+                </p>
               </div>
             )}
 
-            {/* Thinking indicator */}
+            {/* Thinking state */}
             {isThinking && (
-              <div className="flex items-center gap-2 text-cyan-300 font-medium animate-pulse">
+              <div className="flex items-center gap-2 text-cyan-300 font-medium py-1 animate-pulse">
                 <Sparkles className="size-3.5 animate-spin" />
                 <span>Gemini विचार कर रहा है...</span>
               </div>
             )}
 
-            {/* Speaking / Latest response */}
+            {/* Assistant response message */}
             {!isListening && !isThinking && (
-              <div className="text-slate-200 text-xs leading-relaxed">
+              <p className="text-slate-200 text-xs leading-relaxed">
                 {latestResponse}
-              </div>
+              </p>
             )}
 
-            {/* Speaking equalizer & stop button */}
+            {/* Speaking animation & stop button */}
             {isSpeaking && (
               <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-[11px]">
-                <div className="flex items-center gap-1 text-cyan-400">
-                  <span className="w-1 h-3 bg-cyan-400 rounded-full animate-bounce" />
-                  <span className="w-1 h-4 bg-emerald-400 rounded-full animate-bounce delay-75" />
-                  <span className="w-1 h-2 bg-indigo-400 rounded-full animate-bounce delay-150" />
-                  <span className="text-[10px] text-slate-400 ml-1">बोल रहा है</span>
+                <div className="flex items-center gap-1 text-emerald-400">
+                  <span className="w-1 h-3 bg-emerald-400 rounded-full animate-bounce" />
+                  <span className="w-1 h-4 bg-teal-400 rounded-full animate-bounce delay-75" />
+                  <span className="w-1 h-2.5 bg-cyan-400 rounded-full animate-bounce delay-150" />
+                  <span className="text-[10px] text-slate-400 ml-1">असिस्टेंट बोल रहा है</span>
                 </div>
                 <button
                   type="button"
                   onClick={stopSpeaking}
-                  className="text-[10px] font-bold text-rose-400 hover:text-rose-300 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/80 transition-colors"
+                  className="text-[10px] font-bold text-rose-400 hover:text-rose-300 bg-rose-950/70 px-2 py-0.5 rounded-lg border border-rose-800/80 transition-colors"
                 >
                   रोकें (Stop)
                 </button>
@@ -601,77 +698,69 @@ export function VoiceAssistant() {
             )}
           </div>
 
-          {/* 2. CROP LISTING CONFIRMATION CARD (Yes / No confirmation requested by user) */}
-          {pendingListing && (
-            <div className="rounded-xl border-2 border-emerald-500/70 bg-gradient-to-b from-emerald-950/70 to-slate-950 p-3.5 mb-3 shadow-lg animate-in zoom-in-95 duration-150">
-              <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs mb-2">
-                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
-                <span>फसल लिस्टिंग की पुष्टि करें (Confirm Listing)</span>
+          {/* Active Listing Badge with Instant Photo Prompt */}
+          {confirmedListing && (
+            <div className="rounded-2xl border border-emerald-500/50 bg-emerald-950/40 p-2.5 flex items-center justify-between gap-2 shadow-xs animate-in zoom-in-95">
+              <div className="min-w-0 text-xs">
+                <div className="flex items-center gap-1 text-emerald-400 font-bold truncate">
+                  <CheckCircle2 className="size-3.5 shrink-0" />
+                  <span className="truncate">{confirmedListing.crop} ({confirmedListing.quantityKg}{confirmedListing.unit})</span>
+                </div>
+                <span className="text-[10px] text-slate-300 block mt-0.5">
+                  ₹{confirmedListing.pricePerKg}/{confirmedListing.unit} • फॉर्म भर गया
+                </span>
               </div>
-
-              {/* Structured Summary Table */}
-              <div className="bg-slate-900/90 rounded-lg p-2.5 border border-emerald-900/60 text-[11px] space-y-1 mb-3">
-                <div className="flex justify-between text-slate-300">
-                  <span>🌾 फसल (Crop):</span>
-                  <span className="font-bold text-white">{pendingListing.crop}</span>
-                </div>
-                <div className="flex justify-between text-slate-300">
-                  <span>⚖️ मात्रा (Quantity):</span>
-                  <span className="font-bold text-white">{pendingListing.quantityKg} {pendingListing.unit}</span>
-                </div>
-                <div className="flex justify-between text-slate-300">
-                  <span>💰 भाव (Rate):</span>
-                  <span className="font-bold text-emerald-400">₹{pendingListing.pricePerKg} / {pendingListing.unit}</span>
-                </div>
-                <div className="flex justify-between text-slate-300 pt-1 border-t border-slate-800">
-                  <span>💵 कुल अनुमानित मूल्य:</span>
-                  <span className="font-black text-amber-300">₹{pendingListing.quantityKg * pendingListing.pricePerKg}</span>
-                </div>
-              </div>
-
-              <p className="text-[11px] text-slate-300 font-medium text-center mb-3">
-                क्या आप यह फसल किसान बाज़ार में लिस्ट करना चाहते हैं?
-              </p>
-
-              {/* Big Explicit YES / NO Buttons */}
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={handleConfirmListing}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2 text-xs shadow-md transition-all active:scale-95"
-                >
-                  <CheckCircle2 className="size-3.5" />
-                  <span>हाँ, लिस्ट करें</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancelListing}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2 text-xs border border-slate-700 transition-all active:scale-95"
-                >
-                  <XCircle className="size-3.5 text-rose-400" />
-                  <span>नहीं, रद्द करें</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  router.push("/farmer");
+                  setTimeout(() => {
+                    document.getElementById("opencv-scanner")?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }, 800);
+                }}
+                className="shrink-0 flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 text-[10px] shadow-xs active:scale-95 transition-all"
+              >
+                <Camera className="size-3" />
+                <span>फोटो जोड़ें</span>
+              </button>
             </div>
           )}
 
-          {/* 3. MAIN TEXT SUGGESTIONS (Above button as requested) */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold px-0.5">
-              <span>💡 मुख्य सुझाव (Quick Prompts):</span>
-              <span className="text-[10px] text-slate-500">क्लिक करें या बोलें</span>
+          {/* Minimal Quick Actions (4 Clean Pills) */}
+          <div className="space-y-1.5 pt-0.5">
+            <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold px-0.5">
+              <span>त्वरित सुझाव (Quick Actions):</span>
+              <span className="text-[9px] text-slate-500">क्लिक करें या बोलें</span>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto pr-0.5 scrollbar-thin scrollbar-thumb-slate-800">
-              {suggestions.map((item, idx) => (
+            <div className="grid grid-cols-2 gap-1.5">
+              {quickActions.map((item, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => processWithGemini(item.text)}
-                  className="text-left rounded-xl border border-slate-800/90 bg-slate-900/80 hover:bg-emerald-950/60 hover:border-emerald-700/60 p-2 text-[11px] text-slate-200 hover:text-white transition-all group flex items-center justify-between"
+                  className="rounded-xl border border-slate-800/90 bg-slate-900/70 hover:bg-emerald-950/60 hover:border-emerald-700/60 px-2.5 py-1.5 text-left text-[11px] font-medium text-slate-200 hover:text-white transition-all truncate group flex items-center justify-between"
                 >
-                  <span className="truncate pr-1">{item.label}</span>
-                  <ArrowRight className="size-3 text-slate-500 group-hover:text-emerald-400 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                  <span className="truncate">{item.label}</span>
+                  <ArrowRight className="size-2.5 text-slate-500 group-hover:text-emerald-400 shrink-0 transition-transform group-hover:translate-x-0.5 ml-1" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 1-Tap Portal Switcher Row (Direct Page Navigation Control) */}
+          <div className="pt-2 border-t border-slate-800/80 space-y-1">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block px-0.5">
+              पेज पर जाएं (Page Navigation):
+            </span>
+            <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+              {portals.map((p) => (
+                <button
+                  key={p.route}
+                  type="button"
+                  onClick={() => executeNavigation(p.route, p.nameHi, p.nameEn)}
+                  className="shrink-0 rounded-lg px-2 py-1 text-[10px] font-semibold bg-slate-900 border border-slate-800 hover:bg-emerald-900/50 hover:border-emerald-600 text-slate-300 hover:text-white transition-colors"
+                >
+                  {p.label}
                 </button>
               ))}
             </div>
@@ -679,27 +768,24 @@ export function VoiceAssistant() {
         </div>
       )}
 
-      {/* 2. FLOATING GEMINI LIVE CAPSULE BUTTON (Docked at bottom-right) */}
-      <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2">
+      {/* 2. FLOATING GEMINI LIVE CAPSULE BUTTON */}
+      <div className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 z-40 flex items-center gap-2">
         {/* Main Capsule Button */}
         <button
           type="button"
           onClick={() => {
-            // If already open and speaking, clicking stops speaking
             if (isSpeaking) {
               stopSpeaking();
               return;
             }
-            // If open and listening, clicking toggles listening
             if (isListening) {
               toggleListening();
               return;
             }
-            // Toggle suggestions bubble
             setIsOpen((prev) => !prev);
           }}
           aria-label="Toggle Gemini Live Assistant"
-          className={`group relative flex items-center gap-2.5 rounded-full pl-3 pr-4 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-200 active:scale-95 ${
+          className={`group relative flex items-center gap-2 rounded-full pl-3 pr-3.5 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-200 active:scale-95 ${
             isListening 
               ? "bg-rose-950/90 border-2 border-rose-500 shadow-rose-900/50" 
               : isSpeaking
@@ -708,10 +794,10 @@ export function VoiceAssistant() {
           }`}
         >
           {/* Subtle Glow Aura */}
-          <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 opacity-40 blur-xs group-hover:opacity-75 transition-opacity" />
+          <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 opacity-30 blur-xs group-hover:opacity-75 transition-opacity" />
 
           {/* Icon Orb */}
-          <div className={`relative flex size-7 items-center justify-center rounded-full text-white shadow-inner ${
+          <div className={`relative flex size-6 items-center justify-center rounded-full text-white shadow-inner ${
             isListening 
               ? "bg-rose-600 animate-pulse" 
               : isSpeaking
@@ -721,13 +807,13 @@ export function VoiceAssistant() {
               : "bg-gradient-to-br from-emerald-600 to-teal-700"
           }`}>
             {isListening ? (
-              <MicOff className="size-3.5 text-white" />
+              <MicOff className="size-3 text-white" />
             ) : isSpeaking ? (
-              <Volume2 className="size-3.5 text-white animate-bounce" />
+              <Volume2 className="size-3 text-white animate-bounce" />
             ) : isThinking ? (
-              <Sparkles className="size-3.5 text-amber-200" />
+              <Sparkles className="size-3 text-amber-200" />
             ) : (
-              <Sparkles className="size-3.5 text-emerald-200" />
+              <Sparkles className="size-3 text-emerald-200" />
             )}
           </div>
 
@@ -751,14 +837,14 @@ export function VoiceAssistant() {
                   : "bg-emerald-400"
               }`} />
             </div>
-            <p className="text-[10px] text-slate-300 font-medium mt-0.5">
+            <p className="text-[9px] text-slate-300 font-medium mt-0.5">
               {isSpeaking ? "रोकने के लिए दबाएं" : "किसान वाणी"}
             </p>
           </div>
 
           {/* Chevron indicator for bubble state */}
           <div className="relative text-slate-400 group-hover:text-white transition-colors ml-0.5">
-            {isOpen ? <ChevronDown className="size-3.5" /> : <ChevronUp className="size-3.5" />}
+            {isOpen ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}
           </div>
         </button>
 
@@ -768,16 +854,16 @@ export function VoiceAssistant() {
           onClick={toggleListening}
           aria-label={isListening ? "Stop listening" : "Start speaking"}
           title={isListening ? "माइक बंद करें (Stop Mic)" : "बोलकर पूछें (Speak to Gemini)"}
-          className={`flex size-10 items-center justify-center rounded-full text-white shadow-xl transition-all active:scale-90 ${
+          className={`flex size-9 sm:size-10 items-center justify-center rounded-full text-white shadow-xl transition-all active:scale-90 ${
             isListening
               ? "bg-rose-600 hover:bg-rose-500 ring-4 ring-rose-500/40 animate-pulse"
               : "bg-emerald-600 hover:bg-emerald-500 hover:scale-105 shadow-emerald-700/40"
           }`}
         >
           {isListening ? (
-            <MicOff className="size-5" />
+            <MicOff className="size-4.5" />
           ) : (
-            <Mic className="size-5" />
+            <Mic className="size-4.5" />
           )}
         </button>
       </div>
