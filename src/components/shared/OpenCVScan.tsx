@@ -628,19 +628,19 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
 
         {/* Quick Sample Crop Chips */}
         <div className="mt-3 pt-2.5 border-t border-slate-800/80">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span className="font-semibold">त्वरित टेस्ट फसलें (Sample Crops):</span>
-            <span className="text-[11px] text-slate-500">1-क्लिक टेस्ट</span>
+          <div className="flex items-center gap-2 text-xs text-slate-300 mb-2">
+            <span className="font-bold text-slate-200">त्वरित टेस्ट फसलें (Sample Crops):</span>
+            <span className="rounded-full bg-slate-800 border border-slate-700/80 px-2.5 py-0.5 text-[11px] text-emerald-400 font-medium">1-क्लिक टेस्ट</span>
           </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-none">
             {SAMPLE_CROPS.map((sample, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => executeScan(sample.url, sample.hint)}
-                className={`shrink-0 rounded-full border px-3 py-1 text-xs font-bold transition-all ${
+                className={`shrink-0 min-h-[44px] inline-flex items-center justify-center rounded-full border px-4 py-2 text-xs font-bold transition-all active:scale-95 ${
                   currentCropHint.toLowerCase().includes(sample.hint.toLowerCase())
-                    ? "bg-emerald-600 text-white border-emerald-500 shadow-xs"
+                    ? "bg-emerald-600 text-white border-emerald-500 shadow-xs ring-2 ring-emerald-400/50"
                     : "border-slate-800 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white hover:border-emerald-600"
                 }`}
               >

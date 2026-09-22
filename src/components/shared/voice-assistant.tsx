@@ -114,6 +114,7 @@ export function VoiceAssistant() {
   const [isListening, setIsListening] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [language, setLanguage] = useState<"hi-IN" | "en-IN">("hi-IN");
   const [audioFeedbackEnabled, setAudioFeedbackEnabled] = useState(true);
 
@@ -769,103 +770,128 @@ export function VoiceAssistant() {
       )}
 
       {/* 2. FLOATING GEMINI LIVE CAPSULE BUTTON */}
-      <div className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 z-40 flex items-center gap-2">
-        {/* Main Capsule Button */}
-        <button
-          type="button"
-          onClick={() => {
-            if (isSpeaking) {
-              stopSpeaking();
-              return;
-            }
-            if (isListening) {
-              toggleListening();
-              return;
-            }
-            setIsOpen((prev) => !prev);
-          }}
-          aria-label="Toggle Gemini Live Assistant"
-          className={`group relative flex items-center gap-2 rounded-full pl-3 pr-3.5 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-200 active:scale-95 ${
-            isListening 
-              ? "bg-rose-950/90 border-2 border-rose-500 shadow-rose-900/50" 
-              : isSpeaking
-              ? "bg-indigo-950/90 border-2 border-cyan-400 shadow-cyan-900/50"
-              : "bg-slate-950/90 border border-emerald-500/40 hover:border-emerald-400 shadow-emerald-950/30 hover:scale-105"
-          }`}
-        >
-          {/* Subtle Glow Aura */}
-          <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 opacity-30 blur-xs group-hover:opacity-75 transition-opacity" />
-
-          {/* Icon Orb */}
-          <div className={`relative flex size-6 items-center justify-center rounded-full text-white shadow-inner ${
-            isListening 
-              ? "bg-rose-600 animate-pulse" 
-              : isSpeaking
-              ? "bg-cyan-600"
-              : isThinking
-              ? "bg-amber-600 animate-spin"
-              : "bg-gradient-to-br from-emerald-600 to-teal-700"
-          }`}>
-            {isListening ? (
-              <MicOff className="size-3 text-white" />
-            ) : isSpeaking ? (
-              <Volume2 className="size-3 text-white animate-bounce" />
-            ) : isThinking ? (
-              <Sparkles className="size-3 text-amber-200" />
-            ) : (
-              <Sparkles className="size-3 text-emerald-200" />
-            )}
-          </div>
-
-          {/* Button Text */}
-          <div className="relative text-left leading-none">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black tracking-wide text-white">
-                {isListening 
-                  ? "सुन रहे हैं..." 
-                  : isSpeaking
-                  ? "बोल रहा है"
-                  : isThinking
-                  ? "सोच रहे हैं..."
-                  : "Gemini Live"}
-              </span>
-              <span className={`size-1.5 rounded-full ${
+      <div className="fixed bottom-4 md:bottom-5 right-3 sm:right-5 z-40 flex items-center gap-1.5">
+        {isMinimized ? (
+          <button
+            type="button"
+            onClick={() => setIsMinimized(false)}
+            aria-label="Expand Gemini Live Assistant"
+            title="विस्तार करें (Expand Gemini Assistant)"
+            className="flex size-11 items-center justify-center rounded-full bg-slate-950/95 border border-emerald-500/60 text-white shadow-xl hover:scale-105 active:scale-95 transition-all"
+          >
+            <Sparkles className="size-5 text-emerald-400" />
+          </button>
+        ) : (
+          <>
+            {/* Main Capsule Button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isSpeaking) {
+                  stopSpeaking();
+                  return;
+                }
+                if (isListening) {
+                  toggleListening();
+                  return;
+                }
+                setIsOpen((prev) => !prev);
+              }}
+              aria-label="Toggle Gemini Live Assistant"
+              className={`group relative flex items-center gap-2 rounded-full pl-3 pr-3.5 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-200 active:scale-95 ${
                 isListening 
-                  ? "bg-rose-400 animate-ping" 
-                  : isSpeaking 
-                  ? "bg-cyan-400 animate-ping"
-                  : "bg-emerald-400"
-              }`} />
-            </div>
-            <p className="text-[9px] text-slate-300 font-medium mt-0.5">
-              {isSpeaking ? "रोकने के लिए दबाएं" : "किसान वाणी"}
-            </p>
-          </div>
+                  ? "bg-rose-950/90 border-2 border-rose-500 shadow-rose-900/50" 
+                  : isSpeaking
+                  ? "bg-indigo-950/90 border-2 border-cyan-400 shadow-cyan-900/50"
+                  : "bg-slate-950/90 border border-emerald-500/40 hover:border-emerald-400 shadow-emerald-950/30 hover:scale-105"
+              }`}
+            >
+              {/* Subtle Glow Aura */}
+              <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 opacity-30 blur-xs group-hover:opacity-75 transition-opacity" />
 
-          {/* Chevron indicator for bubble state */}
-          <div className="relative text-slate-400 group-hover:text-white transition-colors ml-0.5">
-            {isOpen ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}
-          </div>
-        </button>
+              {/* Icon Orb */}
+              <div className={`relative flex size-6 items-center justify-center rounded-full text-white shadow-inner ${
+                isListening 
+                  ? "bg-rose-600 animate-pulse" 
+                  : isSpeaking
+                  ? "bg-cyan-600"
+                  : isThinking
+                  ? "bg-amber-600 animate-spin"
+                  : "bg-gradient-to-br from-emerald-600 to-teal-700"
+              }`}>
+                {isListening ? (
+                  <MicOff className="size-3 text-white" />
+                ) : isSpeaking ? (
+                  <Volume2 className="size-3 text-white animate-bounce" />
+                ) : isThinking ? (
+                  <Sparkles className="size-3 text-amber-200" />
+                ) : (
+                  <Sparkles className="size-3 text-emerald-200" />
+                )}
+              </div>
 
-        {/* Dedicated Direct Mic Trigger Button */}
-        <button
-          type="button"
-          onClick={toggleListening}
-          aria-label={isListening ? "Stop listening" : "Start speaking"}
-          title={isListening ? "माइक बंद करें (Stop Mic)" : "बोलकर पूछें (Speak to Gemini)"}
-          className={`flex size-9 sm:size-10 items-center justify-center rounded-full text-white shadow-xl transition-all active:scale-90 ${
-            isListening
-              ? "bg-rose-600 hover:bg-rose-500 ring-4 ring-rose-500/40 animate-pulse"
-              : "bg-emerald-600 hover:bg-emerald-500 hover:scale-105 shadow-emerald-700/40"
-          }`}
-        >
-          {isListening ? (
-            <MicOff className="size-4.5" />
-          ) : (
-            <Mic className="size-4.5" />
-          )}
-        </button>
+              {/* Button Text */}
+              <div className="relative text-left leading-none">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-black tracking-wide text-white">
+                    {isListening 
+                      ? "सुन रहे हैं..." 
+                      : isSpeaking
+                      ? "बोल रहा है"
+                      : isThinking
+                      ? "सोच रहे हैं..."
+                      : "Gemini Live"}
+                  </span>
+                  <span className={`size-1.5 rounded-full ${
+                    isListening 
+                      ? "bg-rose-400 animate-ping" 
+                      : isSpeaking 
+                      ? "bg-cyan-400 animate-ping"
+                      : "bg-emerald-400"
+                  }`} />
+                </div>
+                <p className="text-[9px] text-slate-300 font-medium mt-0.5">
+                  {isSpeaking ? "रोकने के लिए दबाएं" : "किसान वाणी"}
+                </p>
+              </div>
+
+              {/* Chevron indicator for bubble state */}
+              <div className="relative text-slate-400 group-hover:text-white transition-colors ml-0.5">
+                {isOpen ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}
+              </div>
+            </button>
+
+            {/* Dedicated Direct Mic Trigger Button */}
+            <button
+              type="button"
+              onClick={toggleListening}
+              aria-label={isListening ? "Stop listening" : "Start speaking"}
+              title={isListening ? "माइक बंद करें (Stop Mic)" : "बोलकर पूछें (Speak to Gemini)"}
+              className={`flex size-9 sm:size-10 items-center justify-center rounded-full text-white shadow-xl transition-all active:scale-90 ${
+                isListening
+                  ? "bg-rose-600 hover:bg-rose-500 ring-4 ring-rose-500/40 animate-pulse"
+                  : "bg-emerald-600 hover:bg-emerald-500 hover:scale-105 shadow-emerald-700/40"
+              }`}
+            >
+              {isListening ? (
+                <MicOff className="size-4.5" />
+              ) : (
+                <Mic className="size-4.5" />
+              )}
+            </button>
+
+            {/* Minimize button to prevent workspace obstruction */}
+            <button
+              type="button"
+              onClick={() => setIsMinimized(true)}
+              aria-label="Minimize Assistant"
+              title="छोटा करें (Minimize)"
+              className="flex size-7 items-center justify-center rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all active:scale-90"
+            >
+              <X className="size-3" />
+            </button>
+          </>
+        )}
       </div>
     </>
   );

@@ -24,7 +24,8 @@ import {
   ShoppingBag,
   ExternalLink,
   Info,
-  X
+  X,
+  ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,14 +38,86 @@ import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
 
 // Crop quick presets organized by category
 const CROP_PRESETS = [
-  { name: "टमाटर (Tomatoes)", category: "Vegetables", variety: "Desi Hybrid (Abhinav)", defaultPrice: 40, unit: "kg", defaultQty: 50, hint: "Tomato" },
-  { name: "प्याज (Onion)", category: "Vegetables", variety: "Nashik Red Garwa", defaultPrice: 28, unit: "kg", defaultQty: 100, hint: "Onion" },
-  { name: "आलू (Potatoes)", category: "Vegetables", variety: "Kufri Jyoti / Pukhraj", defaultPrice: 22, unit: "kg", defaultQty: 150, hint: "Potato" },
-  { name: "गेहूं (Wheat)", category: "Grains", variety: "MP Sharbati Golden", defaultPrice: 28, unit: "kg", defaultQty: 200, hint: "Wheat" },
-  { name: "बासमती चावल (Rice)", category: "Grains", variety: "Pusa 1121 Long Grain", defaultPrice: 65, unit: "kg", defaultQty: 100, hint: "Rice" },
-  { name: "हरी मिर्च (Chillies)", category: "Vegetables", variety: "G-4 Spicy Hybrid", defaultPrice: 45, unit: "kg", defaultQty: 30, hint: "Chilli" },
-  { name: "शिमला मिर्च (Capsicum)", category: "Vegetables", variety: "Indra F1 Hybrid", defaultPrice: 50, unit: "kg", defaultQty: 40, hint: "Capsicum" },
-  { name: "देशी लहसुन (Garlic)", category: "Vegetables", variety: "G-282 Safed", defaultPrice: 110, unit: "kg", defaultQty: 40, hint: "Garlic" },
+  { 
+    name: "टमाटर (Tomatoes)", 
+    category: "Vegetables", 
+    variety: "Desi Hybrid (Abhinav)", 
+    defaultPrice: 40, 
+    unit: "kg", 
+    defaultQty: 50, 
+    hint: "Tomato",
+    image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "प्याज (Onion)", 
+    category: "Vegetables", 
+    variety: "Nashik Red Garwa", 
+    defaultPrice: 28, 
+    unit: "kg", 
+    defaultQty: 100, 
+    hint: "Onion",
+    image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "आलू (Potatoes)", 
+    category: "Vegetables", 
+    variety: "Kufri Jyoti / Pukhraj", 
+    defaultPrice: 22, 
+    unit: "kg", 
+    defaultQty: 150, 
+    hint: "Potato",
+    image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "गेहूं (Wheat)", 
+    category: "Grains", 
+    variety: "MP Sharbati Golden", 
+    defaultPrice: 28, 
+    unit: "kg", 
+    defaultQty: 200, 
+    hint: "Wheat",
+    image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "बासमती चावल (Rice)", 
+    category: "Grains", 
+    variety: "Pusa 1121 Long Grain", 
+    defaultPrice: 65, 
+    unit: "kg", 
+    defaultQty: 100, 
+    hint: "Rice",
+    image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "हरी मिर्च (Chillies)", 
+    category: "Vegetables", 
+    variety: "G-4 Spicy Hybrid", 
+    defaultPrice: 45, 
+    unit: "kg", 
+    defaultQty: 30, 
+    hint: "Chilli",
+    image: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "शिमला मिर्च (Capsicum)", 
+    category: "Vegetables", 
+    variety: "Indra F1 Hybrid", 
+    defaultPrice: 50, 
+    unit: "kg", 
+    defaultQty: 40, 
+    hint: "Capsicum",
+    image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "देशी लहसुन (Garlic)", 
+    category: "Vegetables", 
+    variety: "G-282 Safed", 
+    defaultPrice: 110, 
+    unit: "kg", 
+    defaultQty: 40, 
+    hint: "Garlic",
+    image: "https://images.unsplash.com/photo-1615477032219-bc1882424075?w=600&auto=format&fit=crop&q=80"
+  },
 ];
 
 export default function FarmerPortalPage() {
@@ -105,7 +178,7 @@ export default function FarmerPortalPage() {
     }, 1200);
   }, []);
 
-  // Handle Preset Click
+  // Handle Preset Click - Real-time sync with photo and grading to eliminate mismatch
   const handlePresetSelect = (preset: typeof CROP_PRESETS[0]) => {
     setCropName(preset.name);
     setCropCategory(preset.category as "Vegetables" | "Grains");
@@ -113,6 +186,25 @@ export default function FarmerPortalPage() {
     setQuantity(preset.defaultQty);
     setUnit(preset.unit);
     setFloorPrice(preset.defaultPrice);
+    if (preset.image) {
+      setAttachedPhoto(preset.image);
+    }
+    setScannedGrade((prev) => ({
+      cropName: preset.name,
+      variety: preset.variety,
+      grade: prev?.grade || "Grade A",
+      gradeReason: `सत्यापित उच्च गुणवत्ता ${preset.name}`,
+      ripenessPct: 90,
+      ripenessStage: "Optimal Market Grade",
+      defectPct: 3,
+      defectNotes: "Clean surface, zero rot.",
+      shelfLifeDays: preset.category === "Grains" ? 180 : 7,
+      marketFit: "Direct Consumer Kitchens & Verified Buyers",
+      recommendedPriceDeltaPct: 12,
+      feedbackEn: `Grade-A verified quality for ${preset.name}.`,
+      feedbackHi: `${preset.name} ग्रेड-ए प्रमाणित। सीधे खरीदार को बिक्री हेतु तैयार।`,
+      assayerVerificationId: prev?.assayerVerificationId || `KS-QC-${Math.floor(100000 + Math.random() * 900000)}`,
+    }));
     toast.success(`चुना गया: ${preset.name}`);
   };
 
@@ -130,6 +222,15 @@ export default function FarmerPortalPage() {
     setVariety("");
     setQuantity("");
     setFloorPrice("");
+
+    // Find preset image if available
+    const matchedPreset = CROP_PRESETS.find((p) => 
+      p.hint.toLowerCase().includes(targetData.crop.toLowerCase()) || 
+      p.name.toLowerCase().includes(targetData.crop.toLowerCase())
+    );
+    if (matchedPreset?.image) {
+      setAttachedPhoto(matchedPreset.image);
+    }
 
     let cropIndex = 0;
     const cropStr = targetData.crop;
@@ -290,24 +391,24 @@ export default function FarmerPortalPage() {
       <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 pb-28 sm:pb-24">
         
         {/* 1. Farmer Profile & Verified Ledger Bar */}
-        <section className="rounded-3xl border border-emerald-200/90 bg-white/95 p-4 sm:p-6 shadow-sm backdrop-blur-md">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5 sm:gap-4">
-              <div className="flex size-14 sm:size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-800 text-white shadow-md shrink-0">
-                <Sprout className="size-7 sm:size-8" />
+        <section className="rounded-2xl sm:rounded-3xl border border-emerald-200/90 bg-white/95 py-3.5 px-4 sm:px-6 shadow-sm backdrop-blur-md mb-6 sm:mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-3.5">
+              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-800 text-white shadow-sm shrink-0">
+                <Sprout className="size-6 sm:size-7" />
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
+                  <h1 className="text-base sm:text-xl font-black text-slate-900 leading-tight">
                     रामेश्वर पाटिल (Rameshwar Patil)
                   </h1>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-xs font-bold text-emerald-800 shrink-0">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-800 shrink-0">
                     <ShieldCheck className="size-3.5 text-emerald-600" aria-hidden="true" />
                     <span>पीएम-किसान सत्यापित</span>
                     <span className="rounded bg-emerald-200/80 px-1.5 py-0.2 font-mono text-[11px] text-emerald-900">#IND-84920</span>
                   </span>
                 </div>
-                <p className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 truncate">
+                <p className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5 truncate">
                   <MapPin className="size-3.5 text-emerald-600 shrink-0" />
                   <span>सांवेर क्लस्टर, इंदौर जिला, मध्य प्रदेश (Sanwer, Indore, MP)</span>
                 </p>
@@ -315,16 +416,14 @@ export default function FarmerPortalPage() {
             </div>
 
             {/* Financial Telemetry Pills */}
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 text-xs w-full md:w-auto">
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-3 shadow-2xs flex-1 min-w-[120px]">
-                <span className="text-xs font-semibold text-slate-600 block">सुरक्षित एस्क्रो बैलेंस</span>
-                <p className="text-base sm:text-xl font-black text-emerald-700">₹42,500</p>
-                <span className="text-xs text-emerald-700 font-semibold block">रेज़रपे एस्क्रो में सुरक्षित</span>
+            <div className="flex items-center gap-2 sm:gap-3 text-xs w-full md:w-auto">
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 shadow-2xs flex-1 sm:flex-initial">
+                <span className="text-[11px] font-semibold text-slate-600 block">सुरक्षित एस्क्रो बैलेंस</span>
+                <p className="text-sm sm:text-base font-black text-emerald-700">₹42,500</p>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 shadow-2xs flex-1 min-w-[120px]">
-                <span className="text-xs font-semibold text-slate-600 block">विश्वसनीयता रेटिंग</span>
-                <p className="text-base sm:text-xl font-black text-slate-900">4.9 ★</p>
-                <span className="text-xs text-slate-600 font-semibold block">99.4% समय पर प्रेषण</span>
+              <div className="rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 shadow-2xs flex-1 sm:flex-initial">
+                <span className="text-[11px] font-semibold text-slate-600 block">विश्वसनीयता रेटिंग</span>
+                <p className="text-sm sm:text-base font-black text-slate-900">4.9 ★ <span className="text-[11px] font-normal text-slate-500">(99.4%)</span></p>
               </div>
             </div>
           </div>
@@ -373,7 +472,7 @@ export default function FarmerPortalPage() {
               </div>
 
               {/* Quick Preset Crop Selector */}
-              <div className="space-y-2 rounded-2xl bg-emerald-50/50 p-3.5 border border-emerald-100">
+              <div className="space-y-2.5 rounded-2xl bg-emerald-50/50 p-4 border border-emerald-100">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-800">
                   <span className="flex items-center gap-1.5 text-emerald-900">
                     <Zap className="size-4 text-amber-500" />
@@ -382,15 +481,15 @@ export default function FarmerPortalPage() {
                   <span className="text-[11px] text-emerald-700 font-semibold">1-टैप ऑटोफिल</span>
                 </div>
 
-                <div className="flex flex-wrap gap-2 pt-1">
+                <div className="flex flex-wrap gap-2.5 sm:gap-3 pt-1">
                   {CROP_PRESETS.map((preset, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => handlePresetSelect(preset)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-all truncate ${
+                      className={`min-h-[44px] inline-flex items-center justify-center rounded-full border px-4 py-2.5 text-xs font-bold transition-all truncate active:scale-95 ${
                         cropName.includes(preset.name.split(" ")[0])
-                          ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-300"
                           : "bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50"
                       }`}
                     >
@@ -532,7 +631,7 @@ export default function FarmerPortalPage() {
                     <div className="relative size-12 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-300">
                       <Image
                         src={attachedPhoto}
-                        alt="Crop Thumbnail"
+                        alt={cropName || "Crop Preview"}
                         fill
                         className="object-cover"
                       />
@@ -540,7 +639,7 @@ export default function FarmerPortalPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-xs text-slate-900 truncate">
-                          {scannedGrade?.cropName || cropName}
+                          {cropName || scannedGrade?.cropName || "फसल"}
                         </span>
                         <span className="rounded-full bg-emerald-600 text-white font-bold text-xs px-2.5 py-0.5">
                           {scannedGrade?.grade || "Grade A"}
@@ -671,34 +770,34 @@ export default function FarmerPortalPage() {
                     <h4 className="font-black text-slate-900 text-sm truncate">{item.name}</h4>
                   </div>
                   
-                  <div className="flex items-baseline justify-between text-xs mt-2">
+                  <div className="flex items-baseline justify-between text-xs mt-2 w-full">
                     <div>
                       <span className="text-lg font-black text-emerald-700">
                         ₹{item.farmGatePrice}
                       </span>
                       <span className="text-xs font-semibold text-slate-500">/{item.unit}</span>
-                      <span className="ml-2 text-xs text-slate-400 line-through">
+                      <span className="ml-2 text-xs font-normal text-slate-400 line-through">
                         ₹{item.mandiBenchmarkPrice}
                       </span>
                     </div>
-                    <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg">
+                    <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg shrink-0">
                       {item.quantityAvailable} {item.unit} उपलब्ध
                     </span>
                   </div>
                 </div>
 
                 {/* Bottom Footer Info */}
-                <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
-                  <span className="flex items-center gap-1 text-emerald-700 font-bold truncate">
-                    <CheckCircle2 className="size-3.5 shrink-0" />
+                <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 w-full">
+                  <span className="flex items-center gap-1.5 text-emerald-700 font-bold truncate">
+                    <CheckCircle2 className="size-3.5 shrink-0 text-emerald-600" />
                     <span>OpenCV Assayed</span>
                   </span>
                   <Link
                     href="/consumer"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1.5 text-xs font-bold transition-all hover:border-emerald-300 shadow-2xs hover:shadow-xs active:scale-95"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 min-h-[38px] text-xs font-bold transition-all shadow-xs hover:shadow active:scale-95 group shrink-0"
                   >
                     <span>बाज़ार देखें</span>
-                    <ExternalLink className="size-3.5 text-emerald-700" aria-hidden="true" />
+                    <ArrowRight className="size-3.5 text-white/90 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
                   </Link>
                 </div>
               </div>
