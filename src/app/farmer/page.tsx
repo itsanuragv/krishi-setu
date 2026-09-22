@@ -287,7 +287,7 @@ export default function FarmerPortalPage() {
     <div className="min-h-screen bg-[radial-gradient(at_top_left,#ecfdf5,#ffffff)] bg-grid-subtle">
       <Navbar />
 
-      <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+      <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 pb-28 sm:pb-24">
         
         {/* 1. Farmer Profile & Verified Ledger Bar */}
         <section className="rounded-3xl border border-emerald-200/90 bg-white/95 p-4 sm:p-6 shadow-sm backdrop-blur-md">
@@ -301,9 +301,10 @@ export default function FarmerPortalPage() {
                   <h1 className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
                     रामेश्वर पाटिल (Rameshwar Patil)
                   </h1>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-800 shrink-0">
-                    <ShieldCheck className="size-3.5 text-emerald-600" />
-                    PM-KISAN सत्यापित • PMK-IND-84920
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-xs font-bold text-emerald-800 shrink-0">
+                    <ShieldCheck className="size-3.5 text-emerald-600" aria-hidden="true" />
+                    <span>पीएम-किसान सत्यापित</span>
+                    <span className="rounded bg-emerald-200/80 px-1.5 py-0.2 font-mono text-[11px] text-emerald-900">#IND-84920</span>
                   </span>
                 </div>
                 <p className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 truncate">
@@ -316,14 +317,14 @@ export default function FarmerPortalPage() {
             {/* Financial Telemetry Pills */}
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 text-xs w-full md:w-auto">
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-3 shadow-2xs flex-1 min-w-[120px]">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">सुरक्षित एस्क्रो बैलेंस</span>
+                <span className="text-xs font-semibold text-slate-600 block">सुरक्षित एस्क्रो बैलेंस</span>
                 <p className="text-base sm:text-xl font-black text-emerald-700">₹42,500</p>
-                <span className="text-[10px] text-emerald-600 font-semibold block">रेज़रपे एस्क्रो में सुरक्षित</span>
+                <span className="text-xs text-emerald-700 font-semibold block">रेज़रपे एस्क्रो में सुरक्षित</span>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 shadow-2xs flex-1 min-w-[120px]">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">विश्वसनीयता रेटिंग</span>
+                <span className="text-xs font-semibold text-slate-600 block">विश्वसनीयता रेटिंग</span>
                 <p className="text-base sm:text-xl font-black text-slate-900">4.9 ★</p>
-                <span className="text-[10px] text-slate-500 font-semibold block">99.4% समय पर प्रेषण</span>
+                <span className="text-xs text-slate-600 font-semibold block">99.4% समय पर प्रेषण</span>
               </div>
             </div>
           </div>
@@ -378,19 +379,19 @@ export default function FarmerPortalPage() {
                     <Zap className="size-4 text-amber-500" />
                     <span>त्वरित फसल चुनें (Quick Pick Crop):</span>
                   </span>
-                  <span className="text-[10px] text-emerald-700 font-semibold">1-टैप ऑटोफिल</span>
+                  <span className="text-[11px] text-emerald-700 font-semibold">1-टैप ऑटोफिल</span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1">
+                <div className="flex flex-wrap gap-2 pt-1">
                   {CROP_PRESETS.map((preset, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => handlePresetSelect(preset)}
-                      className={`rounded-xl border px-2.5 py-2 text-left text-xs font-semibold transition-all truncate ${
+                      className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-all truncate ${
                         cropName.includes(preset.name.split(" ")[0])
                           ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
-                          : "bg-white text-slate-700 border-emerald-200/80 hover:bg-emerald-50 hover:border-emerald-300"
+                          : "bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50"
                       }`}
                     >
                       {preset.name}
@@ -400,12 +401,12 @@ export default function FarmerPortalPage() {
               </div>
 
               {/* Comprehensive Harvest Listing Form */}
-              <form onSubmit={handlePublishListing} className="space-y-5">
+              <form onSubmit={handlePublishListing} className="space-y-6">
                 
                 {/* 1. Crop Name & Variety */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="crop" className="text-xs font-bold text-slate-800">
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="crop" className="text-xs font-bold text-slate-800 mb-1 block">
                       फसल का नाम (Crop Name) <span className="text-rose-500">*</span>
                     </Label>
                     <div className="relative">
@@ -415,18 +416,18 @@ export default function FarmerPortalPage() {
                         onChange={(e) => setCropName(e.target.value)}
                         placeholder="जैसे: टमाटर, प्याज, आलू, गेहूं..."
                         required
-                        className={`font-bold text-slate-900 h-11 rounded-xl ${
+                        className={`font-bold text-slate-900 h-12 text-sm rounded-xl ${
                           isTyping ? "border-emerald-500 ring-2 ring-emerald-200" : ""
                         }`}
                       />
                       {isTyping && (
-                        <span className="absolute right-3 top-3 size-2 rounded-full bg-emerald-500 animate-ping" />
+                        <span className="absolute right-3 top-3.5 size-2 rounded-full bg-emerald-500 animate-ping" />
                       )}
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="variety" className="text-xs font-bold text-slate-800">
+                  <div className="space-y-2">
+                    <Label htmlFor="variety" className="text-xs font-bold text-slate-800 mb-1 block">
                       किस्म / प्रजाति (Variety)
                     </Label>
                     <Input
@@ -434,15 +435,15 @@ export default function FarmerPortalPage() {
                       value={variety}
                       onChange={(e) => setVariety(e.target.value)}
                       placeholder="जैसे: देसी हाइब्रिड, शरबती, कुफरी ज्योति"
-                      className="text-slate-900 font-semibold h-11 rounded-xl"
+                      className="text-slate-900 font-semibold h-12 text-sm rounded-xl"
                     />
                   </div>
                 </div>
 
                 {/* 2. Quantity, Unit & Bag Packaging */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="qty" className="text-xs font-bold text-slate-800">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="qty" className="text-xs font-bold text-slate-800 mb-1 block">
                       उपलब्ध मात्रा (Quantity) <span className="text-rose-500">*</span>
                     </Label>
                     <Input
@@ -453,19 +454,19 @@ export default function FarmerPortalPage() {
                       placeholder="50"
                       min={1}
                       required
-                      className="font-bold text-slate-900 h-11 rounded-xl"
+                      className="font-bold text-slate-900 h-12 text-sm rounded-xl"
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="unit" className="text-xs font-bold text-slate-800">
+                  <div className="space-y-2">
+                    <Label htmlFor="unit" className="text-xs font-bold text-slate-800 mb-1 block">
                       इकाई (Unit)
                     </Label>
                     <select
                       id="unit"
                       value={unit}
                       onChange={(e) => setUnit(e.target.value)}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                       <option value="kg">किलोग्राम (kg)</option>
                       <option value="quintal">क्विंटल (Quintal ~100kg)</option>
@@ -473,12 +474,12 @@ export default function FarmerPortalPage() {
                     </select>
                   </div>
 
-                  <div className="col-span-2 sm:col-span-1 space-y-1.5">
-                    <Label htmlFor="price" className="text-xs font-bold text-slate-800">
+                  <div className="col-span-2 sm:col-span-1 space-y-2">
+                    <Label htmlFor="price" className="text-xs font-bold text-slate-800 mb-1 block">
                       फार्म-गेट भाव (₹ / {unit}) <span className="text-rose-500">*</span>
                     </Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-3 text-xs font-black text-emerald-700">₹</span>
+                      <span className="absolute left-3 top-3.5 text-xs font-black text-emerald-700">₹</span>
                       <Input
                         id="price"
                         type="number"
@@ -487,7 +488,7 @@ export default function FarmerPortalPage() {
                         placeholder="40"
                         min={1}
                         required
-                        className="pl-7 font-black text-emerald-700 text-base h-11 rounded-xl"
+                        className="pl-7 font-black text-emerald-700 text-base h-12 rounded-xl"
                       />
                     </div>
                   </div>
@@ -501,25 +502,25 @@ export default function FarmerPortalPage() {
                         <TrendingUp className="size-4 text-emerald-600" />
                         <span>पारंपरिक मंडी बनाम कृषि सेतु बचत कैलकुलेटर:</span>
                       </span>
-                      <span className="rounded-full bg-emerald-600 text-white font-bold px-2.5 py-0.5 text-[10px]">
+                      <span className="rounded-full bg-emerald-600 text-white font-bold px-2.5 py-0.5 text-xs">
                         +{Math.round((extraGainPerUnit / (traditionalMandiNet || 1)) * 100)}% अतिरिक्त लाभ
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-emerald-200/60">
+                    <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-emerald-200/60">
                       <div className="bg-white/90 p-2.5 rounded-xl border border-slate-200">
-                        <span className="text-slate-500 block">पारंपरिक मंडी एजेंट कटौती बाद:</span>
+                        <span className="text-slate-500 block text-[11px]">पारंपरिक मंडी एजेंट कटौती बाद:</span>
                         <p className="text-sm font-bold text-slate-700">₹{traditionalMandiNet} /{unit}</p>
-                        <span className="text-[10px] text-rose-500 font-medium">(आढ़त, तुलाई, ढुलाई नुकसान)</span>
+                        <span className="text-xs text-rose-600 font-medium">(आढ़त, तुलाई, ढुलाई नुकसान)</span>
                       </div>
                       <div className="bg-emerald-100/70 p-2.5 rounded-xl border border-emerald-300">
-                        <span className="text-emerald-800 font-semibold block">कृषि सेतु डायरेक्ट फार्म-गेट:</span>
+                        <span className="text-emerald-800 font-semibold block text-[11px]">कृषि सेतु डायरेक्ट फार्म-गेट:</span>
                         <p className="text-sm font-black text-emerald-800">₹{priceNum} /{unit}</p>
-                        <span className="text-[10px] text-emerald-700 font-bold">100% बैंक/यूपीआई में भुगतान</span>
+                        <span className="text-xs text-emerald-700 font-bold">100% बैंक/यूपीआई में भुगतान</span>
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-emerald-950 font-bold">
+                    <p className="text-xs sm:text-sm text-emerald-950 font-bold leading-normal">
                       💡 इस {quantity || 0} {unit} लॉट पर आपको सीधे <span className="underline font-black text-emerald-800">₹{totalExtraProfit.toLocaleString("en-IN")} अतिरिक्त शुद्ध मुनाफा</span> मिलेगा!
                     </p>
                   </div>
@@ -541,18 +542,18 @@ export default function FarmerPortalPage() {
                         <span className="font-bold text-xs text-slate-900 truncate">
                           {scannedGrade?.cropName || cropName}
                         </span>
-                        <span className="rounded-full bg-emerald-600 text-white font-bold text-[10px] px-2 py-0.2">
+                        <span className="rounded-full bg-emerald-600 text-white font-bold text-xs px-2.5 py-0.5">
                           {scannedGrade?.grade || "Grade A"}
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-500 truncate mt-0.5">
+                      <p className="text-xs text-slate-600 truncate mt-0.5">
                         सत्यापन कोड: {scannedGrade?.assayerVerificationId || "KS-QC-748291"}
                       </p>
                     </div>
                   </div>
 
                   <div className="shrink-0 text-right">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700">
                       <CheckCircle2 className="size-3.5 text-emerald-600" />
                       <span>QC सत्यापित</span>
                     </span>
@@ -676,7 +677,7 @@ export default function FarmerPortalPage() {
                         ₹{item.farmGatePrice}
                       </span>
                       <span className="text-xs font-semibold text-slate-500">/{item.unit}</span>
-                      <span className="ml-2 text-[10px] text-slate-400 line-through">
+                      <span className="ml-2 text-xs text-slate-400 line-through">
                         ₹{item.mandiBenchmarkPrice}
                       </span>
                     </div>
@@ -687,17 +688,17 @@ export default function FarmerPortalPage() {
                 </div>
 
                 {/* Bottom Footer Info */}
-                <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-500">
+                <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
                   <span className="flex items-center gap-1 text-emerald-700 font-bold truncate">
                     <CheckCircle2 className="size-3.5 shrink-0" />
                     <span>OpenCV Assayed</span>
                   </span>
                   <Link
                     href="/consumer"
-                    className="flex items-center gap-1 font-bold text-slate-700 hover:text-emerald-700 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1.5 text-xs font-bold transition-all hover:border-emerald-300 shadow-2xs hover:shadow-xs active:scale-95"
                   >
                     <span>बाज़ार देखें</span>
-                    <ExternalLink className="size-3" />
+                    <ExternalLink className="size-3.5 text-emerald-700" aria-hidden="true" />
                   </Link>
                 </div>
               </div>

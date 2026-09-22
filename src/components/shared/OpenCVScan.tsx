@@ -628,9 +628,9 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
 
         {/* Quick Sample Crop Chips */}
         <div className="mt-3 pt-2.5 border-t border-slate-800/80">
-          <div className="flex items-center justify-between text-[10px] text-slate-400 mb-1.5">
-            <span>तुरंत टेस्ट करें (Sample Crops):</span>
-            <span className="text-slate-500">1-क्लिक टेस्ट</span>
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+            <span className="font-semibold">त्वरित टेस्ट फसलें (Sample Crops):</span>
+            <span className="text-[11px] text-slate-500">1-क्लिक टेस्ट</span>
           </div>
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             {SAMPLE_CROPS.map((sample, idx) => (
@@ -638,7 +638,11 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
                 key={idx}
                 type="button"
                 onClick={() => executeScan(sample.url, sample.hint)}
-                className="shrink-0 rounded-lg border border-slate-800 bg-slate-900/90 hover:bg-emerald-950/60 hover:border-emerald-600 px-2.5 py-1 text-[10px] font-semibold text-slate-300 hover:text-white transition-colors"
+                className={`shrink-0 rounded-full border px-3 py-1 text-xs font-bold transition-all ${
+                  currentCropHint.toLowerCase().includes(sample.hint.toLowerCase())
+                    ? "bg-emerald-600 text-white border-emerald-500 shadow-xs"
+                    : "border-slate-800 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white hover:border-emerald-600"
+                }`}
               >
                 {sample.name}
               </button>
@@ -646,61 +650,82 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
           </div>
         </div>
 
-        {/* Telemetry HUD Gauges */}
-        <div className="grid grid-cols-3 gap-2 mt-3 text-center">
-          <div className="rounded-xl bg-slate-900/90 border border-slate-800 p-2">
-            <span className="text-[9px] uppercase font-bold text-slate-400 block">शार्पनेस (Edge)</span>
-            <p className="text-xs sm:text-sm font-black text-cyan-400">{blurScore}/100</p>
-            <span className="text-[8px] text-emerald-400 block font-medium">Laplacian Pass</span>
-          </div>
-          <div className="rounded-xl bg-slate-900/90 border border-slate-800 p-2">
-            <span className="text-[9px] uppercase font-bold text-slate-400 block">प्रकाश (Light)</span>
-            <p className="text-xs sm:text-sm font-black text-amber-400">{brightness}%</p>
-            <span className="text-[8px] text-emerald-400 block font-medium">Optimal Lux</span>
-          </div>
-          <div className="rounded-xl bg-slate-900/90 border border-slate-800 p-2">
-            <span className="text-[9px] uppercase font-bold text-slate-400 block">शेल्फ लाइफ</span>
-            <p className="text-xs sm:text-sm font-black text-emerald-400">{grading.shelfLifeDays} दिन</p>
-            <span className="text-[8px] text-slate-400 block font-medium">Safe Storage</span>
-          </div>
+        {/* Progressive Disclosure Tabs: Quality Result vs Technical Telemetry */}
+        <div className="flex rounded-xl bg-slate-900 p-1 border border-slate-800 text-xs mt-3">
+          <button
+            type="button"
+            onClick={() => setScanStep("completed")}
+            className="flex-1 rounded-lg py-1.5 font-bold transition-all text-center flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-xs"
+          >
+            <Award className="size-3.5" />
+            <span>गुणवत्ता परिणाम (Grade Result)</span>
+          </button>
         </div>
 
         {/* AI Horticultural Inspection Card */}
-        <div className={`mt-3 rounded-2xl border p-3 text-xs space-y-2 ${theme.bg} ${theme.border}`}>
+        <div className={`mt-3 rounded-2xl border p-3.5 text-xs space-y-2.5 ${theme.bg} ${theme.border}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <Sparkles className="size-3.5 text-amber-300" />
-              <span className="font-extrabold text-white text-xs">{grading.cropName}</span>
+              <span className="font-extrabold text-white text-xs sm:text-sm">{grading.cropName}</span>
             </div>
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${theme.badgeBg}`}>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${theme.badgeBg}`}>
               {grading.grade} (+{grading.recommendedPriceDeltaPct}% भाव)
             </span>
           </div>
 
-          <p className="text-[11px] text-slate-200 leading-relaxed font-medium">
+          <p className="text-xs text-slate-200 leading-relaxed font-medium">
             {language === "hi" ? grading.feedbackHi : grading.feedbackEn}
           </p>
 
-          <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-300 pt-1 border-t border-slate-700/50">
+          <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 pt-2 border-t border-slate-700/50">
             <div>
-              <span className="text-slate-400 block">परिपक्वता (Ripeness):</span>
+              <span className="text-slate-400 block text-[11px]">परिपक्वता (Ripeness):</span>
               <strong className="text-white">{grading.ripenessStage} ({grading.ripenessPct}%)</strong>
             </div>
             <div>
-              <span className="text-slate-400 block">दोष दर (Defects):</span>
+              <span className="text-slate-400 block text-[11px]">दोष दर (Defects):</span>
               <strong className="text-emerald-300">&lt; {grading.defectPct}% (Clean Surface)</strong>
             </div>
           </div>
         </div>
+
+        {/* Collapsible Technical Telemetry Accordion (Progressive Disclosure) */}
+        <details className="mt-2.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 p-2.5 group">
+          <summary className="cursor-pointer text-xs font-bold text-slate-400 hover:text-emerald-400 flex items-center justify-between select-none">
+            <span className="flex items-center gap-1.5">
+              <Gauge className="size-3.5 text-cyan-400" />
+              <span>विस्तृत तकनीकी टेलीमेट्री (Laplacian / Lux / Shelf Life)</span>
+            </span>
+            <span className="text-[11px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2 border-t border-slate-800 text-center">
+            <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
+              <span className="text-[11px] font-bold text-slate-400 block">शार्पनेस</span>
+              <p className="text-xs sm:text-sm font-black text-cyan-400">{blurScore}/100</p>
+              <span className="text-[10px] text-emerald-400 block font-medium">Laplacian Pass</span>
+            </div>
+            <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
+              <span className="text-[11px] font-bold text-slate-400 block">प्रकाश (Light)</span>
+              <p className="text-xs sm:text-sm font-black text-amber-400">{brightness}%</p>
+              <span className="text-[10px] text-emerald-400 block font-medium">Optimal Lux</span>
+            </div>
+            <div className="rounded-xl bg-slate-950 p-2 border border-slate-800">
+              <span className="text-[11px] font-bold text-slate-400 block">शेल्फ लाइफ</span>
+              <p className="text-xs sm:text-sm font-black text-emerald-400">{grading.shelfLifeDays} दिन</p>
+              <span className="text-[10px] text-slate-400 block font-medium">Safe Storage</span>
+            </div>
+          </div>
+        </details>
 
         {/* Primary Action: Apply To Form Button */}
         <div className="mt-3">
           <Button
             type="button"
             onClick={handleApplyToForm}
-            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold h-10 rounded-xl text-xs shadow-lg gap-1.5 transition-all active:scale-98"
+            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold h-11 rounded-xl text-xs shadow-lg gap-1.5 transition-all active:scale-98"
           >
-            <CheckCircle2 className="size-3.5" />
+            <CheckCircle2 className="size-4" />
             <span>✓ यह ग्रेड व फोटो लिस्टिंग फॉर्म में लगाएं (Apply to Form)</span>
           </Button>
         </div>

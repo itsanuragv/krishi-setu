@@ -76,7 +76,7 @@ export function Navbar() {
                     {t("brand_hindi")}
                   </span>
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-medium text-slate-500 tracking-tight leading-none mt-1 hidden sm:inline truncate">
+                <span className="text-xs font-medium text-slate-500 tracking-tight leading-normal mt-0.5 hidden sm:inline truncate">
                   {t("brand_subtitle")}
                 </span>
               </div>
