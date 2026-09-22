@@ -143,17 +143,7 @@ export default function HomePage() {
       <main className="mx-auto w-full max-w-7xl min-w-0 px-3 sm:px-6 lg:px-8 py-5 sm:py-10 space-y-10 sm:space-y-20 flex-1 overflow-x-clip">
         {/* Hero Section */}
         <section className="text-center max-w-4xl mx-auto w-full min-w-0 space-y-5 sm:space-y-6 pt-1 sm:pt-6">
-          {/* Live Cluster Proximity Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 rounded-full border border-emerald-300/80 bg-white/95 px-3 sm:px-4 py-1.5 shadow-xs backdrop-blur-md max-w-full"
-          >
-            <span className="size-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
-            <span className="text-[10px] sm:text-xs font-bold tracking-tight text-emerald-900 truncate">
-              {t("live_cluster_badge")}
-            </span>
-          </motion.div>
+
 
           {/* Headline & Value Proposition */}
           <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="space-y-3 sm:space-y-4 w-full min-w-0">
