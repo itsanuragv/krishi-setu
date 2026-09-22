@@ -35,12 +35,12 @@ export default function HomePage() {
   const [guideModalOpen, setGuideModalOpen] = useState(false);
 
   const LIVE_TICKER_ITEMS = [
-    { crop: t("crop_tomato"), farmGate: "₹40/kg", mandi: "₹58/kg", saving: language === "hi" ? "31% सस्ता" : "31% Lower" },
-    { crop: t("crop_rice"), farmGate: "₹60/kg", mandi: "₹88/kg", saving: language === "hi" ? "+46% अधिक आय" : "+46% Realization" },
-    { crop: t("crop_onion"), farmGate: "₹24/kg", mandi: "₹36/kg", saving: language === "hi" ? "33% सस्ता" : "33% Lower" },
-    { crop: t("crop_wheat"), farmGate: "₹28/kg", mandi: "₹39/kg", saving: language === "hi" ? "+39% अधिक आय" : "+39% Realization" },
-    { crop: t("crop_capsicum"), farmGate: "₹45/kg", mandi: "₹68/kg", saving: language === "hi" ? "34% सस्ता" : "34% Lower" },
-    { crop: t("crop_potato"), farmGate: "₹18/kg", mandi: "₹26/kg", saving: language === "hi" ? "30% सस्ता" : "30% Lower" },
+    { crop: t("crop_wheat"), farmGate: "₹3,400/q", mandi: "₹2,850/q", saving: language === "hi" ? "+19% अधिक लाभ" : "+19% Realization" },
+    { crop: t("crop_soyabean"), farmGate: "₹4,850/q", mandi: "₹4,200/q", saving: language === "hi" ? "+15% अधिक आय" : "+15% Realization" },
+    { crop: t("crop_rice"), farmGate: "₹7,200/q", mandi: "₹6,100/q", saving: language === "hi" ? "+18% अधिक लाभ" : "+18% Realization" },
+    { crop: t("crop_corn"), farmGate: "₹2,350/q", mandi: "₹1,950/q", saving: language === "hi" ? "+20% अधिक आय" : "+20% Realization" },
+    { crop: t("crop_bajra"), farmGate: "₹2,600/q", mandi: "₹2,150/q", saving: language === "hi" ? "+21% अधिक लाभ" : "+21% Realization" },
+    { crop: t("crop_jowar"), farmGate: "₹5,200/q", mandi: "₹4,400/q", saving: language === "hi" ? "+18% अधिक आय" : "+18% Realization" },
   ];
 
   const PRIMARY_ROLES = [

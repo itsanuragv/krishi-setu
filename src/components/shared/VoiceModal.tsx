@@ -134,6 +134,24 @@ const CROP_DEFINITIONS: CropDefinition[] = [
     ],
   },
   {
+    canonical: "Pearl Millet (Bajra)",
+    hindiName: "बाजरा",
+    defaultVariety: "Desi Shanker Shri Anna",
+    patterns: [
+      /\b(?:bajra|pearl\s*millet|millet|sajje|kambu)\b/i,
+      /(?:बाजरा|बाजरे|श्री\s*अन्न)/i,
+    ],
+  },
+  {
+    canonical: "Sorghum (Jowar)",
+    hindiName: "ज्वार",
+    defaultVariety: "Maldandi M-35-1",
+    patterns: [
+      /\b(?:jowar|jowari|sorghum|maldandi|chari)\b/i,
+      /(?:ज्वार|जवारी|मालदांडी)/i,
+    ],
+  },
+  {
     canonical: "Garlic",
     hindiName: "लहसुन",
     defaultVariety: "Desi Garlic",
@@ -166,29 +184,29 @@ const NUMBER_WORDS: Record<string, number> = {
 
 const PRESET_UTTERANCES = [
   {
-    label: "Rice / चावल (हिन्दी)",
-    text: "पचास किलो बासमती चावल साठ रुपये किलो बेचना है",
-    data: { crop: "Rice", quantity: 50, unit: "kg", price: 60, variety: "Basmati Grade-A" },
+    label: "शरबती गेहूं / Wheat (हिन्दी)",
+    text: "सौ क्विंटल सीहोर शरबती गेहूं चौंतीस सौ रुपये क्विंटल बेचना है",
+    data: { crop: "Wheat", quantity: 100, unit: "quintal", price: 3400, variety: "MP Sharbati Golden" },
   },
   {
-    label: "Rice (English)",
-    text: "Selling 60kg Rice at 55 rupees per kg",
-    data: { crop: "Rice", quantity: 60, unit: "kg", price: 55, variety: "Basmati Grade-A" },
+    label: "Yellow Soyabean (हिन्दी)",
+    text: "पचास क्विंटल पीला सोयाबीन अड़तालीस सौ पचास रुपये क्विंटल",
+    data: { crop: "Soybean", quantity: 50, unit: "quintal", price: 4850, variety: "JS-9560 Bold Grain" },
   },
   {
-    label: "गेहूं / Wheat (हिन्दी)",
-    text: "सौ किलो शरबती गेहूं अट्ठाईस रुपये प्रति किलो",
-    data: { crop: "Wheat", quantity: 100, unit: "kg", price: 28, variety: "Sharbati Golden" },
+    label: "Basmati Paddy (English)",
+    text: "List 150 quintal Pusa 1121 Basmati Rice at 7200 rupees per quintal",
+    data: { crop: "Rice", quantity: 150, unit: "quintal", price: 7200, variety: "Pusa 1121 Basmati" },
   },
   {
-    label: "Nashik Onions (English)",
-    text: "List 200kg Nashik Red Onions at 24 rupees per kg",
-    data: { crop: "Onions", quantity: 200, unit: "kg", price: 24, variety: "Nashik Red Export" },
+    label: "Yellow Maize / मक्का (हिन्दी)",
+    text: "अस्सी क्विंटल देशी पीला मक्का तेईस सौ पचास रुपये क्विंटल",
+    data: { crop: "Maize", quantity: 80, unit: "quintal", price: 2350, variety: "Pioneer Hybrid 3396" },
   },
   {
-    label: "Tomatoes (English)",
-    text: "Selling 50kg Tomatoes at 40 rupees per kg",
-    data: { crop: "Tomatoes", quantity: 50, unit: "kg", price: 40, variety: "Desi Hybrid" },
+    label: "Pearl Millet / बाजरा (श्री अन्न)",
+    text: "साठ क्विंटल संकर देशी बाजरा छब्बीस सौ रुपये क्विंटल बेचना है",
+    data: { crop: "Pearl Millet (Bajra)", quantity: 60, unit: "quintal", price: 2600, variety: "Desi Shanker Shri Anna" },
   },
 ];
 

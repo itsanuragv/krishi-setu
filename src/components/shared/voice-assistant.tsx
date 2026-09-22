@@ -327,46 +327,82 @@ export function VoiceAssistant() {
     }
 
     // 2. FAST CLIENT-SIDE CROP LISTING EXTRACTION
-    // If the user mentions selling/listing crops, parse crop, quantity, and price!
-    if (/bech|sell|fasal|list|बेच|बेचना|बिक्री|लिस्ट|दर्ज/i.test(lower) || /टमाटर|प्याज|आलू|गेहूं|चावल|मिर्च|tomato|onion|potato|wheat|chilli/i.test(lower)) {
-      let crop = "टमाटर (Tomatoes)";
-      let variety = "Desi Hybrid (Abhinav)";
-      let defaultPrice = 40;
+    // If the user mentions selling/listing crops, parse field crops, grains, quantity, and price!
+    if (
+      /bech|sell|fasal|list|anaaj|mandi|बेच|बेचना|बिक्री|लिस्ट|दर्ज|अनाज|फसल/i.test(lower) || 
+      /गेहूं|चावल|धान|सोयाबीन|मक्का|बाजरा|ज्वार|चना|सरसों|रागी|wheat|rice|paddy|soya|soyabean|corn|maize|bajra|jowar|chana|mustard|millet/i.test(lower)
+    ) {
+      let crop = "शरबती गेहूं (Wheat)";
+      let variety = "MP Sharbati Golden A+";
+      let defaultQuintalPrice = 3400;
+      let defaultKgPrice = 34;
 
-      if (/प्याज|प्याज़|pyaz|onion/i.test(lower)) {
-        crop = "नासिक लाल प्याज (Onions)";
-        variety = "Nashik Red Garwa";
-        defaultPrice = 28;
-      } else if (/आलू|aloo|potato/i.test(lower)) {
-        crop = "आलू (Potatoes)";
-        variety = "Kufri Jyoti";
-        defaultPrice = 22;
-      } else if (/गेहूं|गेहू|gehu|wheat/i.test(lower)) {
-        crop = "गेहूं (Wheat)";
-        variety = "MP Sharbati Golden";
-        defaultPrice = 28;
-      } else if (/चावल|धान|chawal|rice/i.test(lower)) {
-        crop = "बासमती चावल (Rice)";
+      if (/सोयाबीन|soya|soyabean/i.test(lower)) {
+        crop = "पीला सोयाबीन (Soyabean)";
+        variety = "JS-9560 Bold Grain";
+        defaultQuintalPrice = 4850;
+        defaultKgPrice = 48;
+      } else if (/चावल|धान|बासमती|chawal|rice|paddy|basmati/i.test(lower)) {
+        crop = "बासमती धान / चावल (Paddy/Rice)";
         variety = "Pusa 1121 Long Grain";
-        defaultPrice = 65;
-      } else if (/मिर्च|mirch|chilli/i.test(lower)) {
-        crop = "हरी मिर्च (Chillies)";
-        variety = "G-4 Spicy Hybrid";
-        defaultPrice = 45;
+        defaultQuintalPrice = 7200;
+        defaultKgPrice = 72;
+      } else if (/मक्का|भुट्टा|makka|corn|maize/i.test(lower)) {
+        crop = "देशी पीला मक्का (Yellow Maize)";
+        variety = "Pioneer Hybrid 3396";
+        defaultQuintalPrice = 2350;
+        defaultKgPrice = 24;
+      } else if (/बाजरा|bajra|pearl\s*millet/i.test(lower)) {
+        crop = "देशी बाजरा (Pearl Millet)";
+        variety = "Desi Shanker Shri Anna";
+        defaultQuintalPrice = 2600;
+        defaultKgPrice = 26;
+      } else if (/ज्वार|jowar|sorghum/i.test(lower)) {
+        crop = "मालदांडी सफेद ज्वार (White Jowar)";
+        variety = "M-35-1 Maldandi Shri Anna";
+        defaultQuintalPrice = 5200;
+        defaultKgPrice = 52;
+      } else if (/चना|chana|chickpea|dollar/i.test(lower)) {
+        crop = "मालवा डॉलर चना (Dollar Chana)";
+        variety = "Malwa Bold Kabuli";
+        defaultQuintalPrice = 6800;
+        defaultKgPrice = 68;
+      } else if (/सरसों|mustard|sarson/i.test(lower)) {
+        crop = "काली सरसों (Mustard Seed)";
+        variety = "Pusa Bold Black";
+        defaultQuintalPrice = 5600;
+        defaultKgPrice = 56;
+      } else if (/गेहूं|गेहू|gehu|wheat|sharbati/i.test(lower)) {
+        crop = "शरबती गेहूं (Wheat)";
+        variety = "MP Sharbati Golden A+";
+        defaultQuintalPrice = 3400;
+        defaultKgPrice = 34;
       }
 
-      const qtyMatch = trimmed.match(/(\d+)\s*(?:kg|kilo|quintal|क्विंटल|किलो)/i) || trimmed.match(/(\d+)/);
-      const quantityKg = qtyMatch ? parseInt(qtyMatch[1], 10) : 50;
+      // Unit detection: default to quintal for field crops, support ton, bori, kg
+      let unit: "quintal" | "ton" | "bori" | "kg" = "quintal";
+      if (/ton|टन/i.test(trimmed)) {
+        unit = "ton";
+      } else if (/bori|बोरी|कट्टा/i.test(trimmed)) {
+        unit = "bori";
+      } else if (/kg|kilo|किलो/i.test(trimmed)) {
+        unit = "kg";
+      } else {
+        unit = "quintal";
+      }
+
+      const qtyMatch = trimmed.match(/(\d+)\s*(?:quintal|क्विंटल|ton|टन|bori|बोरी|kg|kilo|किलो)/i) || trimmed.match(/(\d+)/);
+      const quantity = qtyMatch ? parseInt(qtyMatch[1], 10) : (unit === "quintal" ? 100 : unit === "ton" ? 10 : 50);
 
       const priceMatch = trimmed.match(/(?:at|@|ke bhav|mein|rup|₹|rs\.?|रुपये|रुपए|भाव)\s*(\d+)/i) || trimmed.match(/(\d+)\s*(?:rupaye|rupee|rs|inr|रुपये|रुपए)/i);
-      const pricePerKg = priceMatch ? parseInt(priceMatch[1], 10) : defaultPrice;
+      const price = priceMatch ? parseInt(priceMatch[1], 10) : (unit === "kg" ? defaultKgPrice : defaultQuintalPrice);
 
       const listingData: CropListingData = {
         crop,
         variety,
-        quantityKg,
-        pricePerKg,
-        unit: "kg",
+        quantityKg: quantity,
+        pricePerKg: price,
+        unit,
       };
 
       isProcessingRef.current = false;
@@ -560,10 +596,10 @@ export function VoiceAssistant() {
 
   // Curated Minimal Quick Prompts
   const quickActions = [
-    { text: "50 किलो टमाटर ₹40/kg बेचना है", label: "🌾 50kg टमाटर बेचें" },
-    { text: "आज के नासिक प्याज के मंडी भाव क्या हैं?", label: "📈 प्याज के मंडी भाव" },
-    { text: "उपभोक्ता बाज़ार में ताज़ा सब्जियां दिखाओ", label: "🛒 ताज़ा फसल खरीदें" },
-    { text: "डिलीवरी फ्लीट पोर्टल खोलें", label: "🚚 डिलीवरी फ्लीट" },
+    { text: "100 क्विंटल सीहोर शरबती गेहूं ₹3,400 प्रति क्विंटल बेचना है", label: "🌾 100q गेहूं बेचें" },
+    { text: "50 क्विंटल पीला सोयाबीन ₹4,850/क्विंटल लिस्ट करें", label: "🌱 50q सोयाबीन बेचें" },
+    { text: "आज के सीहोर मंडी में गेहूं, सोयाबीन और मक्का का भाव क्या है?", label: "📈 अनाज मंडी भाव" },
+    { text: "उपभोक्ता बाज़ार में उच्च गुणवत्ता वाले श्री अन्न और अनाज दिखाओ", label: "🛒 अनाज व श्री अन्न" },
   ];
 
   // 1-Tap Portal Navigation Row

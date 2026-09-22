@@ -36,123 +36,133 @@ import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan
 import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
 
-// Crop quick presets organized by category
+// Crop quick presets organized by category - Focus on major Field Crops, Grains, Millets & Oilseeds
 const CROP_PRESETS = [
   { 
-    name: "टमाटर (Tomatoes)", 
-    category: "Vegetables", 
-    variety: "Desi Hybrid (Abhinav)", 
-    defaultPrice: 40, 
-    unit: "kg", 
-    defaultQty: 50, 
-    hint: "Tomato",
-    image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
-  },
-  { 
-    name: "प्याज (Onion)", 
-    category: "Vegetables", 
-    variety: "Nashik Red Garwa", 
-    defaultPrice: 28, 
-    unit: "kg", 
-    defaultQty: 100, 
-    hint: "Onion",
-    image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80"
-  },
-  { 
-    name: "आलू (Potatoes)", 
-    category: "Vegetables", 
-    variety: "Kufri Jyoti / Pukhraj", 
-    defaultPrice: 22, 
-    unit: "kg", 
-    defaultQty: 150, 
-    hint: "Potato",
-    image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80"
-  },
-  { 
-    name: "गेहूं (Wheat)", 
+    name: "शरबती गेहूं (Wheat)", 
     category: "Grains", 
-    variety: "MP Sharbati Golden", 
-    defaultPrice: 28, 
-    unit: "kg", 
-    defaultQty: 200, 
+    variety: "सीहोर 306 शरबती (Sehore Golden)", 
+    defaultPrice: 3400, 
+    unit: "quintal", 
+    defaultQty: 100, 
     hint: "Wheat",
     image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
   },
   { 
-    name: "बासमती चावल (Rice)", 
+    name: "बासमती धान/चावल (Rice)", 
     category: "Grains", 
-    variety: "Pusa 1121 Long Grain", 
-    defaultPrice: 65, 
-    unit: "kg", 
-    defaultQty: 100, 
+    variety: "Pusa 1121 Export Grade", 
+    defaultPrice: 7200, 
+    unit: "quintal", 
+    defaultQty: 150, 
     hint: "Rice",
     image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80"
   },
   { 
-    name: "हरी मिर्च (Chillies)", 
-    category: "Vegetables", 
-    variety: "G-4 Spicy Hybrid", 
-    defaultPrice: 45, 
-    unit: "kg", 
-    defaultQty: 30, 
-    hint: "Chilli",
-    image: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600&auto=format&fit=crop&q=80"
+    name: "पीला सोयाबीन (Soyabean)", 
+    category: "Grains", 
+    variety: "JS-9560 / JS-2034 (बोल्ड दाना)", 
+    defaultPrice: 4850, 
+    unit: "quintal", 
+    defaultQty: 120, 
+    hint: "Soyabean",
+    image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=80"
   },
   { 
-    name: "शिमला मिर्च (Capsicum)", 
-    category: "Vegetables", 
-    variety: "Indra F1 Hybrid", 
-    defaultPrice: 50, 
-    unit: "kg", 
-    defaultQty: 40, 
-    hint: "Capsicum",
-    image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=600&auto=format&fit=crop&q=80"
+    name: "देशी पीला मक्का (Corn)", 
+    category: "Grains", 
+    variety: "Pioneer 3302 Hybrid Yellow", 
+    defaultPrice: 2350, 
+    unit: "quintal", 
+    defaultQty: 200, 
+    hint: "Corn",
+    image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80"
   },
   { 
-    name: "देशी लहसुन (Garlic)", 
-    category: "Vegetables", 
-    variety: "G-282 Safed", 
-    defaultPrice: 110, 
-    unit: "kg", 
-    defaultQty: 40, 
-    hint: "Garlic",
-    image: "https://images.unsplash.com/photo-1615477032219-bc1882424075?w=600&auto=format&fit=crop&q=80"
+    name: "संकर देशी बाजरा (Bajra)", 
+    category: "Grains", 
+    variety: "ProAgro Pearl Millet (श्री अन्न)", 
+    defaultPrice: 2600, 
+    unit: "quintal", 
+    defaultQty: 80, 
+    hint: "Bajra",
+    image: "https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "मालदांडी सफेद ज्वार (Jowar)", 
+    category: "Grains", 
+    variety: "M-35-1 Maldandi (श्री अन्न)", 
+    defaultPrice: 5200, 
+    unit: "quintal", 
+    defaultQty: 60, 
+    hint: "Jowar",
+    image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "मालवा डॉलर चना (Chickpea)", 
+    category: "Grains", 
+    variety: "Dollar Chana Extra Bold", 
+    defaultPrice: 6800, 
+    unit: "quintal", 
+    defaultQty: 90, 
+    hint: "Chana",
+    image: "https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "देशी रागी / मडुआ (Ragi)", 
+    category: "Grains", 
+    variety: "GPU-28 Organic Millet", 
+    defaultPrice: 4200, 
+    unit: "quintal", 
+    defaultQty: 50, 
+    hint: "Millet",
+    image: "https://images.unsplash.com/photo-1543158266-0066955047b1?w=600&auto=format&fit=crop&q=80"
+  },
+  { 
+    name: "पीली सरसों (Mustard)", 
+    category: "Grains", 
+    variety: "Pusa Bold 42% Oil Content", 
+    defaultPrice: 5600, 
+    unit: "quintal", 
+    defaultQty: 70, 
+    hint: "Mustard",
+    image: "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?w=600&auto=format&fit=crop&q=80"
   },
 ];
 
 export default function FarmerPortalPage() {
   const { t, language } = useLanguage();
   
-  // Listing Form State
-  const [cropName, setCropName] = useState("टमाटर (Tomatoes)");
-  const [cropCategory, setCropCategory] = useState<"Vegetables" | "Fruits" | "Grains" | "Organic">("Vegetables");
-  const [variety, setVariety] = useState("Desi Hybrid (Abhinav)");
-  const [quantity, setQuantity] = useState<number | "">(50);
-  const [unit, setUnit] = useState("kg");
-  const [floorPrice, setFloorPrice] = useState<number | "">(40);
+  // Listing Form State - Defaulting to MP Sharbati Wheat crop
+  const [cropName, setCropName] = useState("शरबती गेहूं (Wheat)");
+  const [cropCategory, setCropCategory] = useState<"Vegetables" | "Fruits" | "Grains" | "Organic">("Grains");
+  const [variety, setVariety] = useState("सीहोर 306 शरबती (Sehore Golden)");
+  const [quantity, setQuantity] = useState<number | "">(100);
+  const [unit, setUnit] = useState("quintal");
+  const [floorPrice, setFloorPrice] = useState<number | "">(3400);
   const [harvestDate, setHarvestDate] = useState(new Date().toISOString().slice(0, 10));
   const [isTyping, setIsTyping] = useState(false);
   const [isListed, setIsListed] = useState(false);
 
-  // Attached Photo & AI Quality Grade
+  // Attached Photo & AI Quality Grade - Defaulted to Sharbati Wheat
   const [attachedPhoto, setAttachedPhoto] = useState<string>(
-    "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+    "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
   );
   const [scannedGrade, setScannedGrade] = useState<CropGradingData | null>({
-    cropName: "टमाटर (Tomatoes)",
-    variety: "Desi Hybrid (Abhinav)",
+    cropName: "शरबती गेहूं (MP Sharbati Wheat)",
+    variety: "सीहोर 306 शरबती (Sehore Golden)",
     grade: "Grade A",
-    gradeReason: "Uniform crimson pigmentation (>85%), firm calyx, zero rot.",
-    ripenessPct: 88,
-    ripenessStage: "Firm Breaker Ripe",
-    defectPct: 4,
-    defectNotes: "Clean surface, <5% superficial solar blush.",
-    shelfLifeDays: 6,
-    marketFit: "Direct Consumer Kitchens & Quick Commerce Hubs",
-    recommendedPriceDeltaPct: 14,
-    feedbackEn: "Grade-A table quality. Qualifies for +14% farmgate premium.",
-    feedbackHi: "ग्रेड-ए टेबल क्वालिटी। 14% तक बेहतर मंडी भाव संभव।",
-    assayerVerificationId: "KS-QC-748291",
+    gradeReason: "10.4% नमी (मानक <12%), चमकदार सुनहरा दाना, उच्च प्रोटीन व शून्य कचरा।",
+    ripenessPct: 95,
+    ripenessStage: "Fully Matured Golden Grain (पूर्ण परिपक्व दाना)",
+    defectPct: 1,
+    defectNotes: "Clean harvested grain, zero pest infestation, uniform bold size.",
+    shelfLifeDays: 365,
+    marketFit: "Direct Flour Mills, Premium Atta Brands & Bulk Buyers",
+    recommendedPriceDeltaPct: 18,
+    feedbackEn: "Grade-A export quality Sharbati wheat. Low moisture (10.4%) and high test weight. Eligible for +18% premium over local Mandi.",
+    feedbackHi: "ग्रेड-ए शरबती गेहूं। 10.4% नमी, चमकदार दाना और उच्च प्रोटीन। न्यूनतम समर्थन मूल्य (MSP) से 18% अधिक भाव के योग्य।",
+    assayerVerificationId: "KS-QC-918234",
   });
   
   // Active listings list
@@ -331,11 +341,11 @@ export default function FarmerPortalPage() {
         const parsed = JSON.parse(stored);
         sessionStorage.removeItem("krishi_pending_voice_crop");
         simulateVoiceToForm({
-          crop: parsed.crop || "टमाटर",
-          variety: parsed.variety || "Standard Grade-A",
-          quantity: parsed.quantityKg || 50,
-          price: parsed.pricePerKg || 40,
-          unit: parsed.unit || "kg",
+          crop: parsed.crop || "सीहोर शरबती गेहूं (MP Sharbati Wheat)",
+          variety: parsed.variety || "MP Sharbati Golden A+",
+          quantity: parsed.quantityKg || 100,
+          price: parsed.pricePerKg || 3400,
+          unit: parsed.unit || "quintal",
         });
         triggerPhotoPrompt(parsed.crop || "फसल");
       } catch (err) {
@@ -513,7 +523,7 @@ export default function FarmerPortalPage() {
                         id="crop"
                         value={cropName}
                         onChange={(e) => setCropName(e.target.value)}
-                        placeholder="जैसे: टमाटर, प्याज, आलू, गेहूं..."
+                        placeholder="जैसे: शरबती गेहूं, बासमती धान, पीला सोयाबीन, मक्का, बाजरा..."
                         required
                         className={`font-bold text-slate-900 h-12 text-sm rounded-xl ${
                           isTyping ? "border-emerald-500 ring-2 ring-emerald-200" : ""
@@ -533,7 +543,7 @@ export default function FarmerPortalPage() {
                       id="variety"
                       value={variety}
                       onChange={(e) => setVariety(e.target.value)}
-                      placeholder="जैसे: देसी हाइब्रिड, शरबती, कुफरी ज्योति"
+                      placeholder="जैसे: सीहोर 306 शरबती, पूसा 1121, JS-9560, पायनियर..."
                       className="text-slate-900 font-semibold h-12 text-sm rounded-xl"
                     />
                   </div>
@@ -550,7 +560,7 @@ export default function FarmerPortalPage() {
                       type="number"
                       value={quantity}
                       onChange={(e) => setQuantity(e.target.value ? Number(e.target.value) : "")}
-                      placeholder="50"
+                      placeholder="100"
                       min={1}
                       required
                       className="font-bold text-slate-900 h-12 text-sm rounded-xl"
@@ -567,9 +577,10 @@ export default function FarmerPortalPage() {
                       onChange={(e) => setUnit(e.target.value)}
                       className="h-12 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
-                      <option value="kg">किलोग्राम (kg)</option>
                       <option value="quintal">क्विंटल (Quintal ~100kg)</option>
-                      <option value="crates">क्रेट्स (Crates ~25kg)</option>
+                      <option value="ton">टन (Metric Ton)</option>
+                      <option value="bori">बोरी / कट्टे (~50kg Bag)</option>
+                      <option value="kg">किलोग्राम (kg)</option>
                     </select>
                   </div>
 

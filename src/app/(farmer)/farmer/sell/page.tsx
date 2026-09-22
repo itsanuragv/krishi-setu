@@ -49,7 +49,7 @@ export default function SellPage() {
       grade: "A",
       harvestDate: new Date().toISOString().slice(0, 10),
       description: "",
-      district: "Nashik",
+      district: "Sehore",
       photos: [],
     },
   });
@@ -228,9 +228,9 @@ export default function SellPage() {
   }
 
   const SAMPLE_SELL_PROMPTS = [
-    "50 किलो टमाटर 40 रुपये किलो बेचना है",
-    "100 किलो बासमती चावल 60 रुपये",
-    "200 किलो नासिक लाल प्याज 24 रुपये",
+    "100 क्विंटल सीहोर शरबती गेहूं 3400 रुपये क्विंटल बेचना है",
+    "50 क्विंटल पीला सोयाबीन JS-9560 4850 रुपये",
+    "60 क्विंटल देशी बाजरा 2600 रुपये क्विंटल",
   ];
 
   return (

@@ -35,31 +35,52 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
   const lower = text.toLowerCase();
   const isHi = lang === "hi-IN" || /[\u0900-\u097F]/.test(text);
 
-  // 1. Detect Crop Names in Hindi & English
+  // 1. Detect Crop Names in Hindi & English (Major Field Crops & Millets)
   let detectedCrop = "";
-  let defaultPrice = 30;
+  let detectedVariety = "Standard Grade-A";
+  let defaultQuintalPrice = 3400;
+  let defaultKgPrice = 34;
 
-  if (/टमाटर|tamatar|tomato/i.test(text)) {
-    detectedCrop = isHi ? "टमाटर" : "Tomatoes";
-    defaultPrice = 32;
-  } else if (/प्याज|प्याज़|pyaz|pyaaz|onion/i.test(text)) {
-    detectedCrop = isHi ? "नासिक लाल प्याज" : "Nashik Red Onion";
-    defaultPrice = 28;
-  } else if (/आलू|aloo|potato/i.test(text)) {
-    detectedCrop = isHi ? "आलू" : "Potatoes";
-    defaultPrice = 22;
-  } else if (/चावल|धान|chawal|dhan|rice/i.test(text)) {
-    detectedCrop = isHi ? "बासमती चावल" : "Basmati Rice";
-    defaultPrice = 65;
-  } else if (/गेहूं|गेहू|gehu|wheat/i.test(text)) {
-    detectedCrop = isHi ? "शरबती गेहूं" : "Sharbati Wheat";
-    defaultPrice = 25;
-  } else if (/मिर्च|mirch|chilli|pepper/i.test(text)) {
-    detectedCrop = isHi ? "हरी मिर्च" : "Green Chillies";
-    defaultPrice = 45;
-  } else if (/शिमला|shimla|capsicum/i.test(text)) {
-    detectedCrop = isHi ? "शिमला मिर्च" : "Capsicum";
-    defaultPrice = 50;
+  if (/गेहूं|गेहू|gehu|wheat|sharbati|शरबती/i.test(text)) {
+    detectedCrop = isHi ? "सीहोर शरबती गेहूं" : "MP Sharbati Golden Wheat";
+    detectedVariety = "MP Sharbati Golden A+";
+    defaultQuintalPrice = 3400;
+    defaultKgPrice = 34;
+  } else if (/सोयाबीन|सोया|soya|soyabean/i.test(text)) {
+    detectedCrop = isHi ? "पीला सोयाबीन" : "Yellow Soyabean (JS-9560)";
+    detectedVariety = "JS-9560 Bold Grain";
+    defaultQuintalPrice = 4850;
+    defaultKgPrice = 48;
+  } else if (/चावल|धान|बासमती|chawal|dhan|rice|basmati/i.test(text)) {
+    detectedCrop = isHi ? "पूसा 1121 बासमती धान / चावल" : "Pusa 1121 Basmati Paddy";
+    detectedVariety = "Pusa 1121 Long Grain";
+    defaultQuintalPrice = 7200;
+    defaultKgPrice = 72;
+  } else if (/मक्का|भुट्टा|makka|corn|maize/i.test(text)) {
+    detectedCrop = isHi ? "देशी पीला मक्का" : "Pioneer Hybrid Yellow Maize";
+    detectedVariety = "Pioneer Hybrid 3396";
+    defaultQuintalPrice = 2350;
+    defaultKgPrice = 24;
+  } else if (/बाजरा|bajra|millet|pearl/i.test(text)) {
+    detectedCrop = isHi ? "देशी संकर बाजरा (श्री अन्न)" : "Desi Pearl Millet (Bajra)";
+    detectedVariety = "Desi Shanker Shri Anna";
+    defaultQuintalPrice = 2600;
+    defaultKgPrice = 26;
+  } else if (/ज्वार|jowar|sorghum|maldandi|मालदांडी/i.test(text)) {
+    detectedCrop = isHi ? "मालदांडी सफेद ज्वार (श्री अन्न)" : "Maldandi White Jowar";
+    detectedVariety = "M-35-1 Maldandi Shri Anna";
+    defaultQuintalPrice = 5200;
+    defaultKgPrice = 52;
+  } else if (/चना|chana|chickpea|dollar|काबुली/i.test(text)) {
+    detectedCrop = isHi ? "मालवा डॉलर चना (काबुली)" : "Malwa Dollar Chana";
+    detectedVariety = "Malwa Bold Kabuli";
+    defaultQuintalPrice = 6800;
+    defaultKgPrice = 68;
+  } else if (/सरसों|राई|mustard|sarson/i.test(text)) {
+    detectedCrop = isHi ? "काली सरसों" : "Black Mustard Seed";
+    detectedVariety = "Pusa Bold Black";
+    defaultQuintalPrice = 5600;
+    defaultKgPrice = 56;
   }
 
   // 2. Mandi Rates / Price Queries (भाव, रेट, दाम, कीमत, Mandi Rates)
@@ -69,8 +90,8 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
         intent: "AGRI_QUERY",
         route: "/farmer",
         spokenResponse: isHi
-          ? `आज की प्रमुख मंडियों में ${detectedCrop} का थोक भाव ₹${defaultPrice - 4} से ₹${defaultPrice + 5} प्रति किलो चल रहा है।`
-          : `Current wholesale market benchmark for ${detectedCrop} is ₹${defaultPrice - 4} to ₹${defaultPrice + 5} per kg.`,
+          ? `आज की सीहोर एवं इंदौर मंडियों में ${detectedCrop} का थोक भाव ₹${defaultQuintalPrice - 100} से ₹${defaultQuintalPrice + 150} प्रति क्विंटल चल रहा है।`
+          : `Current APMC Mandi benchmark for ${detectedCrop} is ₹${defaultQuintalPrice - 100} to ₹${defaultQuintalPrice + 150} per quintal.`,
         suggestedActions: [
           { label: `${detectedCrop} बेचें`, action: "speak", speakText: `मुझे ${detectedCrop} बेचना है` },
           { label: "मंडी डैशबोर्ड खोलें", action: "navigate", route: "/farmer" }
@@ -82,38 +103,48 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
       intent: "AGRI_QUERY",
       route: "/farmer",
       spokenResponse: isHi
-        ? "आज के मुख्य मंडी भाव: टमाटर ₹30/kg, प्याज ₹28/kg, आलू ₹22/kg और गेहूं ₹2500/क्विंटल है।"
-        : "Today's APMC Mandi benchmarks: Tomato ₹30/kg, Onion ₹28/kg, Potato ₹22/kg, Wheat ₹2500/quintal.",
+        ? "आज के मुख्य अनाज मंडी भाव: शरबती गेहूं ₹3,400/क्विंटल, पीला सोयाबीन ₹4,850/क्विंटल, बासमती धान ₹7,200/क्विंटल, मक्का ₹2,350/क्विंटल और बाजरा ₹2,600/क्विंटल है।"
+        : "Today's APMC Mandi benchmarks: Sharbati Wheat ₹3,400/q, Soyabean ₹4,850/q, Basmati Paddy ₹7,200/q, Maize ₹2,350/q, Bajra ₹2,600/q.",
       suggestedActions: [
-        { label: "टमाटर का भाव", action: "speak", speakText: "टमाटर का मंडी भाव क्या है?" },
-        { label: "प्याज का भाव", action: "speak", speakText: "प्याज का मंडी भाव क्या है?" },
+        { label: "गेहूं का भाव", action: "speak", speakText: "शरबती गेहूं का मंडी भाव क्या है?" },
+        { label: "सोयाबीन का भाव", action: "speak", speakText: "सोयाबीन का मंडी भाव क्या है?" },
         { label: "फसल लिस्ट करें", action: "navigate", route: "/farmer" }
       ]
     };
   }
 
   // 3. Sell / List Crop Intent (बेचना, फसल, लिस्ट, Sell, List)
-  if (/bech|sell|fasal|list|बेच|बेचना|बिक्री|लिस्ट|दर्ज/i.test(text)) {
-    const qtyMatch = text.match(/(\d+)\s*(?:kg|kilo|quintal|क्विंटल|किलो)/i) || text.match(/(\d+)/);
-    const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 50;
+  if (/bech|sell|fasal|list|anaaj|mandi|बेच|बेचना|बिक्री|लिस्ट|दर्ज|अनाज|फसल/i.test(text)) {
+    // Detect unit
+    let unit = "quintal";
+    if (/ton|टन/i.test(text)) {
+      unit = "ton";
+    } else if (/bori|बोरी|कट्टा/i.test(text)) {
+      unit = "bori";
+    } else if (/kg|kilo|किलो/i.test(text)) {
+      unit = "kg";
+    }
+
+    const qtyMatch = text.match(/(\d+)\s*(?:quintal|क्विंटल|ton|टन|bori|बोरी|kg|kilo|किलो)/i) || text.match(/(\d+)/);
+    const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : (unit === "quintal" ? 100 : unit === "ton" ? 10 : 50);
 
     const priceMatch = text.match(/(?:at|@|ke bhav|mein|rup|₹|rs\.?|रुपये|रुपए|भाव)\s*(\d+)/i) || text.match(/(\d+)\s*(?:rupaye|rupee|rs|inr|रुपये|रुपए)/i);
-    const price = priceMatch ? parseInt(priceMatch[1], 10) : defaultPrice;
+    const price = priceMatch ? parseInt(priceMatch[1], 10) : (unit === "kg" ? defaultKgPrice : defaultQuintalPrice);
 
-    const finalCrop = detectedCrop || (isHi ? "टमाटर" : "Tomatoes");
+    const finalCrop = detectedCrop || (isHi ? "सीहोर शरबती गेहूं" : "MP Sharbati Golden Wheat");
 
     return {
       intent: "LIST_CROP",
       route: "/farmer",
       spokenResponse: isHi
-        ? `जी किसान भाई, मैंने ${qty} किलो ${finalCrop} ₹${price} प्रति किलो लिस्टिंग में भर दिया है! अब कृपया अपनी फसल की फोटो अपलोड करें या AI स्कैन करें।`
-        : `Added ${qty}kg ${finalCrop} at ₹${price}/kg to listing! Now please upload harvest photos or run AI quality scan.`,
+        ? `जी किसान भाई, मैंने ${qty} ${unit === "quintal" ? "क्विंटल" : unit === "ton" ? "टन" : unit === "bori" ? "बोरी" : "किलो"} ${finalCrop} ₹${price} प्रति ${unit === "quintal" ? "क्विंटल" : unit} लिस्टिंग में भर दिया है! अब कृपया अपनी फसल की फोटो अपलोड करें या AI स्कैन करें।`
+        : `Added ${qty} ${unit} ${finalCrop} at ₹${price}/${unit} to listing! Now please upload harvest photos or run AI quality scan.`,
       cropData: {
         crop: finalCrop,
-        variety: "Desi Hybrid (Abhinav)",
+        variety: detectedVariety,
         quantityKg: qty,
         pricePerKg: price,
-        unit: "kg",
+        unit,
       },
       suggestedActions: [
         { label: "📸 फोटो व AI स्कैन करें", action: "navigate", route: "/farmer" },
@@ -124,13 +155,13 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
 
   // 4. Search / Buy Produce Intent (ढूंढो, खोजो, खरीदना, चाहिए, Buy, Search)
   if (/dhundo|search|khareed|buy|chahiye|ढूंढ|ढूंढो|खोज|खरीद|चाहिए/i.test(text)) {
-    const query = detectedCrop || text.replace(/ढूंढो|खोजो|चाहिए|खरीदना|search|buy/gi, "").trim() || "ताजा सब्जियां";
+    const query = detectedCrop || text.replace(/ढूंढो|खोजो|चाहिए|खरीदना|search|buy/gi, "").trim() || "प्रीमियम अनाज व फसलें";
     return {
       intent: "SEARCH_PRODUCE",
       route: `/consumer?search=${encodeURIComponent(query)}`,
       spokenResponse: isHi
-        ? `उपभोक्ता बाज़ार में ताज़ा ${query} खोजी जा रही है।`
-        : `Searching fresh ${query} in the direct consumer marketplace.`,
+        ? `उपभोक्ता बाज़ार में उच्च गुणवत्ता वाली ${query} खोजी जा रही है।`
+        : `Searching verified high-grade ${query} in the marketplace.`,
       searchQuery: {
         query,
       },
@@ -213,11 +244,11 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
   return {
     intent: "CLARIFICATION",
     spokenResponse: isHi
-      ? `नमस्ते किसान भाई! आपने कहा "${text}"। आप फसल बेचने के लिए नाम और भाव बता सकते हैं, या मंडी भाव पूछ सकते हैं।`
-      : `Hello! You said "${text}". You can tell me which crop to sell with quantity, or ask for today's market rates.`,
+      ? `नमस्ते किसान भाई! आपने कहा "${text}"। आप अपनी फसल (गेहूं, सोयाबीन, धान, मक्का, बाजरा) बेचने के लिए मात्रा और भाव बता सकते हैं, या आज का मंडी भाव पूछ सकते हैं।`
+      : `Hello! You said "${text}". You can tell me which field crop or grain to sell with quantity (in quintals or kg), or ask for today's APMC mandi rates.`,
     suggestedActions: [
-      { label: "🍅 50kg टमाटर बेचें", action: "speak", speakText: "50 किलो टमाटर 35 रुपये में बेचना है" },
-      { label: "🧅 प्याज का मंडी भाव", action: "speak", speakText: "प्याज का मंडी भाव क्या है?" },
+      { label: "🌾 100q गेहूं बेचें", action: "speak", speakText: "100 क्विंटल शरबती गेहूं 3400 रुपये क्विंटल बेचना है" },
+      { label: "🌱 50q सोयाबीन बेचें", action: "speak", speakText: "50 क्विंटल पीला सोयाबीन 4850 रुपये में बेचना है" },
       { label: "📊 किसान पोर्टल", action: "navigate", route: "/farmer" }
     ]
   };
@@ -249,24 +280,32 @@ export async function POST(req: Request) {
     }
 
     const systemContext = `You are "Kisan Voice Saathi" (किसान वाणी), the official real-time Gemini Voice Assistant for Krishi Setu (Bharat's Direct Farm-to-Buyer Digital Highway).
-You are speaking directly with Indian farmers, consumers, and logistics drivers via a live voice interface.
+You are speaking directly with Indian farmers, grain buyers, and logistics drivers via a live voice interface.
+The platform is dedicated to major agricultural field crops, grains, millets (Shri Anna), oilseeds, and pulses (Wheat, Basmati Paddy/Rice, Soyabean, Maize/Corn, Pearl Millet/Bajra, Jowar, Dollar Chana, Mustard) — not roadside retail vegetables.
 
 Your Personality:
 - Warm, respectful, and encouraging (use "नमस्ते किसान भाई", "जी", or polite Indian English).
 - Speak concisely (1-2 sentences maximum, under 30 words) because your response is converted directly to live Text-To-Speech audio.
-- Match user's language: if they speak Hindi or Hinglish, reply in clear, sweet Devanagari Hindi. If English, reply in friendly English.
+- Match user's language: if they speak Hindi or Hinglish, reply in clear, natural Devanagari Hindi. If English, reply in friendly English.
 
 Your Domain Knowledge:
-- Current Mandi Benchmarks: Tomatoes (₹28-35/kg), Onions (₹25-32/kg), Potatoes (₹18-22/kg), Wheat (₹2400/quintal), Rice (₹3200/quintal).
-- Direct escrow payment: Buyers pay upfront into RBI-compliant escrow; money releases to farmer instantly upon verified QR delivery.
-- AI Quality Assayer: Farmers can take a photo of their produce to get automated AGMARK Grade A/B/C certification and a 10-15% price premium.
+- Current Mandi Benchmarks (in Quintals / ₹ per 100kg):
+  * MP Sharbati Golden Wheat (₹3,200 - ₹3,600/q)
+  * Yellow Soyabean JS-9560 (₹4,600 - ₹5,100/q)
+  * Pusa 1121 Basmati Paddy/Rice (₹6,800 - ₹7,600/q)
+  * Pioneer Hybrid Yellow Maize (₹2,200 - ₹2,500/q)
+  * Desi Pearl Millet / Bajra (₹2,400 - ₹2,800/q)
+  * Maldandi White Jowar (₹4,900 - ₹5,500/q)
+  * Malwa Dollar Chana (₹6,400 - ₹7,200/q)
+- Direct escrow payment: Commercial buyers deposit upfront into RBI-compliant escrow; payment releases to farmer instantly upon verified QR delivery at storage/mandi.
+- AI Quality Assayer: Farmers can upload photos or scan grain samples with camera to get automated AGMARK Grade A/B/C certification (moisture %, grain luster, hectolitre weight) and a 10-15% price premium.
 
 Intents:
-1. "LIST_CROP": Farmer wants to sell crops (e.g. "50 किलो टमाटर बेचना है", "sell 100kg potatoes at 25"). Extract crop, variety, quantityKg (numeric), pricePerKg (numeric). Route: "/farmer". In spokenResponse, always confirm the filled crop and prompt to upload photo or run AI camera scan: "जी किसान भाई, मैंने [मात्रा] [फसल] ₹[भाव]/kg भर दिया है! अब कृपया फसल की फोटो अपलोड करें या AI स्कैन करें।"
-2. "SEARCH_PRODUCE": Consumer wants to buy fresh produce. Route: "/consumer?search=[query]".
+1. "LIST_CROP": Farmer wants to sell crops (e.g. "100 क्विंटल शरबती गेहूं बेचना है 3400 में", "sell 50 quintal soyabean at 4800"). Extract crop, variety, quantityKg (numeric quantity in quintals or specified unit), pricePerKg (numeric price), unit ("quintal", "ton", "bori", "kg"). Route: "/farmer". In spokenResponse, always confirm the filled crop and prompt to upload photo or run AI camera scan: "जी किसान भाई, मैंने [मात्रा] [यूनिट] [फसल] ₹[भाव] प्रति [यूनिट] भर दिया है! अब कृपया फसल की फोटो अपलोड करें या AI स्कैन करें।"
+2. "SEARCH_PRODUCE": Buyer wants to search or buy field crops/grains. Route: "/consumer?search=[query]".
 3. "NAVIGATE": User wants to navigate. Targets: "/" (Home), "/farmer" (Farmer Intake), "/consumer" (Consumer Market), "/buyer/dashboard" (Bulk Buyers B2B), "/delivery" (Logistics Fleet), "/admin" (Admin Dispute & Governance).
-4. "AGRI_QUERY": Farming questions, mandi prices, pest control, weather, or escrow trust questions.
-5. "CLARIFICATION": If user said something incomplete like "मुझे बेचना है" without crop name, ask politely what crop they wish to sell.
+4. "AGRI_QUERY": Farming questions, mandi prices, moisture testing, storage, or escrow trust questions.
+5. "CLARIFICATION": If user said something incomplete like "मुझे बेचना है" without crop name, ask politely what field crop or grain they wish to sell.
 
 STRICT JSON OUTPUT FORMAT:
 {
@@ -274,21 +313,21 @@ STRICT JSON OUTPUT FORMAT:
   "spokenResponse": "Concise spoken reply suitable for audio playback",
   "route": "/optional_route_path",
   "cropData": {
-    "crop": "Tomato",
-    "variety": "Desi Hybrid",
-    "quantityKg": 50,
-    "pricePerKg": 35,
-    "unit": "kg"
+    "crop": "सीहोर शरबती गेहूं (MP Sharbati Wheat)",
+    "variety": "MP Sharbati Golden A+",
+    "quantityKg": 100,
+    "pricePerKg": 3400,
+    "unit": "quintal"
   },
   "searchQuery": {
-    "query": "Onion",
-    "maxPrice": 30,
-    "category": "Vegetables",
-    "distanceKm": 25
+    "query": "Soyabean",
+    "maxPrice": 5000,
+    "category": "Grains & Oilseeds",
+    "distanceKm": 50
   },
   "suggestedActions": [
-    { "label": "फसल लिस्टिंग फॉर्म", "action": "navigate", "route": "/farmer/sell" },
-    { "label": "मंडी भाव जानें", "action": "speak", "speakText": "आज के मंडी भाव क्या हैं?" }
+    { "label": "फसल लिस्टिंग फॉर्म", "action": "navigate", "route": "/farmer" },
+    { "label": "मंडी भाव जानें", "action": "speak", "speakText": "आज के सीहोर मंडी भाव क्या हैं?" }
   ]
 }`;
 

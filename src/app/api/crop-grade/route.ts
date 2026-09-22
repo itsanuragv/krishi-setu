@@ -22,82 +22,142 @@ function fallbackGrading(cropHint?: string, lang: string = "hi"): CropGradingRes
   const hint = (cropHint || "").trim().toLowerCase();
   const id = `KS-QC-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // 1. Onion (प्याज)
-  if (hint.includes("onion") || hint.includes("pyaz") || hint.includes("pyaaz") || hint.includes("प्याज")) {
-    return {
-      cropName: "नासिक लाल प्याज (Nashik Red Onion)",
-      variety: "Garwa Winter Cured",
-      grade: "Grade A",
-      gradeReason: "Uniform bulb diameter (55-65mm), multi-layered dry outer skin intact, zero sprouting or neck softness.",
-      ripenessPct: 94,
-      ripenessStage: "Well-cured & Dried (पूर्णतः सुखाया हुआ)",
-      defectPct: 3,
-      defectNotes: "Clean surface, solid concentric internal scales, no black mould or basal rot.",
-      shelfLifeDays: 35,
-      marketFit: "Direct Consumer & Long-haul Inter-state Transport",
-      recommendedPriceDeltaPct: 15,
-      feedbackEn: "Grade-A export quality. Bulbs are tightly cured with excellent firmness. Suitable for 35+ days storage.",
-      feedbackHi: "ग्रेड-ए निर्यात गुणवत्ता। प्याज की गांठें ठोस व सूखी हैं, अंकुरण नहीं है। 35 दिनों से अधिक भंडारण योग्य।",
-      assayerVerificationId: id,
-    };
-  }
-
-  // 2. Potato (आलू)
-  if (hint.includes("potato") || hint.includes("aloo") || hint.includes("alu") || hint.includes("आलू")) {
-    return {
-      cropName: "आलू (Fresh Table Potatoes)",
-      variety: "Kufri Jyoti / Pukhraj",
-      grade: "Grade A",
-      gradeReason: "Uniform oval shape, firm skin adhesion, zero greening (solanine <2mg/100g), free from hollow heart.",
-      ripenessPct: 90,
-      ripenessStage: "Firm Tuber Maturity (ठोस कंद परिपक्वता)",
-      defectPct: 4,
-      defectNotes: "Free of scab, zero mechanical cuts, minimal superficial soil dusting.",
-      shelfLifeDays: 30,
-      marketFit: "Direct Kitchens, Retail Packs & Quick Commerce",
-      recommendedPriceDeltaPct: 12,
-      feedbackEn: "Grade-A table quality. Clean surface and uniform tuber density with zero greening.",
-      feedbackHi: "ग्रेड-ए टेबल क्वालिटी। आलू बिना किसी हरेपन के ठोस हैं। खुदरा व सीधे उपभोक्ता आपूर्ति के लिए सर्वोत्तम।",
-      assayerVerificationId: id,
-    };
-  }
-
-  // 3. Wheat (गेहूं)
-  if (hint.includes("wheat") || hint.includes("gehu") || hint.includes("gehun") || hint.includes("गेहूं") || hint.includes("गेहू")) {
+  // 1. Wheat (गेहूं)
+  if (hint.includes("wheat") || hint.includes("gehu") || hint.includes("gehun") || hint.includes("गेहूं") || hint.includes("गेहू") || hint.includes("शरबती")) {
     return {
       cropName: "शरबती गेहूं (Sharbati Golden Wheat)",
-      variety: "MP Sharbati Sehore Special",
+      variety: "सीहोर 306 शरबती (Sehore Special)",
       grade: "Grade A",
-      gradeReason: "Lustrous golden amber grain, low moisture (<11.5%), high hectolitre weight (>79 kg/hl), zero weeviled grains.",
-      ripenessPct: 98,
+      gradeReason: "चमकदार सुनहरा दाना, कम नमी (<11%), उच्च हेक्टोलीटर वजन (>80 kg/hl), घुन या कचरा शून्य (<0.2%)।",
+      ripenessPct: 96,
       ripenessStage: "Sun-Dried Storage Ready (धूप में सूखा भंडार योग्य)",
       defectPct: 1,
-      defectNotes: "Clean grains, negligible broken kernels (<0.8%), zero foreign matter.",
+      defectNotes: "साफ दाना, टूटे दाने शून्य (<0.5%), बाह्य अवांछित पदार्थ मुक्त।",
       shelfLifeDays: 365,
-      marketFit: "Premium Atta Chakki, Direct Consumer & FPO Bulk",
+      marketFit: "प्रीमियम आटा चक्की, सीधे उपभोक्ता व एफपीओ थोक आपूर्ति",
       recommendedPriceDeltaPct: 18,
-      feedbackEn: "Grade-A premium Sharbati grains with rich golden sheen and optimal moisture for long storage.",
+      feedbackEn: "Grade-A premium Sharbati grains with rich golden sheen and optimal moisture (<11%) for long storage.",
       feedbackHi: "ग्रेड-ए प्रीमियम शरबती दाना। चमक और ठोस बनावट उत्कृष्ट है। न्यूनतम नमी के कारण वर्षभर सुरक्षित रहेगा।",
       assayerVerificationId: id,
     };
   }
 
-  // 4. Basmati Rice / Paddy (चावल / धान)
-  if (hint.includes("rice") || hint.includes("chawal") || hint.includes("dhan") || hint.includes("paddy") || hint.includes("चावल") || hint.includes("धान")) {
+  // 2. Basmati Rice / Paddy (चावल / धान)
+  if (hint.includes("rice") || hint.includes("chawal") || hint.includes("dhan") || hint.includes("paddy") || hint.includes("चावल") || hint.includes("धान") || hint.includes("बासमती")) {
     return {
-      cropName: "बासमती चावल (Basmati Paddy)",
-      variety: "Pusa 1121 Extra Long",
+      cropName: "बासमती धान / चावल (Pusa 1121 Basmati)",
+      variety: "पूसा 1121 एक्सपोर्ट ग्रेड",
       grade: "Grade A",
-      gradeReason: "Average grain length >8.3mm, aromatic aroma, low chalkiness (<2%), optimal milling recovery.",
+      gradeReason: "औसत दाना लंबाई >8.4mm, प्राकृतिक सौंधी सुगंध, चाकी दाना शून्य (<1.5%), 12% सुरक्षित नमी।",
       ripenessPct: 95,
-      ripenessStage: "Cured Paddy (परिपक्व धान)",
-      defectPct: 2,
-      defectNotes: "Minimal discolored kernels, zero moisture damage, uniform grain length.",
+      ripenessStage: "Cured Export Paddy (परिपक्व धान)",
+      defectPct: 1.5,
+      defectNotes: "रंगहीन या टूटे दाने शून्य, नमी क्षति रहित, समान लंबाई।",
       shelfLifeDays: 365,
-      marketFit: "Direct Consumer Kitchens, Export & Retail Grocery",
+      marketFit: "सीधे राइस मिलर्स, एक्सपोर्ट बायर्स व प्रीमियम सुपरमार्केट",
       recommendedPriceDeltaPct: 20,
-      feedbackEn: "Grade-A extra long grain. High elongation ratio upon cooking, high market premium.",
+      feedbackEn: "Grade-A extra long grain. High elongation ratio upon cooking, high export market premium.",
       feedbackHi: "ग्रेड-ए उत्तम दाना। चावल की लंबाई और सुगंध उच्च श्रेणी की है। 20% तक बेहतर प्रीमियम भाव संभव।",
+      assayerVerificationId: id,
+    };
+  }
+
+  // 3. Soyabean (सोयाबीन)
+  if (hint.includes("soya") || hint.includes("soyabean") || hint.includes("soybean") || hint.includes("सोयाबीन")) {
+    return {
+      cropName: "पीला सोयाबीन (Yellow Soyabean)",
+      variety: "JS-9560 / JS-2034 (बोल्ड दाना)",
+      grade: "Grade A",
+      gradeReason: "चमकदार पीला छिलका, 20.8% तेल अंश, 40% प्रोटीन, 9.8% नमी, मिट्टी-कचरा शून्य।",
+      ripenessPct: 95,
+      ripenessStage: "Dry Pod Harvest (सूखा परिपक्व दाना)",
+      defectPct: 1,
+      defectNotes: "दागी या सड़े दाने शून्य, एकसमान गोल बीज आकार।",
+      shelfLifeDays: 270,
+      marketFit: "सॉल्वेंट एक्सट्रैक्शन प्लांट्स, तेल मिल व फ़ीड निर्माता",
+      recommendedPriceDeltaPct: 16,
+      feedbackEn: "Grade-A bold seed soyabean. High oil and protein metrics qualify for top institutional pricing.",
+      feedbackHi: "ग्रेड-ए पीला सोयाबीन। उच्च तेल व प्रोटीन सामग्री। तेल मिलों से 16% तक अतिरिक्त प्रीमियम संभव।",
+      assayerVerificationId: id,
+    };
+  }
+
+  // 4. Maize / Corn (मक्का)
+  if (hint.includes("corn") || hint.includes("maize") || hint.includes("makka") || hint.includes("मक्का")) {
+    return {
+      cropName: "देशी पीला मक्का (Yellow Maize)",
+      variety: "पायनियर 3302 हाइब्रिड",
+      grade: "Grade A",
+      gradeReason: "चमकदार पीला दाना, 12% मानक नमी, स्टार्च अंश >72%, फफूंद या एफ्लाटॉक्सिन शून्य।",
+      ripenessPct: 94,
+      ripenessStage: "Field Cured Kernel (पूर्ण परिपक्व दाना)",
+      defectPct: 2,
+      defectNotes: "घुन मुक्त, शून्य फंगस, ठोस कड़े दाने।",
+      shelfLifeDays: 240,
+      marketFit: "स्टार्च इंडस्ट्री, पोल्ट्री फीड निर्माता व थोक व्यापारी",
+      recommendedPriceDeltaPct: 14,
+      feedbackEn: "Grade-A clean yellow corn. Low moisture and high starch yield suitable for industrial processors.",
+      feedbackHi: "ग्रेड-ए पीला मक्का। 12% नमी और उच्च स्टार्च घनत्व। मंडी भाव से 14% अधिक सीधा लाभ।",
+      assayerVerificationId: id,
+    };
+  }
+
+  // 5. Bajra / Pearl Millet (बाजरा - श्री अन्न)
+  if (hint.includes("bajra") || hint.includes("millet") || hint.includes("pearl") || hint.includes("बाजरा")) {
+    return {
+      cropName: "संकर देशी बाजरा (Pearl Millet)",
+      variety: "प्रो-एग्रो संकर (श्री अन्न)",
+      grade: "Grade A",
+      gradeReason: "आयरन व जिंक से भरपूर हरा-धूसर दाना, नमी <10%, बाह्य धूल रहित।",
+      ripenessPct: 96,
+      ripenessStage: "Fully Cured Millet (परिपक्व श्री अन्न)",
+      defectPct: 1,
+      defectNotes: "साफ छना हुआ दाना, अरगट या कीड़े शून्य।",
+      shelfLifeDays: 180,
+      marketFit: "मिलेट प्रोसेसर्स, एफपीओ और जैविक ब्रांड्स",
+      recommendedPriceDeltaPct: 15,
+      feedbackEn: "Grade-A nutrient-dense Bajra. Complies with National Millet Mission quality standards.",
+      feedbackHi: "ग्रेड-ए पोषक बाजरा। 10% से कम नमी, आयरन युक्त दाना। 15% अतिरिक्त लाभ संभव।",
+      assayerVerificationId: id,
+    };
+  }
+
+  // 6. Jowar / Sorghum (ज्वार - श्री अन्न)
+  if (hint.includes("jowar") || hint.includes("sorghum") || hint.includes("ज्वार")) {
+    return {
+      cropName: "मालदांडी सफेद ज्वार (White Sorghum)",
+      variety: "M-35-1 मालदांडी (श्री अन्न)",
+      grade: "Grade A",
+      gradeReason: "मोती जैसा सफेद चमकदार दाना, मीठा स्वाद, 10.2% नमी, ग्लूटन-फ्री।",
+      ripenessPct: 95,
+      ripenessStage: "Pearly Grain Maturity (सफेद चमकदार दाना)",
+      defectPct: 1,
+      defectNotes: "काला दाग शून्य, साफ छना हुआ दाना।",
+      shelfLifeDays: 240,
+      marketFit: "सीधे ऑर्गेनिक आटा ब्रांड्स व सुपरमार्केट्स",
+      recommendedPriceDeltaPct: 18,
+      feedbackEn: "Grade-A Maldandi Jowar. Pearly white grain with sweet undertones and high dietary fiber.",
+      feedbackHi: "ग्रेड-ए मालदांडी ज्वार। सफेद चमकदार दाना, वर्षभर सुरक्षित भंडारण योग्य। 18% तक बेहतर भाव।",
+      assayerVerificationId: id,
+    };
+  }
+
+  // 7. Chana / Chickpea (चना)
+  if (hint.includes("chana") || hint.includes("gram") || hint.includes("chickpea") || hint.includes("चना")) {
+    return {
+      cropName: "मालवा डॉलर चना (Dollar Chickpea)",
+      variety: "काबुली / देशी बोल्ड दाना",
+      grade: "Grade A",
+      gradeReason: "11-12mm बोल्ड साइज, 9.5% नमी, सुडौल दाना, घुन शून्य।",
+      ripenessPct: 96,
+      ripenessStage: "Fully Dried Pulses (सूखा दलहन)",
+      defectPct: 1,
+      defectNotes: "साफ दाना, कीड़ा शून्य, समान रंग।",
+      shelfLifeDays: 365,
+      marketFit: "एक्सपोर्ट बायर्स, बेसन मिल व होलसेल व्यापारी",
+      recommendedPriceDeltaPct: 16,
+      feedbackEn: "Grade-A bold chickpea. High count per ounce, export-ready texture and minimal split grains.",
+      feedbackHi: "ग्रेड-ए डॉलर चना। 11-12mm बोल्ड दाना, 9.5% नमी। एक्सपोर्ट और थोक खरीद हेतु तैयार।",
       assayerVerificationId: id,
     };
   }
@@ -202,25 +262,25 @@ function fallbackGrading(cropHint?: string, lang: string = "hi"): CropGradingRes
     };
   }
 
-  // 10. Default / Tomatoes
+  // 10. Default / Field Crops (Sharbati Wheat)
   const displayName = cropHint && cropHint !== "Farm Harvested Crop" && cropHint.length > 2
     ? cropHint
-    : "ताजा टमाटर (Fresh Tomatoes)";
+    : "शरबती गेहूं (MP Sharbati Wheat)";
 
   return {
     cropName: displayName,
-    variety: "Desi Hybrid (Abhinav/Vaishali)",
+    variety: "सीहोर 306 शरबती (Sehore Golden)",
     grade: "Grade A",
-    gradeReason: "Uniform coloration (>85%), firm pulp with zero internal rot or blossom-end scars.",
-    ripenessPct: 88,
-    ripenessStage: "Firm Breaker Ripe (ठोस पकी फसल)",
-    defectPct: 4,
-    defectNotes: "Smooth epidermal skin, minor harmless solar blush on shoulder (<4%).",
-    shelfLifeDays: 6,
-    marketFit: "Direct Consumer Retail & Quick Commerce Hubs",
-    recommendedPriceDeltaPct: 14,
-    feedbackEn: "Grade-A table quality. Optimal firmness with 6-day shelf life and 14% price premium.",
-    feedbackHi: "ग्रेड-ए टेबल क्वालिटी। फसल ठोस व ताज़ा है। 6 दिन तक पूरी तरह ताज़ा रहेगी। 14% तक बेहतर मंडी भाव संभव।",
+    gradeReason: "10.4% नमी, चमकदार सुनहरा दाना, उच्च हेक्टोलीटर वजन (>80 kg/hl), कचरा शून्य (<0.2%)।",
+    ripenessPct: 96,
+    ripenessStage: "Fully Matured Golden Grain (पूर्ण परिपक्व सूखा दाना)",
+    defectPct: 1,
+    defectNotes: "साफ दाना, कीड़ा शून्य, समान रंग व आकार।",
+    shelfLifeDays: 365,
+    marketFit: "प्रीमियम आटा चक्की, सीधे उपभोक्ता व थोक खरीददार",
+    recommendedPriceDeltaPct: 18,
+    feedbackEn: "Grade-A Sharbati Wheat. Optimal moisture (10.4%) with high test weight. Qualifies for +18% premium over local Mandi.",
+    feedbackHi: "ग्रेड-ए शरबती गेहूं। 10.4% नमी, चमकदार दाना और उच्च प्रोटीन। न्यूनतम समर्थन मूल्य (MSP) से 18% अधिक भाव के योग्य।",
     assayerVerificationId: id,
   };
 }
@@ -271,12 +331,12 @@ Guidelines for grading:
 2. "Grade B": Standard Retail Mandi Quality. Slight size irregularity, 6-15% minor surface spots or uneven color, good firmness, ready for immediate sale.
 3. "Grade C": Processing / Factory Quality. Over-ripe or under-ripe, >15% cosmetic blemishes, minor cuts or softening, best suited for puree, sauce, dehydration, or feed.
 
-Produce context hint: "${cropHint || "Agricultural produce / vegetable / grain / fruit"}".
+Produce context hint: "${cropHint || "Agricultural field crop / grain / oilseed / pulse / millet"}".
 
 Respond with STRICT JSON adhering exactly to this structure (no markdown fences, just pure JSON):
 {
-  "cropName": "Identified Produce Name in Hindi & English (e.g. ताजा टमाटर (Fresh Tomatoes), नासिक लाल प्याज (Nashik Red Onion), आलू (Potatoes))",
-  "variety": "Probable agricultural variety (e.g. Desi Hybrid, Garwa, Sharbati, Kufri Jyoti)",
+  "cropName": "Identified Field Crop / Grain Name in Hindi & English (e.g. सीहोर शरबती गेहूं (MP Sharbati Wheat), पीला सोयाबीन (Yellow Soyabean), पूसा 1121 बासमती (Basmati Paddy), देशी पीला मक्का (Yellow Maize))",
+  "variety": "Probable variety (e.g. MP Sharbati Golden A+, JS-9560 Bold Grain, Pusa 1121, Pioneer Hybrid 3396, Desi Shanker)",
   "grade": "Grade A",
   "gradeReason": "Technical reasoning based on APMC/AGMARK horticultural inspection",
   "ripenessPct": 88,

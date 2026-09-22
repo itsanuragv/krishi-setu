@@ -45,10 +45,10 @@ export default function ConsumerPortalPage() {
   const [generatedPin, setGeneratedPin] = useState("7429");
 
   const CATEGORIES = [
-    { id: "All", label: t("cat_all") },
-    { id: "Vegetables", label: t("cat_vegetables") },
-    { id: "Fruits", label: t("cat_fruits") },
-    { id: "Grains", label: t("cat_grains") },
+    { id: "All", label: language === "hi" ? "सभी मुख्य फसलें" : "All Field Crops" },
+    { id: "Grains", label: language === "hi" ? "अनाज व खाद्यान्न" : "Grains & Cereals" },
+    { id: "Millets", label: language === "hi" ? "श्री अन्न (Millets)" : "Millets (Shri Anna)" },
+    { id: "Oilseeds", label: language === "hi" ? "तिलहन व दलहन" : "Oilseeds & Pulses" },
   ];
 
   // Voice Search Direct Web Speech Handler
@@ -60,61 +60,61 @@ export default function ConsumerPortalPage() {
       return;
     }
 
-    if (isListening) {
-      setIsListening(false);
-      return;
-    }
-
     try {
       const recognition = new SpeechRecognition();
-      recognition.lang = "hi-IN";
-      recognition.continuous = false;
+      recognition.lang = language === "hi" ? "hi-IN" : "en-IN";
       recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-      setIsListening(true);
-      toast.info("बोलिए... उपज का नाम जैसे 'टमाटर' या 'Mango'", { icon: "🎙️" });
-
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        const text = event.results[0][0].transcript;
-        // Clean query of trailing punctuation
-        const clean = text.replace(/[.,!?]/g, "").trim();
-        setSearchQuery(clean);
-        setIsListening(false);
-        toast.success(`खोजा गया: "${clean}"`);
-      };
-
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
       recognition.onerror = () => {
         setIsListening(false);
+        toast.error("आवाज पहचानने में समस्या हुई। कृपया दोबारा प्रयास करें।");
       };
 
-      recognition.onend = () => {
-        setIsListening(false);
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchQuery(transcript);
+        toast.success(`खोजा जा रहा है: "${transcript}"`);
       };
 
       recognition.start();
+      toast.info("बोलिए... मुख्य फसल का नाम जैसे 'शरबती गेहूं' या 'सोयाबीन'", { icon: "🎙️" });
     } catch {
       setIsListening(false);
+      window.dispatchEvent(new CustomEvent("open-voice-assistant"));
     }
   };
 
-  // Filter listings by dynamic PostGIS proximity slider, category, and voice/text search
   const filteredListings = MOCK_PRODUCE_LISTINGS.filter((item) => {
     const withinDistance = item.distanceKm <= maxDistance;
-    const categoryMatches = selectedCategory === "All" || item.category === selectedCategory;
-    const query = searchQuery.trim().toLowerCase();
+    const categoryMatches = selectedCategory === "All" || 
+      item.category === selectedCategory ||
+      (selectedCategory === "Millets" && (item.name.toLowerCase().includes("millet") || item.name.toLowerCase().includes("bajra") || item.name.toLowerCase().includes("jowar") || item.hindiName?.includes("बाजरा") || item.hindiName?.includes("ज्वार") || item.hindiName?.includes("अन्न"))) ||
+      (selectedCategory === "Oilseeds" && (item.name.toLowerCase().includes("soya") || item.name.toLowerCase().includes("chana") || item.name.toLowerCase().includes("mustard") || item.hindiName?.includes("सोयाबीन") || item.hindiName?.includes("चना")));
+
+    const query = searchQuery.toLowerCase().trim();
     const searchMatches = !query || 
       item.name.toLowerCase().includes(query) ||
       (item.hindiName && item.hindiName.toLowerCase().includes(query)) ||
       item.farmerName.toLowerCase().includes(query) ||
       item.category.toLowerCase().includes(query) ||
-      (query.includes("tamatar") && item.name.toLowerCase().includes("tomato")) ||
-      (query.includes("टमाटर") && item.name.toLowerCase().includes("tomato")) ||
-      (query.includes("aam") && item.name.toLowerCase().includes("mango")) ||
-      (query.includes("आम") && item.name.toLowerCase().includes("mango")) ||
-      (query.includes("pyaz") && item.name.toLowerCase().includes("onion")) ||
-      (query.includes("प्याज") && item.name.toLowerCase().includes("onion")) ||
       (query.includes("gehun") && item.name.toLowerCase().includes("wheat")) ||
-      (query.includes("गेहूं") && item.name.toLowerCase().includes("wheat"));
+      (query.includes("गेहूं") && item.name.toLowerCase().includes("wheat")) ||
+      (query.includes("chawal") && item.name.toLowerCase().includes("rice")) ||
+      (query.includes("चावल") && item.name.toLowerCase().includes("rice")) ||
+      (query.includes("धान") && item.name.toLowerCase().includes("rice")) ||
+      (query.includes("soya") && item.name.toLowerCase().includes("soya")) ||
+      (query.includes("सोयाबीन") && item.name.toLowerCase().includes("soya")) ||
+      (query.includes("makka") && item.name.toLowerCase().includes("maize")) ||
+      (query.includes("मक्का") && item.name.toLowerCase().includes("maize")) ||
+      (query.includes("bajra") && item.name.toLowerCase().includes("millet")) ||
+      (query.includes("बाजरा") && item.name.toLowerCase().includes("millet")) ||
+      (query.includes("jowar") && item.name.toLowerCase().includes("jowar")) ||
+      (query.includes("ज्वार") && item.name.toLowerCase().includes("jowar")) ||
+      (query.includes("chana") && item.name.toLowerCase().includes("chana")) ||
+      (query.includes("चना") && item.name.toLowerCase().includes("chana"));
     return withinDistance && categoryMatches && searchMatches;
   });
 
@@ -235,10 +235,13 @@ export default function ConsumerPortalPage() {
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[11px] font-medium text-emerald-100">{t("voice_suggestions_label")}</span>
                 {[
-                  { label: "🍅 टमाटर", query: "टमाटर" },
-                  { label: "🌾 गेहूँ", query: "गेहूं" },
-                  { label: "🥭 आम", query: "आम" },
-                  { label: "🧅 प्याज", query: "प्याज" }
+                  { label: "🌾 शरबती गेहूं", query: "गेहूं" },
+                  { label: "🍚 बासमती चावल", query: "चावल" },
+                  { label: "🌱 पीला सोयाबीन", query: "सोयाबीन" },
+                  { label: "🌽 देशी मक्का", query: "मक्का" },
+                  { label: "🌾 संकर बाजरा", query: "बाजरा" },
+                  { label: "🥣 मालदांडी ज्वार", query: "ज्वार" },
+                  { label: "🫘 डॉलर चना", query: "चना" },
                 ].map((chip) => (
                   <button
                     key={chip.label}

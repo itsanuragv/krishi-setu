@@ -57,47 +57,52 @@ export interface OpenCVScanProps {
 
 const SAMPLE_CROPS = [
   { 
-    name: "ताजा टमाटर", 
-    hint: "Tomato",
-    url: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80" 
-  },
-  { 
-    name: "नासिक प्याज", 
-    hint: "Onion",
-    url: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80" 
-  },
-  { 
-    name: "फार्म आलू", 
-    hint: "Potato",
-    url: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80" 
-  },
-  { 
-    name: "हरी मिर्च", 
-    hint: "Green Chilli",
-    url: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600&auto=format&fit=crop&q=80" 
-  },
-  { 
     name: "शरबती गेहूं", 
     hint: "Wheat",
     url: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80" 
   },
+  { 
+    name: "बासमती चावल", 
+    hint: "Rice",
+    url: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80" 
+  },
+  { 
+    name: "पीला सोयाबीन", 
+    hint: "Soyabean",
+    url: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=80" 
+  },
+  { 
+    name: "देशी मक्का", 
+    hint: "Corn",
+    url: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80" 
+  },
+  { 
+    name: "संकर बाजरा", 
+    hint: "Bajra",
+    url: "https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=600&auto=format&fit=crop&q=80" 
+  },
+  { 
+    name: "मालदांडी ज्वार", 
+    hint: "Jowar",
+    url: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80" 
+  },
 ];
 
 const INITIAL_GRADING: CropGradingData = {
-  cropName: "ताजा टमाटर (Fresh Tomatoes)",
-  variety: "Desi Hybrid (Abhinav/Vaishali)",
+  cropName: "शरबती गेहूं (MP Sharbati Wheat)",
+  variety: "सीहोर 306 शरबती (Sehore Golden)",
   grade: "Grade A",
-  gradeReason: "Uniform crimson pigmentation (>85%), firm calyx, zero blossom-end rot.",
-  ripenessPct: 88,
-  ripenessStage: "Firm Breaker Ripe (ठोस पकी फसल)",
-  defectPct: 4,
-  defectNotes: "Clean surface, <5% superficial solar blush on shoulder.",
-  shelfLifeDays: 6,
-  marketFit: "Direct Consumer Kitchens & Quick Commerce Hubs",
-  recommendedPriceDeltaPct: 14,
-  feedbackEn: "Grade-A table quality. Optimal firmness with 6-day shelf life. Qualifies for +14% farmgate price premium.",
-  feedbackHi: "ग्रेड-ए टेबल क्वालिटी। टमाटर 88% पके और ठोस हैं। 6 दिन तक पूरी तरह ताज़ा रहेंगे। 14% तक बेहतर मंडी भाव संभव।",
-  assayerVerificationId: "KS-QC-748291",
+  gradeReason: "10.4% नमी, चमकदार सुनहरा दाना, उच्च हेक्टोलीटर वजन (>80 kg/hl), कचरा शून्य (<0.2%)।",
+  ripenessPct: 96,
+  ripenessStage: "Fully Matured Golden Grain (पूर्ण परिपक्व सूखा दाना)",
+  defectPct: 1,
+  defectNotes: "Clean harvested grain, zero weevil infestation, uniform bold grain size.",
+  shelfLifeDays: 365,
+  marketFit: "Direct Flour Mills, Premium Atta Brands & Grain Aggregators",
+  recommendedPriceDeltaPct: 18,
+  feedbackEn: "Grade-A export quality Sharbati wheat. Low moisture (10.4%) and high test weight. Qualifies for +18% farmgate premium over local Mandi.",
+  feedbackHi: "ग्रेड-ए शरबती गेहूं। 10.4% नमी, चमकदार दाना और उच्च प्रोटीन। न्यूनतम समर्थन मूल्य (MSP) से 18% अधिक भाव के योग्य।",
+  assayerVerificationId: "KS-QC-918234",
 };
 
 export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false, onScanComplete, onApplyToForm }: OpenCVScanProps) {
@@ -105,7 +110,7 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
   const [selectedImage, setSelectedImage] = useState(
     initialImage || SAMPLE_CROPS[0].url
   );
-  const [currentCropHint, setCurrentCropHint] = useState<string>(cropHint || "Tomato");
+  const [currentCropHint, setCurrentCropHint] = useState<string>(cropHint || "Wheat");
 
   // Step progression: "idle" | "tier1_edge" | "tier2_ai" | "completed"
   const [scanStep, setScanStep] = useState<"idle" | "tier1_edge" | "tier2_ai" | "completed">("completed");
