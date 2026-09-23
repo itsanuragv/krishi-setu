@@ -1,7 +1,76 @@
 import type { Variants } from "framer-motion";
 
+// 60fps hardware-accelerated cubic bezier easing
+export const smoothEase = [0.16, 1, 0.3, 1] as const;
+
+// Hero section staggered container
+export const heroContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+// Hero child element entry: slide-up (y: 24) + fade
+export const heroChildVariants: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+// Scroll reveal stagger container
+export const scrollStaggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+// Scroll reveal card item
+export const scrollCardItem: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+// Smooth button hover & tap interaction
+export const buttonMotion = {
+  whileHover: { y: -2, scale: 1.02 },
+  whileTap: { scale: 0.98 },
+  transition: { duration: 0.15, ease: "easeOut" as const },
+};
+
+// Ecosystem portal card hover interaction (smooth hover lift y: -4px)
+export const cardHover: Variants = {
+  rest: { y: 0, transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] } },
+  hover: {
+    y: -4,
+    transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
 export const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
@@ -33,20 +102,11 @@ export const pulseGlow: Variants = {
   },
 };
 
-export const cardHover: Variants = {
-  rest: { y: 0, boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)" },
-  hover: {
-    y: -6,
-    boxShadow: "0 20px 25px -5px rgba(5, 150, 105, 0.15), 0 8px 10px -6px rgba(5, 150, 105, 0.1)",
-    transition: { type: "spring" as const, stiffness: 350, damping: 22 },
-  },
-};
-
 export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.94 },
+  hidden: { opacity: 0, scale: 0.95 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.35, ease: "easeOut" },
+    transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
   },
 };

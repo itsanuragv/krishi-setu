@@ -25,7 +25,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/shared/Navbar";
 import { PlatformGuideModal } from "@/components/shared/PlatformGuideModal";
-import { cardHover, fadeInUp, staggerContainer } from "@/lib/animations";
+import { 
+  heroContainerVariants, 
+  heroChildVariants, 
+  scrollStaggerContainer, 
+  scrollCardItem 
+} from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
 import { KrishiSetuLogo } from "@/components/shared/KrishiSetuLogo";
 import { RATING_CONFIG } from "@/config/rating-config";
@@ -133,18 +138,38 @@ export default function HomePage() {
 
       <main className="mx-auto w-full max-w-7xl min-w-0 px-3 sm:px-6 lg:px-8 py-5 sm:py-10 space-y-10 sm:space-y-20 flex-1 overflow-x-clip">
         {/* Hero Section */}
-        <section className="text-center max-w-4xl mx-auto w-full min-w-0 space-y-5 sm:space-y-6 pt-1 sm:pt-6">
+        <motion.section
+          variants={heroContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="text-center max-w-4xl mx-auto w-full min-w-0 space-y-5 sm:space-y-6 pt-1 sm:pt-6"
+        >
+          {/* Top Badge */}
+          <motion.div
+            variants={heroChildVariants}
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-100/90 px-3.5 py-1 text-xs font-bold text-emerald-900 border border-emerald-200/80 shadow-2xs backdrop-blur-xs"
+          >
+            <span className="relative flex size-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full size-2 bg-emerald-600" />
+            </span>
+            <span>{language === "hi" ? "भारत का पहला प्रत्यक्ष कृषि मंच" : "India's Direct Farm-to-Fork Platform"}</span>
+          </motion.div>
 
+          {/* Main Headline */}
+          <motion.h1
+            variants={heroChildVariants}
+            className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight sm:leading-[1.12] break-words"
+          >
+            {t("hero_headline_prefix")}{" "}
+            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-800 bg-clip-text text-transparent">
+              {t("hero_headline_gradient")}
+            </span>{" "}
+            {t("hero_headline_suffix")}
+          </motion.h1>
 
-          {/* Headline & Value Proposition */}
-          <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="space-y-3 sm:space-y-4 w-full min-w-0">
-            <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight sm:leading-[1.12] break-words">
-              {t("hero_headline_prefix")}{" "}
-              <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-800 bg-clip-text text-transparent">
-                {t("hero_headline_gradient")}
-              </span>{" "}
-              {t("hero_headline_suffix")}
-            </h1>
+          {/* Subtitle & Value Proposition */}
+          <motion.div variants={heroChildVariants} className="space-y-2">
             <p className="text-xs sm:text-base font-semibold text-emerald-800 break-words">
               {t("hero_subheadline")}
             </p>
@@ -154,80 +179,123 @@ export default function HomePage() {
           </motion.div>
 
           {/* Primary Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 pt-2 w-full max-w-sm sm:max-w-none mx-auto">
-            <Button
-              asChild
-              size="lg"
-              className="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-800 text-white shadow-md gap-2 font-bold text-sm px-6 h-12 rounded-xl"
+          <motion.div
+            variants={heroChildVariants}
+            className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 pt-2 w-full max-w-sm sm:max-w-none mx-auto"
+          >
+            <motion.div
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full sm:w-auto shadow-sm hover:shadow-emerald-600/25 transition-shadow rounded-xl"
             >
-              <Link href="/farmer">
-                <Sprout className="size-4.5 shrink-0" />
-                <span>{t("btn_start_selling")}</span>
-              </Link>
-            </Button>
+              <Button
+                asChild
+                size="lg"
+                className="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-800 text-white shadow-md gap-2 font-bold text-sm px-6 h-12 rounded-xl"
+              >
+                <Link href="/farmer">
+                  <Sprout className="size-4.5 shrink-0" />
+                  <span>{t("btn_start_selling")}</span>
+                </Link>
+              </Button>
+            </motion.div>
 
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="w-full sm:w-auto border-emerald-300 text-emerald-900 hover:bg-emerald-50 gap-2 font-bold text-sm px-6 h-12 rounded-xl"
+            <motion.div
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full sm:w-auto shadow-sm hover:shadow-emerald-600/15 transition-shadow rounded-xl"
             >
-              <Link href="/consumer">
-                <ShoppingBag className="size-4.5 text-emerald-700 shrink-0" />
-                <span>{t("btn_shop_produce")}</span>
-              </Link>
-            </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto border-emerald-300 text-emerald-900 hover:bg-emerald-50 gap-2 font-bold text-sm px-6 h-12 rounded-xl"
+              >
+                <Link href="/consumer">
+                  <ShoppingBag className="size-4.5 text-emerald-700 shrink-0" />
+                  <span>{t("btn_shop_produce")}</span>
+                </Link>
+              </Button>
+            </motion.div>
 
-            <Button
-              size="lg"
-              variant="ghost"
-              onClick={() => setGuideModalOpen(true)}
-              className="w-full sm:w-auto text-slate-700 hover:bg-slate-100 gap-2 font-semibold text-xs sm:text-sm h-12 rounded-xl"
+            <motion.div
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full sm:w-auto rounded-xl"
             >
-              <Compass className="size-4 text-emerald-700 shrink-0" />
-              <span>{t("btn_how_it_works")}</span>
-            </Button>
-          </div>
+              <Button
+                size="lg"
+                variant="ghost"
+                onClick={() => setGuideModalOpen(true)}
+                className="w-full sm:w-auto text-slate-700 hover:bg-slate-100 gap-2 font-semibold text-xs sm:text-sm h-12 rounded-xl"
+              >
+                <Compass className="size-4 text-emerald-700 shrink-0" />
+                <span>{t("btn_how_it_works")}</span>
+              </Button>
+            </motion.div>
+          </motion.div>
 
-          {/* Production 4-Pillar Value Telemetry Banner */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 pt-4 sm:pt-6 max-w-4xl mx-auto w-full min-w-0">
-            <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
+          {/* Production 4-Pillar Value Telemetry Banner (Scroll Reveal) */}
+          <motion.div
+            variants={scrollStaggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 pt-4 sm:pt-6 max-w-4xl mx-auto w-full min-w-0"
+          >
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden hover:border-emerald-300 hover:shadow-md transition-all duration-200"
+            >
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-emerald-800 truncate">
                 <TrendingUp className="size-3 sm:size-3.5 text-emerald-600 shrink-0" />
                 <span className="truncate">{t("stat_farmer_realization")}</span>
               </div>
               <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_farmer_realization_val")}</p>
               <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_farmer_realization_sub")}</p>
-            </div>
+            </motion.div>
 
-            <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden hover:border-emerald-300 hover:shadow-md transition-all duration-200"
+            >
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-teal-800 truncate">
                 <Clock className="size-3 sm:size-3.5 text-teal-600 shrink-0" />
                 <span className="truncate">{t("stat_transit")}</span>
               </div>
               <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_transit_val")}</p>
               <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_transit_sub")}</p>
-            </div>
+            </motion.div>
 
-            <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden hover:border-emerald-300 hover:shadow-md transition-all duration-200"
+            >
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-blue-800 truncate">
                 <ShieldAlert className="size-3 sm:size-3.5 text-blue-600 shrink-0" />
                 <span className="truncate">{t("stat_spoilage")}</span>
               </div>
               <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_spoilage_val")}</p>
               <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_spoilage_sub")}</p>
-            </div>
+            </motion.div>
 
-            <div className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="glass rounded-2xl p-2.5 sm:p-4 border border-emerald-200/80 text-left min-w-0 overflow-hidden hover:border-emerald-300 hover:shadow-md transition-all duration-200"
+            >
               <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-amber-800 truncate">
                 <Lock className="size-3 sm:size-3.5 text-amber-600 shrink-0" />
                 <span className="truncate">{t("stat_escrow")}</span>
               </div>
               <p className="mt-1 text-lg sm:text-2xl font-black text-slate-900 truncate">{t("stat_escrow_val")}</p>
               <p className="text-[9px] sm:text-xs text-slate-600 line-clamp-2 leading-tight">{t("stat_escrow_sub")}</p>
-            </div>
-          </div>
-        </section>
+            </motion.div>
+          </motion.div>
+        </motion.section>
 
 
 
@@ -248,9 +316,19 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <motion.div
+            variants={scrollStaggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid gap-4 sm:grid-cols-3"
+          >
             {/* Step 1: Farmer */}
-            <div className="rounded-3xl border border-emerald-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-md transition-all">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -4, scale: 1.01 }}
+              className="rounded-3xl border border-emerald-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-lg hover:border-emerald-300 transition-all duration-300"
+            >
               <div className="flex items-center justify-between">
                 <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 font-black text-sm">
                   1
@@ -264,16 +342,20 @@ export default function HomePage() {
                 किसान अपनी भाषा में बोलकर फसल, मात्रा और भाव तय करते हैं। मोबाइल कैमरे से ऑन-डिवाइस OpenCV ग्रेड A/B/C की तुरंत जांच होती है।
               </p>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                <Link href="/farmer" className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800">
+                <Link href="/farmer" className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800 transition-colors">
                   <span>किसान पोर्टल</span>
                   <ArrowRight className="size-3.5" />
                 </Link>
                 <span className="text-[10px] text-emerald-600 font-semibold">0% आढ़त कटौती</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Step 2: Consumer */}
-            <div className="rounded-3xl border border-teal-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-md transition-all">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -4, scale: 1.01 }}
+              className="rounded-3xl border border-teal-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-lg hover:border-teal-300 transition-all duration-300"
+            >
               <div className="flex items-center justify-between">
                 <span className="flex size-9 items-center justify-center rounded-xl bg-teal-100 text-teal-800 font-black text-sm">
                   2
@@ -287,16 +369,20 @@ export default function HomePage() {
                 उपभोक्ता अपने पास के खेतों से 12 घंटे में कटी ताज़ा फसलें सीधे फार्म-गेट भाव पर खरीदते हैं। खरीदने से पहले एआई ग्रेड व शेल्फ लाइफ दिखती है।
               </p>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                <Link href="/consumer" className="inline-flex items-center gap-1 font-bold text-teal-700 hover:text-teal-800">
+                <Link href="/consumer" className="inline-flex items-center gap-1 font-bold text-teal-700 hover:text-teal-800 transition-colors">
                   <span>उपभोक्ता बाज़ार</span>
                   <ArrowRight className="size-3.5" />
                 </Link>
                 <span className="text-[10px] text-teal-600 font-semibold">30-40% सीधी बचत</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Step 3: Delivery & Escrow */}
-            <div className="rounded-3xl border border-amber-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-md transition-all">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -4, scale: 1.01 }}
+              className="rounded-3xl border border-amber-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-lg hover:border-amber-300 transition-all duration-300"
+            >
               <div className="flex items-center justify-between">
                 <span className="flex size-9 items-center justify-center rounded-xl bg-amber-100 text-amber-800 font-black text-sm">
                   3
@@ -313,15 +399,15 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setGuideModalOpen(true)}
-                  className="inline-flex items-center gap-1 font-bold text-amber-700 hover:text-amber-800"
+                  className="inline-flex items-center gap-1 font-bold text-amber-700 hover:text-amber-800 transition-colors cursor-pointer"
                 >
                   <span>विस्तृत गाइड देखें</span>
                   <ArrowRight className="size-3.5" />
                 </button>
                 <span className="text-[10px] text-amber-600 font-semibold">100% सुरक्षित भुगतान</span>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
         {/* Ecosystem Portals (5 Core Role Gateways) */}
@@ -337,9 +423,10 @@ export default function HomePage() {
 
           {/* Primary Role Cards (Farmer, Consumer, Bulk Buyer) */}
           <motion.div
-            variants={staggerContainer}
+            variants={scrollStaggerContainer}
             initial="hidden"
-            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
             className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full min-w-0"
           >
             {PRIMARY_ROLES.map((card) => {
@@ -347,10 +434,9 @@ export default function HomePage() {
               return (
                 <motion.div
                   key={card.role}
-                  variants={cardHover}
-                  initial="rest"
-                  whileHover="hover"
-                  className="glass flex flex-col justify-between rounded-3xl border border-emerald-200/80 bg-white/95 p-4 sm:p-6 shadow-xs transition-all min-w-0 overflow-hidden"
+                  variants={scrollCardItem}
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  className="glass flex flex-col justify-between rounded-3xl border border-emerald-200/80 bg-white/95 p-4 sm:p-6 shadow-xs hover:border-emerald-400 hover:shadow-xl hover:shadow-emerald-600/10 transition-all duration-300 min-w-0 overflow-hidden"
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -381,12 +467,14 @@ export default function HomePage() {
                   </div>
 
                   <div className="pt-6">
-                    <Button asChild className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold gap-2 shadow-xs h-11 rounded-xl">
-                      <Link href={card.href} aria-label={`Enter as ${card.title}`}>
-                        <span>{card.ctaText}</span>
-                        <ArrowRight className="size-4" />
-                      </Link>
-                    </Button>
+                    <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button asChild className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold gap-2 shadow-xs hover:shadow-emerald-700/25 h-11 rounded-xl">
+                        <Link href={card.href} aria-label={`Enter as ${card.title}`}>
+                          <span>{card.ctaText}</span>
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </Button>
+                    </motion.div>
                   </div>
                 </motion.div>
               );
@@ -394,16 +482,21 @@ export default function HomePage() {
           </motion.div>
 
           {/* Secondary Role Cards (Transporter & Admin) */}
-          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 pt-2 w-full min-w-0">
+          <motion.div
+            variants={scrollStaggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid gap-3 sm:gap-4 sm:grid-cols-2 pt-2 w-full min-w-0"
+          >
             {SECONDARY_ROLES.map((card) => {
               const Icon = card.icon;
               return (
                 <motion.div
                   key={card.role}
-                  variants={cardHover}
-                  initial="rest"
-                  whileHover="hover"
-                  className="glass flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 sm:p-5 shadow-xs transition-all min-w-0 overflow-hidden"
+                  variants={scrollCardItem}
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  className="glass flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 sm:p-5 shadow-xs hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-600/10 transition-all duration-300 min-w-0 overflow-hidden"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${card.color}`}>
@@ -423,16 +516,18 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <Button asChild variant="outline" size="sm" className="shrink-0 border-slate-300 text-slate-900 hover:bg-slate-100 gap-1.5 self-start sm:self-center h-10 rounded-xl">
-                    <Link href={card.href} aria-label={card.ariaLabel}>
-                      <span>{card.ctaText}</span>
-                      <ArrowRight className="size-3.5" />
-                    </Link>
-                  </Button>
+                  <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.98 }} className="self-start sm:self-center">
+                    <Button asChild variant="outline" size="sm" className="shrink-0 border-slate-300 text-slate-900 hover:bg-emerald-50 hover:border-emerald-300 gap-1.5 h-10 rounded-xl">
+                      <Link href={card.href} aria-label={card.ariaLabel}>
+                        <span>{card.ctaText}</span>
+                        <ArrowRight className="size-3.5" />
+                      </Link>
+                    </Button>
+                  </motion.div>
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </section>
 
         {/* Technology & Trust Innovation Grid */}
@@ -447,17 +542,29 @@ export default function HomePage() {
                 {t("tech_infra_title")}
               </h3>
             </div>
-            <Button
-              onClick={() => setGuideModalOpen(true)}
-              className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs gap-1.5 self-start sm:self-auto rounded-xl"
-            >
-              <Compass className="size-3.5" />
-              <span>{t("btn_arch_tour")}</span>
-            </Button>
+            <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={() => setGuideModalOpen(true)}
+                className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs gap-1.5 self-start sm:self-auto rounded-xl shadow-xs"
+              >
+                <Compass className="size-3.5" />
+                <span>{t("btn_arch_tour")}</span>
+              </Button>
+            </motion.div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3 pt-2 text-xs">
-            <div className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2">
+          <motion.div
+            variants={scrollStaggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid gap-3 sm:grid-cols-3 pt-2 text-xs"
+          >
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2 hover:border-emerald-300 hover:shadow-md transition-all duration-200"
+            >
               <strong className="text-slate-900 font-bold flex items-center gap-2 text-sm">
                 <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
                 {t("tech_card1_title")}
@@ -465,9 +572,13 @@ export default function HomePage() {
               <p className="text-slate-600 leading-relaxed">
                 {t("tech_card1_desc")}
               </p>
-            </div>
+            </motion.div>
 
-            <div className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2 hover:border-emerald-300 hover:shadow-md transition-all duration-200"
+            >
               <strong className="text-slate-900 font-bold flex items-center gap-2 text-sm">
                 <Scan className="size-4 text-emerald-600 shrink-0" />
                 {t("tech_card2_title")}
@@ -475,9 +586,13 @@ export default function HomePage() {
               <p className="text-slate-600 leading-relaxed">
                 {t("tech_card2_desc")}
               </p>
-            </div>
+            </motion.div>
 
-            <div className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2">
+            <motion.div
+              variants={scrollCardItem}
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="rounded-2xl bg-white/95 p-4 sm:p-5 border border-emerald-100 shadow-xs space-y-2 hover:border-emerald-300 hover:shadow-md transition-all duration-200"
+            >
               <strong className="text-slate-900 font-bold flex items-center gap-2 text-sm">
                 <Lock className="size-4 text-emerald-600 shrink-0" />
                 {t("tech_card3_title")}
@@ -485,8 +600,8 @@ export default function HomePage() {
               <p className="text-slate-600 leading-relaxed">
                 {t("tech_card3_desc")}
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
         {/* Verified Farmer & Buyer Testimonials */}
@@ -508,11 +623,19 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <motion.div
+            variants={scrollStaggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid gap-4 sm:grid-cols-3"
+          >
             {TESTIMONIALS.map((tItem, idx) => (
-              <div
+              <motion.div
                 key={idx}
-                className="glass flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-3"
+                variants={scrollCardItem}
+                whileHover={{ y: -3, scale: 1.01 }}
+                className="glass flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-3 hover:border-emerald-300 hover:shadow-md transition-all duration-200"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -544,9 +667,9 @@ export default function HomePage() {
                   <p className="text-[11px] text-slate-500">{tItem.role}</p>
                   <p className="text-[10px] font-semibold text-emerald-700 mt-0.5">{tItem.crop}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         {/* Regulatory & Institutional Trust Badges */}
