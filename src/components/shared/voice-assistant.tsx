@@ -23,6 +23,7 @@ import {
   ChevronUp
 } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/context/LanguageContext";
 import { 
   getSpeechRecognition, 
   type SpeechRecognitionInstance, 
@@ -108,15 +109,76 @@ function getBestVoice(lang: "hi-IN" | "en-IN"): SpeechSynthesisVoice | null {
 
 export function VoiceAssistant() {
   const router = useRouter();
+  const { language: currentLang } = useLanguage();
   
   // UI States
   const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [language, setLanguage] = useState<"hi-IN" | "en-IN">("hi-IN");
   const [audioFeedbackEnabled, setAudioFeedbackEnabled] = useState(true);
+
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Sync assistant voice language with app language context
+  useEffect(() => {
+    setLanguage(currentLang === "en" ? "en-IN" : "hi-IN");
+  }, [currentLang]);
+
+  // Onboarding Tooltip: Show for first-time visitors after page load
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const dismissed = localStorage.getItem("krishi_ai_tooltip_dismissed");
+    if (!dismissed) {
+      const timer = setTimeout(() => {
+        setShowTooltip(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const dismissTooltip = useCallback(() => {
+    setShowTooltip(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("krishi_ai_tooltip_dismissed", "true");
+    }
+  }, []);
+
+  // Collapse on outside click or Escape key
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+      const clickedInsideWidget = widgetRef.current?.contains(target);
+      const clickedInsideCard = cardRef.current?.contains(target);
+
+      if (!clickedInsideWidget && !clickedInsideCard) {
+        if (isOpen) setIsOpen(false);
+        if (isExpanded && !isListening && !isSpeaking) {
+          setIsExpanded(false);
+        }
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        if (isOpen) setIsOpen(false);
+        if (isExpanded && !isListening && !isSpeaking) {
+          setIsExpanded(false);
+        }
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, isExpanded, isListening, isSpeaking]);
 
   // Transcripts & Assistant Feedback
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -205,6 +267,7 @@ export function VoiceAssistant() {
     setIsThinking(false);
     setInterimTranscript("");
     setIsOpen(false);
+    setIsExpanded(false);
   }, [stopSpeaking]);
 
   /**
@@ -274,6 +337,8 @@ export function VoiceAssistant() {
     setLastUserQuery(trimmed);
     setIsThinking(true);
     setIsOpen(true);
+    setIsExpanded(true);
+    dismissTooltip();
 
     const lower = trimmed.toLowerCase();
 
@@ -524,12 +589,14 @@ export function VoiceAssistant() {
   useEffect(() => {
     function handleOpenEvent() {
       setIsOpen(true);
+      setIsExpanded(true);
+      dismissTooltip();
     }
     window.addEventListener("open-voice-assistant", handleOpenEvent);
     return () => {
       window.removeEventListener("open-voice-assistant", handleOpenEvent);
     };
-  }, []);
+  }, [dismissTooltip]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -568,6 +635,8 @@ export function VoiceAssistant() {
       }
     } else {
       setIsOpen(true);
+      setIsExpanded(true);
+      dismissTooltip();
       setInterimTranscript("");
       try {
         playAssistantChime("start");
@@ -617,7 +686,8 @@ export function VoiceAssistant() {
       {/* 1. ULTRA-MINIMAL & SIMPLIFIED FLOATING ASSISTANT CARD */}
       {isOpen && (
         <div 
-          className="fixed bottom-34 md:bottom-20 right-3 sm:right-6 z-40 w-[320px] sm:w-[350px] max-w-[calc(100vw-1.5rem)] rounded-3xl border border-emerald-500/30 bg-slate-950/92 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-white p-4 space-y-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
+          ref={cardRef}
+          className="fixed bottom-20 md:bottom-20 right-3 sm:right-6 z-40 w-[320px] sm:w-[350px] max-w-[calc(100vw-1.5rem)] rounded-3xl border border-emerald-500/30 bg-slate-950/92 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-white p-4 space-y-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
           role="region"
           aria-label="Kisan Setu Voice Assistant"
         >
@@ -805,20 +875,110 @@ export function VoiceAssistant() {
         </div>
       )}
 
-      {/* 2. FLOATING GEMINI LIVE CAPSULE BUTTON */}
-      <div className="fixed bottom-4 md:bottom-5 right-3 sm:right-5 z-40 flex items-center gap-1.5">
-        {isMinimized ? (
-          <button
-            type="button"
-            onClick={() => setIsMinimized(false)}
-            aria-label="Expand Gemini Live Assistant"
-            title="विस्तार करें (Expand Gemini Assistant)"
-            className="flex size-11 items-center justify-center rounded-full bg-slate-950/95 border border-emerald-500/60 text-white shadow-xl hover:scale-105 active:scale-95 transition-all"
-          >
-            <Sparkles className="size-5 text-emerald-400" />
-          </button>
+      {/* 2. FLOATING AI ASSISTANT WIDGET (FAB & EXPANDED PILL) */}
+      <div 
+        ref={widgetRef} 
+        className="fixed bottom-4 md:bottom-5 right-3 sm:right-5 z-40 select-none flex items-center"
+      >
+        {/* Onboarding Tooltip / Callout (First-Time Visitor Guide) */}
+        {showTooltip && !isExpanded && !isOpen && (
+          <div className="absolute bottom-full right-0 mb-3.5 w-72 sm:w-80 animate-tooltip-float z-50 pointer-events-auto">
+            <div 
+              onClick={() => {
+                dismissTooltip();
+                setIsExpanded(true);
+              }}
+              className="group relative cursor-pointer rounded-2xl bg-slate-950/95 border border-emerald-500/50 p-3 sm:p-3.5 shadow-[0_12px_36px_rgba(0,0,0,0.55)] backdrop-blur-xl text-white transition-all hover:border-emerald-400 hover:shadow-emerald-950/50"
+            >
+              {/* Ambient gradient glow behind tooltip */}
+              <span className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500 opacity-25 blur-sm -z-10 group-hover:opacity-40 transition-opacity" />
+
+              {/* Dismiss '✕' button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dismissTooltip();
+                }}
+                aria-label="Dismiss guide"
+                title="बंद करें (Dismiss Guide)"
+                className="absolute top-2.5 right-2.5 size-5 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-slate-700/80 transition-colors"
+              >
+                <X className="size-3" />
+              </button>
+
+              {/* Tooltip Header & Content */}
+              <div className="flex items-start gap-2.5 pr-4">
+                <span className="text-xl sm:text-2xl shrink-0 select-none">👋</span>
+                <div className="space-y-1 text-left">
+                  <p className="text-xs font-black tracking-tight text-emerald-300 leading-tight">
+                    {currentLang === "hi"
+                      ? "कृषि सेतु में सहायता चाहिए?"
+                      : "Confused where to start?"}
+                  </p>
+                  <p className="text-[11px] text-slate-200 leading-relaxed font-normal">
+                    {currentLang === "hi"
+                      ? "मंडी भाव, फसल लिस्टिंग या उपज खरीदने के लिए AI गाइड से पूछें!"
+                      : "Click here for AI guidance on mandi prices, listing, or buying!"}
+                  </p>
+                  <p className="text-[10px] text-amber-300 font-semibold pt-0.5 flex items-center gap-1">
+                    <Sparkles className="size-3 text-amber-400 animate-pulse" />
+                    <span>
+                      {currentLang === "hi" 
+                        ? "मार्गदर्शन के लिए यहाँ क्लिक करें" 
+                        : "Click below for instant guidance"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Downward Caret pointing straight to circular FAB */}
+              <div className="absolute -bottom-2 right-5 sm:right-6 size-0 border-x-8 border-x-transparent border-t-8 border-t-slate-950 filter drop-shadow-[0_3px_2px_rgba(16,185,129,0.3)]" />
+            </div>
+          </div>
+        )}
+
+        {/* Floating AI Assistant Trigger: Default Logo-Only FAB vs Smoothly Expanded Pill */}
+        {!isExpanded ? (
+          <div className="animate-float">
+            <button
+              type="button"
+              onClick={() => {
+                dismissTooltip();
+                setIsExpanded(true);
+              }}
+              aria-label="Open Krishi Setu AI Assistant"
+              title={currentLang === "hi" ? "कृषि सेतु AI असिस्टेंट खोलें" : "Open Krishi Setu AI Assistant"}
+              className="group relative flex size-12 sm:size-14 items-center justify-center rounded-full shadow-[0_8px_30px_rgba(16,185,129,0.35)] transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer focus:outline-hidden"
+            >
+              {/* Ambient colored blur/glow effect pulsing gently behind the button */}
+              <span className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 opacity-60 blur-md group-hover:opacity-100 transition-opacity animate-pulse" />
+
+              {/* Shimmer light reflection on hover */}
+              <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none" />
+
+              {/* Vibrant Gradient Background Ring: Emerald green, Vibrant cyan/teal, Warm harvest golden amber */}
+              <div className="relative size-full rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-amber-500 p-0.5 sm:p-1 flex items-center justify-center shadow-inner">
+                {/* Dark inner disc with glass depth */}
+                <div className="size-full rounded-full bg-slate-950/90 flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.35),transparent_70%)]" />
+                  
+                  {/* Logo icon with interactive micro-interactions */}
+                  <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
+                    <Sparkles className="size-5 sm:size-6 text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Small pulsing green live/online status indicator dot on border */}
+              <span className="absolute top-0 right-0 flex size-3.5 sm:size-4">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex size-3.5 sm:size-4 rounded-full border-2 border-slate-950 bg-emerald-500 shadow-xs" />
+              </span>
+            </button>
+          </div>
         ) : (
-          <>
+          <div className="flex items-center gap-1.5 animate-in fade-in zoom-in-95 duration-200">
             {/* Main Capsule Button */}
             <button
               type="button"
@@ -834,39 +994,41 @@ export function VoiceAssistant() {
                 setIsOpen((prev) => !prev);
               }}
               aria-label="Toggle Gemini Live Assistant"
-              className={`group relative flex items-center gap-2 rounded-full pl-3 pr-3.5 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-200 active:scale-95 ${
+              className={`group relative flex items-center gap-2 rounded-full pl-2.5 sm:pl-3 pr-3 sm:pr-3.5 py-1.5 sm:py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-200 active:scale-95 ${
                 isListening 
                   ? "bg-rose-950/90 border-2 border-rose-500 shadow-rose-900/50" 
                   : isSpeaking
                   ? "bg-indigo-950/90 border-2 border-cyan-400 shadow-cyan-900/50"
-                  : "bg-slate-950/90 border border-emerald-500/40 hover:border-emerald-400 shadow-emerald-950/30 hover:scale-105"
+                  : "bg-slate-950/95 border border-emerald-500/50 hover:border-emerald-400 shadow-emerald-950/40 hover:scale-[1.02]"
               }`}
             >
-              {/* Subtle Glow Aura */}
-              <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 opacity-30 blur-xs group-hover:opacity-75 transition-opacity" />
+              {/* Subtle Glow Aura behind capsule */}
+              <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 opacity-35 blur-xs group-hover:opacity-75 transition-opacity" />
 
-              {/* Icon Orb */}
-              <div className={`relative flex size-6 items-center justify-center rounded-full text-white shadow-inner ${
+              {/* Vibrant Icon Orb */}
+              <div className={`relative flex size-7 sm:size-8 items-center justify-center rounded-full text-white shadow-inner p-0.5 ${
                 isListening 
                   ? "bg-rose-600 animate-pulse" 
                   : isSpeaking
                   ? "bg-cyan-600"
                   : isThinking
                   ? "bg-amber-600 animate-spin"
-                  : "bg-gradient-to-br from-emerald-600 to-teal-700"
+                  : "bg-gradient-to-br from-emerald-500 via-teal-500 to-amber-500"
               }`}>
-                {isListening ? (
-                  <MicOff className="size-3 text-white" />
-                ) : isSpeaking ? (
-                  <Volume2 className="size-3 text-white animate-bounce" />
-                ) : isThinking ? (
-                  <Sparkles className="size-3 text-amber-200" />
-                ) : (
-                  <Sparkles className="size-3 text-emerald-200" />
-                )}
+                <div className="size-full rounded-full bg-slate-950/80 flex items-center justify-center">
+                  {isListening ? (
+                    <MicOff className="size-3.5 text-rose-400" />
+                  ) : isSpeaking ? (
+                    <Volume2 className="size-3.5 text-cyan-400 animate-bounce" />
+                  ) : isThinking ? (
+                    <Sparkles className="size-3.5 text-amber-300" />
+                  ) : (
+                    <Sparkles className="size-3.5 text-amber-300" />
+                  )}
+                </div>
               </div>
 
-              {/* Button Text */}
+              {/* Button Text & Subtitle */}
               <div className="relative text-left leading-none">
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs font-black tracking-wide text-white">
@@ -887,11 +1049,11 @@ export function VoiceAssistant() {
                   }`} />
                 </div>
                 <p className="text-[9px] text-slate-300 font-medium mt-0.5">
-                  {isSpeaking ? "रोकने के लिए दबाएं" : "किसान वाणी"}
+                  {isSpeaking ? "रोकने के लिए दबाएं" : "किसान वाणी • AI Guide"}
                 </p>
               </div>
 
-              {/* Chevron indicator for bubble state */}
+              {/* Chevron indicator for panel state */}
               <div className="relative text-slate-400 group-hover:text-white transition-colors ml-0.5">
                 {isOpen ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}
               </div>
@@ -903,10 +1065,10 @@ export function VoiceAssistant() {
               onClick={toggleListening}
               aria-label={isListening ? "Stop listening" : "Start speaking"}
               title={isListening ? "माइक बंद करें (Stop Mic)" : "बोलकर पूछें (Speak to Gemini)"}
-              className={`flex size-9 sm:size-10 items-center justify-center rounded-full text-white shadow-xl transition-all active:scale-90 ${
+              className={`flex size-9 sm:size-10 items-center justify-center rounded-full text-white shadow-xl transition-all duration-200 active:scale-90 ${
                 isListening
                   ? "bg-rose-600 hover:bg-rose-500 ring-4 ring-rose-500/40 animate-pulse"
-                  : "bg-emerald-600 hover:bg-emerald-500 hover:scale-105 shadow-emerald-700/40"
+                  : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 hover:scale-105 shadow-emerald-700/40"
               }`}
             >
               {isListening ? (
@@ -916,17 +1078,21 @@ export function VoiceAssistant() {
               )}
             </button>
 
-            {/* Minimize button to prevent workspace obstruction */}
+            {/* Interactive Close / Collapse Trigger (✕) */}
             <button
               type="button"
-              onClick={() => setIsMinimized(true)}
-              aria-label="Minimize Assistant"
-              title="छोटा करें (Minimize)"
-              className="flex size-7 items-center justify-center rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all active:scale-90"
+              onClick={() => {
+                setIsExpanded(false);
+                setIsOpen(false);
+                stopSpeaking();
+              }}
+              aria-label="Collapse Assistant"
+              title="छोटा करें (Collapse)"
+              className="flex size-7 sm:size-8 items-center justify-center rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all active:scale-90 shadow-md"
             >
-              <X className="size-3" />
+              <X className="size-3.5" />
             </button>
-          </>
+          </div>
         )}
       </div>
     </>

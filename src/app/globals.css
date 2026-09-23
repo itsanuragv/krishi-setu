@@ -144,6 +144,34 @@ body {
   animation: pulseGlow 2.5s infinite;
 }
 
+/* Floating levitation animation (~4-6px translation with smooth easing) */
+@keyframes floatLevitate {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float {
+  animation: floatLevitate 3.5s ease-in-out infinite;
+}
+
+/* Subtle tooltip floating bounce */
+@keyframes tooltipFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-tooltip-float {
+  animation: tooltipFloat 2.8s ease-in-out infinite;
+}
+
 /* Horizontal ticker animation for live Mandi prices */
 @keyframes tickerSlide {
   0% {
