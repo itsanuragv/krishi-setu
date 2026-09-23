@@ -38,11 +38,60 @@ export default function ConsumerPortalPage() {
   const [isListening, setIsListening] = useState(false);
   const [selectedListingForModal, setSelectedListingForModal] = useState<ProduceListing | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [listings, setListings] = useState<ProduceListing[]>(MOCK_PRODUCE_LISTINGS);
 
   // Escrow Lock Simulation State
   const [escrowListing, setEscrowListing] = useState<ProduceListing | null>(null);
   const [escrowStep, setEscrowStep] = useState<"idle" | "locking" | "locked">("idle");
   const [generatedPin, setGeneratedPin] = useState("7429");
+
+  // Sync consumer produce prices when live Agmarknet prices are received
+  useEffect(() => {
+    const applyLiveMandiPrices = (benchmarks: any[]) => {
+      if (!Array.isArray(benchmarks) || benchmarks.length === 0) return;
+      setListings((prev) =>
+        prev.map((item) => {
+          const match = benchmarks.find((b) =>
+            item.name.toLowerCase().includes(b.cropEn.toLowerCase().split(" ")[0]) ||
+            (b.apiKey && item.name.toLowerCase().includes(b.apiKey.toLowerCase()))
+          );
+          if (match && match.rawMandiPrice) {
+            const unitIsKg = item.unit.toLowerCase().includes("kg");
+            const updatedMandi = unitIsKg
+              ? Math.round(match.rawMandiPrice / 100)
+              : match.rawMandiPrice;
+            const updatedFarmGate = unitIsKg
+              ? Math.round(match.rawFarmGatePrice / 100)
+              : match.rawFarmGatePrice;
+
+            return {
+              ...item,
+              mandiBenchmarkPrice: updatedMandi,
+              farmGatePrice: updatedFarmGate,
+            };
+          }
+          return item;
+        })
+      );
+    };
+
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("krishi_live_mandi_benchmarks");
+      if (stored) {
+        try {
+          applyLiveMandiPrices(JSON.parse(stored));
+        } catch {
+          // ignore
+        }
+      }
+
+      const handler = (e: any) => {
+        applyLiveMandiPrices(e.detail);
+      };
+      window.addEventListener("krishi-mandi-synced", handler);
+      return () => window.removeEventListener("krishi-mandi-synced", handler);
+    }
+  }, []);
 
   const CATEGORIES = [
     { id: "All", label: language === "hi" ? "सभी मुख्य फसलें" : "All Field Crops" },
@@ -87,7 +136,7 @@ export default function ConsumerPortalPage() {
     }
   };
 
-  const filteredListings = MOCK_PRODUCE_LISTINGS.filter((item) => {
+  const filteredListings = listings.filter((item) => {
     const withinDistance = item.distanceKm <= maxDistance;
     const categoryMatches = selectedCategory === "All" || 
       item.category === selectedCategory ||
