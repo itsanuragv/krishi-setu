@@ -34,15 +34,6 @@ export default function HomePage() {
   const { language, t } = useLanguage();
   const [guideModalOpen, setGuideModalOpen] = useState(false);
 
-  const LIVE_TICKER_ITEMS = [
-    { crop: t("crop_wheat"), farmGate: "₹3,400/q", mandi: "₹2,850/q", saving: language === "hi" ? "+19% अधिक लाभ" : "+19% Realization" },
-    { crop: t("crop_soyabean"), farmGate: "₹4,850/q", mandi: "₹4,200/q", saving: language === "hi" ? "+15% अधिक आय" : "+15% Realization" },
-    { crop: t("crop_rice"), farmGate: "₹7,200/q", mandi: "₹6,100/q", saving: language === "hi" ? "+18% अधिक लाभ" : "+18% Realization" },
-    { crop: t("crop_corn"), farmGate: "₹2,350/q", mandi: "₹1,950/q", saving: language === "hi" ? "+20% अधिक आय" : "+20% Realization" },
-    { crop: t("crop_bajra"), farmGate: "₹2,600/q", mandi: "₹2,150/q", saving: language === "hi" ? "+21% अधिक लाभ" : "+21% Realization" },
-    { crop: t("crop_jowar"), farmGate: "₹5,200/q", mandi: "₹4,400/q", saving: language === "hi" ? "+18% अधिक आय" : "+18% Realization" },
-  ];
-
   const PRIMARY_ROLES = [
     {
       role: "farmer",
@@ -238,34 +229,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Live Mandi Benchmark vs Farm-Gate Comparison Ticker */}
-        <section className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-emerald-200/80 bg-white/90 p-3 sm:p-4 shadow-xs">
-          <div className="flex items-center gap-2 mb-2 px-1">
-            <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <h3 className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-700 truncate">
-              {t("ticker_title")}
-            </h3>
-          </div>
-          <div className="w-full max-w-full min-w-0 overflow-x-auto no-scrollbar py-1">
-            <div className="flex items-center gap-2.5 sm:gap-3 w-max">
-              {LIVE_TICKER_ITEMS.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 shrink-0 rounded-xl bg-slate-50 border border-slate-200/70 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs"
-                >
-                  <span className="font-bold text-slate-800">{item.crop}</span>
-                  <div className="flex items-center gap-1 text-[11px]">
-                    <span className="text-emerald-700 font-bold">{item.farmGate}</span>
-                    <span className="text-slate-400 line-through">{item.mandi}</span>
-                  </div>
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                    {item.saving}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+
 
         {/* How Krishi Setu Works: 3-Pillar Direct Highway (Farmer, Consumer, Logistics) */}
         <section id="how-it-works" className="space-y-5 pt-2">

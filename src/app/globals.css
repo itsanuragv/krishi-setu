@@ -192,6 +192,26 @@ body {
   animation-play-state: paused;
 }
 
+/* Infinite Horizontal Marquee for Live Mandi Prices */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
 /* Hide scrollbar for clean touch sliders */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

@@ -18,8 +18,9 @@ import {
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
 import { KrishiSetuLogo } from "@/components/shared/KrishiSetuLogo";
+import { MandiPriceTicker } from "@/components/shared/MandiPriceTicker";
 
-export function Navbar() {
+export function Navbar({ hideTicker = false }: { hideTicker?: boolean }) {
   const pathname = usePathname();
   const { language, toggleLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,8 +62,8 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-emerald-100/70 bg-white/95 backdrop-blur-md transition-all shadow-xs">
-        <div className="mx-auto flex h-[72px] sm:h-[76px] max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md transition-all shadow-xs">
+        <div className="mx-auto flex h-[72px] sm:h-[76px] max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8 border-b border-emerald-100/70">
           {/* Brand Logo with Krishi Setu Emblem */}
           <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
             <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group touch-target min-w-0">
@@ -149,6 +150,9 @@ export function Navbar() {
             </button>
           </div>
         </div>
+
+        {/* Live Mandi Benchmark Utility Sub-Bar */}
+        {!hideTicker && <MandiPriceTicker />}
       </header>
 
       {/* Modern Slide-over Mobile Navigation Sheet */}
