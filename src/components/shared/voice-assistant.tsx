@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
+import { GeminiSparkleIcon, GeminiWaveform } from "@/components/shared/GeminiLiveIcon";
 import { 
   getSpeechRecognition, 
   type SpeechRecognitionInstance, 
@@ -687,22 +688,29 @@ export function VoiceAssistant() {
       {isOpen && (
         <div 
           ref={cardRef}
-          className="fixed bottom-20 md:bottom-20 right-3 sm:right-6 z-40 w-[320px] sm:w-[350px] max-w-[calc(100vw-1.5rem)] rounded-3xl border border-emerald-500/30 bg-slate-950/92 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-white p-4 space-y-3 animate-in fade-in slide-in-from-bottom-3 duration-200"
+          className="fixed bottom-16 sm:bottom-20 right-3 sm:right-6 z-40 w-[320px] sm:w-[350px] max-w-[calc(100vw-1.5rem)] max-h-[82vh] overflow-y-auto rounded-3xl border border-emerald-500/30 bg-slate-950/92 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-white p-4 space-y-3 animate-in fade-in slide-in-from-bottom-3 duration-200 scrollbar-thin scrollbar-thumb-slate-700"
           role="region"
           aria-label="Kisan Setu Voice Assistant"
         >
           {/* Top Bar: Minimal Status & Controls */}
           <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-            <div className="flex items-center gap-2">
-              <div className="flex size-7 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 text-slate-950 shadow-xs">
-                <Sparkles className="size-3.5" />
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-400 via-emerald-400 to-cyan-400 p-0.5 shadow-md overflow-hidden">
+                <div className="size-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                  <GeminiSparkleIcon size={18} />
+                </div>
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white flex items-center gap-1.5 leading-none">
-                  Gemini Live <span className="text-emerald-400">किसान वाणी</span>
-                  <span className={`inline-block size-1.5 rounded-full ${isListening ? "bg-rose-400 animate-ping" : isSpeaking ? "bg-cyan-400 animate-ping" : "bg-emerald-400"}`} />
+                <h3 className="text-xs font-black text-white flex items-center gap-1.5 leading-none">
+                  <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-emerald-300 bg-clip-text text-transparent font-black tracking-wide">
+                    {language === "hi-IN" ? "किसान साथी Live" : "Kisan Saathi Live"}
+                  </span>
+                  <span className="text-[10px] text-emerald-300 font-bold bg-emerald-900/90 px-1.5 py-0.5 rounded-md border border-emerald-400/50 shadow-xs">
+                    AI
+                  </span>
+                  <span className={`inline-block size-1.5 rounded-full ${isListening ? "bg-emerald-400 animate-ping" : isSpeaking ? "bg-cyan-400 animate-ping" : "bg-emerald-400"}`} />
                 </h3>
-                <span className="text-[9px] text-slate-400">वॉयस व नेविगेशन कंट्रोल</span>
+                <span className="text-[9px] text-slate-300 font-medium">वॉयस व नेविगेशन कंट्रोल • Real-time AI</span>
               </div>
             </div>
 
@@ -731,7 +739,7 @@ export function VoiceAssistant() {
                 {audioFeedbackEnabled ? (
                   <Volume2 className="size-3.5 text-cyan-400" />
                 ) : (
-                  <VolumeX className="size-3.5 text-rose-400" />
+                  <VolumeX className="size-3.5 text-slate-400" />
                 )}
               </button>
 
@@ -759,12 +767,8 @@ export function VoiceAssistant() {
             {/* Listening state with animated soundwave */}
             {isListening && (
               <div className="flex items-center gap-2.5 py-1">
-                <div className="flex items-center gap-1 text-rose-400 shrink-0">
-                  <span className="w-1 h-3.5 bg-rose-500 rounded-full animate-bounce" />
-                  <span className="w-1 h-5 bg-rose-400 rounded-full animate-bounce delay-100" />
-                  <span className="w-1 h-2.5 bg-rose-500 rounded-full animate-bounce delay-150" />
-                </div>
-                <p className="text-xs text-rose-200 font-medium italic truncate">
+                <GeminiWaveform active variant="listening" className="shrink-0" />
+                <p className="text-xs text-emerald-300 font-medium italic truncate">
                   {interimTranscript ? `"${interimTranscript}..."` : "बोलिए, सुन रहे हैं..."}
                 </p>
               </div>
@@ -772,9 +776,11 @@ export function VoiceAssistant() {
 
             {/* Thinking state */}
             {isThinking && (
-              <div className="flex items-center gap-2 text-cyan-300 font-medium py-1 animate-pulse">
-                <Sparkles className="size-3.5 animate-spin" />
-                <span>Gemini विचार कर रहा है...</span>
+              <div className="flex items-center gap-2 text-cyan-300 font-medium py-1">
+                <GeminiSparkleIcon size={16} className="animate-spin" />
+                <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-amber-200 bg-clip-text text-transparent font-semibold">
+                  Gemini विचार कर रहा है...
+                </span>
               </div>
             )}
 
@@ -788,16 +794,14 @@ export function VoiceAssistant() {
             {/* Speaking animation & stop button */}
             {isSpeaking && (
               <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-[11px]">
-                <div className="flex items-center gap-1 text-emerald-400">
-                  <span className="w-1 h-3 bg-emerald-400 rounded-full animate-bounce" />
-                  <span className="w-1 h-4 bg-teal-400 rounded-full animate-bounce delay-75" />
-                  <span className="w-1 h-2.5 bg-cyan-400 rounded-full animate-bounce delay-150" />
-                  <span className="text-[10px] text-slate-400 ml-1">असिस्टेंट बोल रहा है</span>
+                <div className="flex items-center gap-1.5 text-emerald-400">
+                  <GeminiWaveform active variant="speaking" className="scale-90" />
+                  <span className="text-[10px] text-slate-300 ml-1">असिस्टेंट बोल रहा है</span>
                 </div>
                 <button
                   type="button"
                   onClick={stopSpeaking}
-                  className="text-[10px] font-bold text-rose-400 hover:text-rose-300 bg-rose-950/70 px-2 py-0.5 rounded-lg border border-rose-800/80 transition-colors"
+                  className="text-[10px] font-bold text-rose-300 hover:text-white bg-rose-950/80 hover:bg-rose-900 px-2 py-0.5 rounded-lg border border-rose-700/80 transition-colors cursor-pointer"
                 >
                   रोकें (Stop)
                 </button>
@@ -882,7 +886,7 @@ export function VoiceAssistant() {
       >
         {/* Onboarding Tooltip / Callout (First-Time Visitor Guide) */}
         {showTooltip && !isExpanded && !isOpen && (
-          <div className="absolute bottom-full right-0 mb-3.5 w-72 sm:w-80 animate-tooltip-float z-50 pointer-events-auto">
+          <div className="absolute bottom-full right-0 mb-3 w-[calc(100vw-2rem)] sm:w-80 max-w-[320px] animate-tooltip-float z-50 pointer-events-auto">
             <div 
               onClick={() => {
                 dismissTooltip();
@@ -909,77 +913,122 @@ export function VoiceAssistant() {
 
               {/* Tooltip Header & Content */}
               <div className="flex items-start gap-2.5 pr-4">
-                <span className="text-xl sm:text-2xl shrink-0 select-none">👋</span>
+                <div className="size-7 sm:size-8 rounded-xl bg-gradient-to-tr from-amber-400 to-emerald-400 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                  <div className="size-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                    <GeminiSparkleIcon size={16} />
+                  </div>
+                </div>
                 <div className="space-y-1 text-left">
-                  <p className="text-xs font-black tracking-tight text-emerald-300 leading-tight">
+                  <p className="text-xs font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-emerald-300 leading-tight">
                     {currentLang === "hi"
-                      ? "कृषि सेतु में सहायता चाहिए?"
-                      : "Confused where to start?"}
+                      ? "कृषि सेतु • किसान साथी Live"
+                      : "Krishi Setu • Kisan Saathi Live"}
                   </p>
                   <p className="text-[11px] text-slate-200 leading-relaxed font-normal">
                     {currentLang === "hi"
                       ? "मंडी भाव, फसल लिस्टिंग या उपज खरीदने के लिए AI गाइड से पूछें!"
-                      : "Click here for AI guidance on mandi prices, listing, or buying!"}
+                      : "Ask real-time mandi prices, list crops, or browse harvests with your voice!"}
                   </p>
                   <p className="text-[10px] text-amber-300 font-semibold pt-0.5 flex items-center gap-1">
-                    <Sparkles className="size-3 text-amber-400 animate-pulse" />
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
                     <span>
                       {currentLang === "hi" 
-                        ? "मार्गदर्शन के लिए यहाँ क्लिक करें" 
-                        : "Click below for instant guidance"}
+                        ? "बोलकर शुरू करने के लिए यहाँ टैप करें" 
+                        : "Tap below to start speaking"}
                     </span>
                   </p>
                 </div>
               </div>
 
               {/* Downward Caret pointing straight to circular FAB */}
-              <div className="absolute -bottom-2 right-5 sm:right-6 size-0 border-x-8 border-x-transparent border-t-8 border-t-slate-950 filter drop-shadow-[0_3px_2px_rgba(16,185,129,0.3)]" />
+              <div className="absolute -bottom-2 right-4 sm:right-5 size-0 border-x-8 border-x-transparent border-t-8 border-t-slate-950 filter drop-shadow-[0_3px_2px_rgba(16,185,129,0.3)]" />
             </div>
           </div>
         )}
 
-        {/* Floating AI Assistant Trigger: Default Logo-Only FAB vs Smoothly Expanded Pill */}
+        {/* Floating Kisan Saathi Live AI Assistant Trigger: Compact, Bright, Responsive & Mobile-Friendly */}
         {!isExpanded ? (
-          <div className="animate-float">
+          <div className="animate-float relative group flex items-center justify-center">
+            {/* Quick Micro-Badge Floating Tooltip on Desktop Hover */}
+            <div className="hidden sm:block absolute bottom-full right-0 mb-3 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:-translate-y-1 z-50">
+              <div className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-emerald-400/80 px-3 py-1.5 shadow-[0_10px_30px_rgba(16,185,129,0.4)] backdrop-blur-xl text-white whitespace-nowrap">
+                <GeminiSparkleIcon size={16} />
+                <div className="text-left">
+                  <p className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-emerald-300 leading-none">
+                    {currentLang === "hi" ? "किसान साथी Live" : "Kisan Saathi Live"}
+                  </p>
+                  <p className="text-[10px] text-emerald-300 font-semibold mt-0.5">
+                    {currentLang === "hi" ? "बोलकर पूछें • AI वॉयस गाइड" : "Voice AI • Tap to chat"}
+                  </p>
+                </div>
+                <span className="size-2 rounded-full bg-emerald-400 animate-ping ml-1" />
+              </div>
+              <div className="absolute -bottom-1.5 right-5 size-0 border-x-6 border-x-transparent border-t-6 border-t-slate-950 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
+            </div>
+
+            {/* Super-Bright, Sleek & Compact Energy Orb FAB (44px on mobile, 48px on desktop) */}
             <button
               type="button"
               onClick={() => {
                 dismissTooltip();
                 setIsExpanded(true);
               }}
-              aria-label="Open Krishi Setu AI Assistant"
-              title={currentLang === "hi" ? "कृषि सेतु AI असिस्टेंट खोलें" : "Open Krishi Setu AI Assistant"}
-              className="group relative flex size-12 sm:size-14 items-center justify-center rounded-full shadow-[0_8px_30px_rgba(16,185,129,0.35)] transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer focus:outline-hidden"
+              aria-label="Open Kisan Saathi Live Voice Assistant"
+              title={currentLang === "hi" ? "किसान साथी Live खोलें" : "Open Kisan Saathi Live Assistant"}
+              className="group relative flex size-11 sm:size-12 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer focus:outline-hidden animate-bright-bloom shadow-[0_6px_22px_rgba(16,185,129,0.5)]"
             >
-              {/* Ambient colored blur/glow effect pulsing gently behind the button */}
-              <span className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 opacity-60 blur-md group-hover:opacity-100 transition-opacity animate-pulse" />
+              {/* Vibrant Outer Neon Glow Aura */}
+              <span className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-emerald-500 via-cyan-400 via-amber-400 to-teal-500 opacity-75 blur-xs group-hover:opacity-100 transition-opacity" />
 
-              {/* Shimmer light reflection on hover */}
-              <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none" />
+              {/* 360-Degree Continuous Rotating Rainbow Conic Border */}
+              <div className="absolute -inset-[2px] rounded-full p-[2px] overflow-hidden pointer-events-none">
+                <div
+                  className="size-full rounded-full animate-gemini-spin"
+                  style={{
+                    background:
+                      "conic-gradient(from 0deg, #FFE600, #FF6600, #FF007A, #9B51E0, #00F5FF, #10B981, #FFE600)",
+                  }}
+                />
+              </div>
 
-              {/* Vibrant Gradient Background Ring: Emerald green, Vibrant cyan/teal, Warm harvest golden amber */}
-              <div className="relative size-full rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-amber-500 p-0.5 sm:p-1 flex items-center justify-center shadow-inner">
-                {/* Dark inner disc with glass depth */}
-                <div className="size-full rounded-full bg-slate-950/90 flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.35),transparent_70%)]" />
-                  
-                  {/* Logo icon with interactive micro-interactions */}
-                  <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
-                    <Sparkles className="size-5 sm:size-6 text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+              {/* Ultra-Bright Rich Jewel Core */}
+              <div className="relative size-full rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-0.5 flex items-center justify-center overflow-hidden border border-white/90 shadow-inner">
+                {/* Luminous Inner Core */}
+                <div className="size-full rounded-full bg-gradient-to-tr from-emerald-950/90 via-slate-950/95 to-teal-950/90 flex flex-col items-center justify-center relative overflow-hidden">
+                  {/* Radial Sunburst Flare */}
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.4),transparent_65%)] pointer-events-none" />
+
+                  {/* Specular Diagonal Light Shimmer Sweep */}
+                  <span className="absolute inset-0 w-[45%] h-[200%] bg-gradient-to-r from-transparent via-white/40 to-transparent animate-gemini-shine pointer-events-none" />
+
+                  {/* Centered Radiant Golden Star */}
+                  <div className="relative flex items-center justify-center transition-all duration-300 group-hover:scale-115 group-hover:rotate-12">
+                    <GeminiSparkleIcon size={22} className="filter drop-shadow-[0_0_10px_rgba(250,204,21,0.9)]" />
                   </div>
+
+                  {/* Active Neon Waveform */}
+                  {(isListening || isSpeaking) && (
+                    <div className="absolute bottom-0.5 flex items-center justify-center">
+                      <GeminiWaveform
+                        active={isListening || isSpeaking}
+                        variant={isListening ? "listening" : isSpeaking ? "speaking" : "gemini"}
+                        className="scale-65"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Small pulsing green live/online status indicator dot on border */}
-              <span className="absolute top-0 right-0 flex size-3.5 sm:size-4">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex size-3.5 sm:size-4 rounded-full border-2 border-slate-950 bg-emerald-500 shadow-xs" />
+              {/* Satellite Radar Live Beacon Dot */}
+              <span className="absolute -top-0.5 -right-0.5 flex size-3.5 sm:size-4">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-90" />
+                <span className="relative inline-flex size-3.5 sm:size-4 rounded-full border border-white bg-gradient-to-r from-amber-400 to-yellow-300 shadow-[0_0_8px_rgba(245,158,11,1)]" />
               </span>
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 animate-in fade-in zoom-in-95 duration-200">
-            {/* Main Capsule Button */}
+          <div className="relative flex items-center gap-1.5 sm:gap-2 animate-in fade-in zoom-in-95 duration-200">
+            {/* Main Interactive Vibrant Capsule - Compact, Calming & Mobile-Optimized */}
             <button
               type="button"
               onClick={() => {
@@ -993,92 +1042,140 @@ export function VoiceAssistant() {
                 }
                 setIsOpen((prev) => !prev);
               }}
-              aria-label="Toggle Gemini Live Assistant"
-              className={`group relative flex items-center gap-2 rounded-full pl-2.5 sm:pl-3 pr-3 sm:pr-3.5 py-1.5 sm:py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-200 active:scale-95 ${
-                isListening 
-                  ? "bg-rose-950/90 border-2 border-rose-500 shadow-rose-900/50" 
+              aria-label="Toggle Kisan Saathi Live Assistant"
+              className={`group relative flex items-center gap-1.5 sm:gap-2 rounded-full pl-1.5 sm:pl-2 pr-2.5 sm:pr-3 py-1 sm:py-1.5 text-white shadow-[0_8px_25px_rgba(16,185,129,0.5),0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer overflow-hidden border border-white/80 ${
+                isListening
+                  ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 shadow-emerald-500/50"
                   : isSpeaking
-                  ? "bg-indigo-950/90 border-2 border-cyan-400 shadow-cyan-900/50"
-                  : "bg-slate-950/95 border border-emerald-500/50 hover:border-emerald-400 shadow-emerald-950/40 hover:scale-[1.02]"
+                  ? "bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 shadow-cyan-600/60"
+                  : isThinking
+                  ? "bg-gradient-to-r from-purple-700 via-indigo-600 to-pink-600 shadow-purple-600/60"
+                  : "bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 shadow-emerald-600/60"
               }`}
             >
-              {/* Subtle Glow Aura behind capsule */}
-              <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 opacity-35 blur-xs group-hover:opacity-75 transition-opacity" />
+              {/* Outer Vibrant Bloom Glow */}
+              <span
+                className={`absolute -inset-1 rounded-full opacity-50 blur-xs group-hover:opacity-90 transition-opacity pointer-events-none ${
+                  isListening
+                    ? "bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300"
+                    : isSpeaking
+                    ? "bg-gradient-to-r from-cyan-400 to-emerald-400"
+                    : "bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300"
+                }`}
+              />
 
-              {/* Vibrant Icon Orb */}
-              <div className={`relative flex size-7 sm:size-8 items-center justify-center rounded-full text-white shadow-inner p-0.5 ${
-                isListening 
-                  ? "bg-rose-600 animate-pulse" 
-                  : isSpeaking
-                  ? "bg-cyan-600"
-                  : isThinking
-                  ? "bg-amber-600 animate-spin"
-                  : "bg-gradient-to-br from-emerald-500 via-teal-500 to-amber-500"
-              }`}>
-                <div className="size-full rounded-full bg-slate-950/80 flex items-center justify-center">
+              {/* Specular Diagonal Light Shimmer Sweep */}
+              <span className="absolute inset-0 w-[40%] h-[200%] bg-gradient-to-r from-transparent via-white/35 to-transparent animate-gemini-shine pointer-events-none" />
+
+              {/* Left Sunburst Golden Avatar Circle (compact 28px/32px) */}
+              <div
+                className={`relative flex size-7 sm:size-8 items-center justify-center rounded-full text-white shadow-[0_0_10px_rgba(250,204,21,0.7)] shrink-0 transition-transform duration-300 group-hover:scale-105 ${
+                  isListening
+                    ? "bg-gradient-to-tr from-emerald-400 to-teal-300 text-slate-950"
+                    : isSpeaking
+                    ? "bg-gradient-to-tr from-cyan-300 to-teal-200 text-slate-950"
+                    : "bg-gradient-to-tr from-amber-300 via-yellow-400 to-amber-500 text-slate-950"
+                }`}
+              >
+                <div className="size-full rounded-full bg-slate-950/80 flex items-center justify-center overflow-hidden border border-white/40">
                   {isListening ? (
-                    <MicOff className="size-3.5 text-rose-400" />
+                    <Mic className="size-3.5 text-emerald-400 animate-bounce" />
                   ) : isSpeaking ? (
-                    <Volume2 className="size-3.5 text-cyan-400 animate-bounce" />
+                    <Volume2 className="size-3.5 text-cyan-300 animate-bounce" />
                   ) : isThinking ? (
-                    <Sparkles className="size-3.5 text-amber-300" />
+                    <div className="relative flex items-center justify-center">
+                      <GeminiSparkleIcon size={14} />
+                      <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-amber-400 animate-ping" />
+                    </div>
                   ) : (
-                    <Sparkles className="size-3.5 text-amber-300" />
+                    <GeminiSparkleIcon size={15} className="group-hover:rotate-12 transition-transform duration-300" />
                   )}
                 </div>
               </div>
 
-              {/* Button Text & Subtitle */}
-              <div className="relative text-left leading-none">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black tracking-wide text-white">
-                    {isListening 
-                      ? "सुन रहे हैं..." 
+              {/* Center Typography & Real-time Live Equalizer */}
+              <div className="relative text-left leading-none max-w-[105px] sm:max-w-[130px]">
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] sm:text-xs font-black tracking-tight text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] truncate">
+                    {isListening
+                      ? "सुन रहे हैं..."
                       : isSpeaking
-                      ? "बोल रहा है"
+                      ? "बोल रहा है..."
                       : isThinking
                       ? "सोच रहे हैं..."
-                      : "Gemini Live"}
+                      : currentLang === "hi"
+                      ? "किसान साथी Live"
+                      : "Kisan Saathi Live"}
                   </span>
-                  <span className={`size-1.5 rounded-full ${
-                    isListening 
-                      ? "bg-rose-400 animate-ping" 
-                      : isSpeaking 
-                      ? "bg-cyan-400 animate-ping"
-                      : "bg-emerald-400"
-                  }`} />
+
+                  {/* Super-Bright Neon Audio Equalizer */}
+                  <GeminiWaveform
+                    active={isListening || isSpeaking}
+                    variant={isListening ? "listening" : isSpeaking ? "speaking" : "gemini"}
+                    className="scale-75 origin-left shrink-0"
+                  />
+
+                  {/* Pinging Radar Beacon Dot */}
+                  <span className="relative flex size-2 shrink-0 ml-auto sm:ml-0">
+                    <span
+                      className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-90 ${
+                        isListening
+                          ? "bg-emerald-300"
+                          : isSpeaking
+                          ? "bg-white"
+                          : "bg-amber-300"
+                      }`}
+                    />
+                    <span
+                      className={`relative inline-flex size-2 rounded-full border border-white ${
+                        isListening
+                          ? "bg-emerald-400"
+                          : isSpeaking
+                          ? "bg-cyan-300"
+                          : "bg-amber-400"
+                      }`}
+                    />
+                  </span>
                 </div>
-                <p className="text-[9px] text-slate-300 font-medium mt-0.5">
-                  {isSpeaking ? "रोकने के लिए दबाएं" : "किसान वाणी • AI Guide"}
+
+                <p className="text-[8.5px] sm:text-[9.5px] text-amber-200 font-extrabold mt-0.5 truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  {isListening
+                    ? "माइक चालू • बोलिए"
+                    : isSpeaking
+                    ? "रोकने के लिए टैप करें"
+                    : isThinking
+                    ? "AI विश्लेषण..."
+                    : currentLang === "hi"
+                    ? "बोलकर पूछें • Voice AI"
+                    : "Direct Voice Assistant"}
                 </p>
               </div>
 
-              {/* Chevron indicator for panel state */}
-              <div className="relative text-slate-400 group-hover:text-white transition-colors ml-0.5">
-                {isOpen ? <ChevronDown className="size-3" /> : <ChevronUp className="size-3" />}
+              {/* Interactive Panel Chevron */}
+              <div className="relative text-white/90 group-hover:text-white transition-all ml-0.5 shrink-0">
+                <div className={`transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"}`}>
+                  <ChevronUp className="size-3.5 drop-shadow-xs" />
+                </div>
               </div>
             </button>
 
-            {/* Dedicated Direct Mic Trigger Button */}
+            {/* Dedicated Golden/Emerald Mic Trigger Button (compact 36px/40px) */}
             <button
               type="button"
               onClick={toggleListening}
               aria-label={isListening ? "Stop listening" : "Start speaking"}
-              title={isListening ? "माइक बंद करें (Stop Mic)" : "बोलकर पूछें (Speak to Gemini)"}
-              className={`flex size-9 sm:size-10 items-center justify-center rounded-full text-white shadow-xl transition-all duration-200 active:scale-90 ${
+              title={isListening ? "सुन रहे हैं • बंद करने के लिए टैप करें" : "बोलकर पूछें (Speak to Kisan Saathi Live)"}
+              className={`group relative flex size-9 sm:size-10 items-center justify-center rounded-full text-slate-950 font-black transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer border border-white shrink-0 ${
                 isListening
-                  ? "bg-rose-600 hover:bg-rose-500 ring-4 ring-rose-500/40 animate-pulse"
-                  : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 hover:scale-105 shadow-emerald-700/40"
+                  ? "bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 ring-2 ring-emerald-300/80 shadow-[0_0_18px_rgba(16,185,129,0.7)]"
+                  : "bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 hover:from-amber-300 hover:to-yellow-200 shadow-[0_0_18px_rgba(250,204,21,0.7)]"
               }`}
             >
-              {isListening ? (
-                <MicOff className="size-4.5" />
-              ) : (
-                <Mic className="size-4.5" />
-              )}
+              <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <Mic className={`size-4 sm:size-4.5 ${isListening ? "text-slate-950 animate-bounce" : "group-hover:scale-110 transition-transform"}`} />
             </button>
 
-            {/* Interactive Close / Collapse Trigger (✕) */}
+            {/* Interactive Close / Collapse Trigger (✕) (compact 28px/32px) */}
             <button
               type="button"
               onClick={() => {
@@ -1088,9 +1185,9 @@ export function VoiceAssistant() {
               }}
               aria-label="Collapse Assistant"
               title="छोटा करें (Collapse)"
-              className="flex size-7 sm:size-8 items-center justify-center rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all active:scale-90 shadow-md"
+              className="group flex size-7 sm:size-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/35 text-white border border-white/60 transition-all duration-200 active:scale-90 shadow-md cursor-pointer backdrop-blur-md shrink-0"
             >
-              <X className="size-3.5" />
+              <X className="size-3.5 group-hover:rotate-90 transition-transform duration-200" />
             </button>
           </div>
         )}

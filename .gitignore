@@ -229,6 +229,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .env*.local
+.agents/**/mcp_config.json
+.agents/plugins/
+graphify-out/
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+

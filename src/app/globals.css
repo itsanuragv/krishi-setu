@@ -232,4 +232,197 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 1rem);
 }
 
+/* ========================================================
+   GEMINI LIVE HYPER-INTERACTIVE DESIGN SYSTEM ANIMATIONS
+   ======================================================== */
+
+/* 1. 360-Degree Continuous Conic Aurora Rotation */
+@keyframes geminiConicSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-gemini-spin {
+  animation: geminiConicSpin 4s linear infinite;
+}
+
+.animate-gemini-spin-slow {
+  animation: geminiConicSpin 8s linear infinite;
+}
+
+/* 2. Specular Diagonal Light Shimmer Sweep */
+@keyframes geminiShineSweep {
+  0% {
+    transform: translateX(-140%) skewX(-24deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  50%, 100% {
+    transform: translateX(260%) skewX(-24deg);
+    opacity: 0;
+  }
+}
+
+.animate-gemini-shine {
+  animation: geminiShineSweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* 3. Breathing Multi-Spectrum Ambient Aura */
+@keyframes geminiAuraBreathe {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.16);
+    opacity: 0.85;
+  }
+}
+
+.animate-gemini-aura {
+  animation: geminiAuraBreathe 3s ease-in-out infinite;
+}
+
+/* 4. Sonar Acoustic Ripple Radiating Outwards */
+@keyframes sonarRipplePulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.animate-sonar-ring-1 {
+  animation: sonarRipplePulse 2.2s cubic-bezier(0.1, 0.25, 0.35, 1) infinite;
+}
+
+.animate-sonar-ring-2 {
+  animation: sonarRipplePulse 2.2s cubic-bezier(0.1, 0.25, 0.35, 1) infinite 0.75s;
+}
+
+.animate-sonar-ring-3 {
+  animation: sonarRipplePulse 2.2s cubic-bezier(0.1, 0.25, 0.35, 1) infinite 1.5s;
+}
+
+/* 5. Staggered Audio Frequency Equalizer Bar Animations */
+@keyframes eqBarPulse1 {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+@keyframes eqBarPulse2 {
+  0%, 100% { height: 7px; }
+  50% { height: 22px; }
+}
+
+@keyframes eqBarPulse3 {
+  0%, 100% { height: 3px; }
+  50% { height: 18px; }
+}
+
+@keyframes eqBarPulse4 {
+  0%, 100% { height: 8px; }
+  50% { height: 20px; }
+}
+
+@keyframes eqBarPulse5 {
+  0%, 100% { height: 5px; }
+  50% { height: 14px; }
+}
+
+.animate-eq-1 {
+  animation: eqBarPulse1 0.75s ease-in-out infinite alternate;
+}
+
+.animate-eq-2 {
+  animation: eqBarPulse2 0.6s ease-in-out infinite alternate 0.15s;
+}
+
+.animate-eq-3 {
+  animation: eqBarPulse3 0.85s ease-in-out infinite alternate 0.3s;
+}
+
+.animate-eq-4 {
+  animation: eqBarPulse4 0.65s ease-in-out infinite alternate 0.2s;
+}
+
+.animate-eq-5 {
+  animation: eqBarPulse5 0.7s ease-in-out infinite alternate 0.4s;
+}
+
+/* 6. Orbital Particle Rotation for Thinking State */
+@keyframes orbitParticles {
+  0% {
+    transform: rotate(0deg) translateX(14px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(14px) rotate(-360deg);
+  }
+}
+
+.animate-orbit {
+  animation: orbitParticles 2.4s linear infinite;
+}
+
+/* 7. Rainbow Gradient Shift for Ultra-Vibrant Appeal */
+@keyframes rainbowFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-rainbow-flow {
+  background-size: 250% 250%;
+  animation: rainbowFlow 4s ease infinite;
+}
+
+/* 8. Super Bright Vivid Neon Shadow Glow */
+@keyframes brightNeonPulse {
+  0%, 100% {
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.6), 0 0 25px rgba(6, 182, 212, 0.5), 0 0 40px rgba(245, 158, 11, 0.4);
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    box-shadow: 0 12px 45px rgba(16, 185, 129, 0.85), 0 0 40px rgba(6, 182, 212, 0.7), 0 0 60px rgba(245, 158, 11, 0.6);
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+.animate-bright-bloom {
+  animation: brightNeonPulse 3s ease-in-out infinite;
+}
+
+/* 9. Golden Sparkle Twinkle */
+@keyframes goldenTwinkle {
+  0%, 100% {
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.25) rotate(15deg);
+    opacity: 1;
+  }
+}
+
+.animate-golden-twinkle {
+  animation: goldenTwinkle 1.8s ease-in-out infinite;
+}
+
+
+
 
