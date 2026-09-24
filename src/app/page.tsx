@@ -159,10 +159,10 @@ export default function HomePage() {
           {/* Main Headline */}
           <motion.h1
             variants={heroChildVariants}
-            className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-tight sm:leading-[1.12] break-words"
+            className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-snug sm:leading-[1.22] lg:leading-[1.25] break-words py-1 sm:py-2"
           >
             {t("hero_headline_prefix")}{" "}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-800 bg-clip-text text-transparent">
+            <span className="inline-block bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-800 bg-clip-text text-transparent pt-1.5 sm:pt-2.5 pb-1 px-1 -my-1 sm:-my-2 align-baseline">
               {t("hero_headline_gradient")}
             </span>{" "}
             {t("hero_headline_suffix")}

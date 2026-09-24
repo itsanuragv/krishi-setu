@@ -160,21 +160,14 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
       role="region"
       aria-label="Live Mandi Price Benchmark Ticker"
     >
-      {/* Fixed Left Badge (Anchor) with Live Status & Manual Sync Button - Hidden on mobile so ticker gets 100% full width */}
-      <div className="hidden sm:flex relative z-20 shrink-0 h-full items-center gap-2 bg-white/95 sm:bg-white/90 backdrop-blur-md px-2.5 sm:px-4 border-r border-emerald-100/80 shadow-[6px_0_16px_rgba(255,255,255,0.95)]">
-        <span className="relative flex size-2 shrink-0">
+      {/* Fixed Left Badge: Minimal live pulsing indicator dot & quick sync button without space-hogging text */}
+      <div className="relative z-20 shrink-0 h-full flex items-center gap-1.5 sm:gap-2 bg-white/95 sm:bg-white/90 backdrop-blur-md px-2 sm:px-3 border-r border-emerald-100/80 shadow-[4px_0_12px_rgba(255,255,255,0.95)]">
+        <span
+          className="relative flex size-2 shrink-0 ml-0.5"
+          title={language === "hi" ? "लाइव मंडी बेंचमार्क सक्रिय" : "Live Mandi Benchmark Active"}
+        >
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
-        </span>
-
-        <span className="text-[11px] sm:text-xs font-semibold text-emerald-800 tracking-wide uppercase whitespace-nowrap">
-          {isLive
-            ? language === "hi"
-              ? "🔴 लाइव Agmarknet मंडी"
-              : "🔴 LIVE AGMARKNET"
-            : language === "hi"
-            ? "🔴 लाइव मंडी बेंचमार्क"
-            : "🔴 LIVE MANDI BENCHMARK"}
         </span>
 
         {/* Live Manual Sync Button */}
@@ -185,28 +178,19 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
           aria-label="Sync Mandi Prices"
           title={
             language === "hi"
-              ? `मंडी भाव अभी सिंक करें ${lastSynced ? `(अंतिम सिंक: ${lastSynced})` : ""}`
-              : `Sync live Agmarknet prices ${lastSynced ? `(Last sync: ${lastSynced})` : ""}`
+              ? `मंडी भाव अभी सिंक करें ${lastSynced ? `(अंतिम: ${lastSynced})` : ""}`
+              : `Sync live Agmarknet prices ${lastSynced ? `(Last: ${lastSynced})` : ""}`
           }
-          className="ml-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 hover:bg-emerald-100/90 text-emerald-800 px-2 py-0.5 text-[10px] font-bold border border-emerald-200 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+          className="inline-flex items-center gap-1 rounded-full bg-emerald-50 hover:bg-emerald-100/90 text-emerald-800 p-1 sm:px-2 sm:py-0.5 text-[10px] font-bold border border-emerald-200 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
         >
           <RefreshCw
             className={`size-3 text-emerald-700 shrink-0 ${
               isSyncing ? "animate-spin" : ""
             }`}
           />
-          <span className="hidden xs:inline">
-            {isSyncing
-              ? language === "hi"
-                ? "सिंक..."
-                : "Syncing..."
-              : language === "hi"
-              ? "सिंक करें"
-              : "Sync"}
-          </span>
           {lastSynced && !isSyncing && (
-            <span className="hidden md:inline text-[9px] text-emerald-600 font-normal">
-              • {lastSynced}
+            <span className="hidden sm:inline text-[9px] text-emerald-600 font-normal">
+              {lastSynced}
             </span>
           )}
         </button>

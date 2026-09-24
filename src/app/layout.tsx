@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Fraunces } from "next/font/google";
+import { DM_Sans, Fraunces, Noto_Sans_Devanagari } from "next/font/google";
 import { Toaster } from "sonner";
 import { MswProvider } from "@/lib/msw-provider";
 import { QueryProvider } from "@/lib/query-provider";
@@ -15,6 +15,12 @@ const dmSans = DM_Sans({
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
+});
+
+const notoDevanagari = Noto_Sans_Devanagari({
+  variable: "--font-noto-devanagari",
+  subsets: ["devanagari"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const viewport: Viewport = {
@@ -60,7 +66,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${fraunces.variable} antialiased`}>
+      <body className={`${dmSans.variable} ${fraunces.variable} ${notoDevanagari.variable} antialiased`}>
         <MswProvider>
           <QueryProvider>
             <LanguageProvider>
