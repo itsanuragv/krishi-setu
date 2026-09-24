@@ -800,7 +800,6 @@ export const TRANSLATIONS: Translations = {
   // OpenCV Scan Component
   opencv_ai_quality_lab: { en: "OpenCV AI Quality Lab", hi: "ओपनसीवी एआई गुणवत्ता लैब" },
   opencv_ai_grading_sub: { en: "Crop Quality & AI Grading Inspection", hi: "फसल गुणवत्ता व एआई ग्रेडिंग जांच" },
-  btn_listen_report: { en: "Listen", hi: "सुनें" },
   btn_stop_report: { en: "Stop", hi: "रोकें" },
   btn_camera_snap: { en: "Camera Photo", hi: "कैमरा फोटो" },
   btn_gallery_upload: { en: "Gallery File", hi: "गैलरी फाइल" },

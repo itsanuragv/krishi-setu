@@ -41,7 +41,7 @@ export interface DeliveryRoute {
   stops: {
     step: number;
     title: string;
-    role: "Farmer Pickup" | "Consumer Drop-off" | "Bulk HoReCa Drop";
+    role: "Farmer Pickup" | "Consumer Drop-off" | "Bulk HoReCa Drop" | "Grain Silo Drop-off" | "Agro Processing Drop";
     location: string;
     crop: string;
     quantity: string;
