@@ -31,6 +31,8 @@ import {
   type SpeechRecognitionEvent, 
   type SpeechRecognitionErrorEvent 
 } from "@/lib/speech-types";
+import { motion, AnimatePresence } from "framer-motion";
+import { modalSpringVariants, appleSpringSnappy } from "@/lib/animations";
 
 interface CropListingData {
   crop: string;
@@ -685,199 +687,209 @@ export function VoiceAssistant() {
   return (
     <>
       {/* 1. ULTRA-MINIMAL & SIMPLIFIED FLOATING ASSISTANT CARD */}
-      {isOpen && (
-        <div 
-          ref={cardRef}
-          className="fixed bottom-16 sm:bottom-20 right-3 sm:right-6 z-40 w-[320px] sm:w-[350px] max-w-[calc(100vw-1.5rem)] max-h-[82vh] overflow-y-auto rounded-3xl border border-emerald-500/30 bg-slate-950/92 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-white p-4 space-y-3 animate-in fade-in slide-in-from-bottom-3 duration-200 scrollbar-thin scrollbar-thumb-slate-700"
-          role="region"
-          aria-label="Kisan Setu Voice Assistant"
-        >
-          {/* Top Bar: Minimal Status & Controls */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-400 via-emerald-400 to-cyan-400 p-0.5 shadow-md overflow-hidden">
-                <div className="size-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                  <GeminiSparkleIcon size={18} />
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            ref={cardRef}
+            variants={modalSpringVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed bottom-16 sm:bottom-20 right-3 sm:right-6 z-40 w-[320px] sm:w-[350px] max-w-[calc(100vw-1.5rem)] max-h-[82vh] overflow-y-auto rounded-3xl apple-glass-elevated rim-light-lg shadow-[0_24px_60px_rgba(0,0,0,0.5)] text-white p-4 space-y-3.5 apple-scrollbar"
+            role="region"
+            aria-label="Kisan Setu Voice Assistant"
+          >
+            {/* Top Bar: Minimal Status & Controls */}
+            <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-400 via-emerald-400 to-cyan-400 p-0.5 shadow-md overflow-hidden rim-light">
+                  <div className="size-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                    <GeminiSparkleIcon size={18} />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xs font-black text-white flex items-center gap-1.5 leading-none">
+                    <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-emerald-300 bg-clip-text text-transparent font-black tracking-wide">
+                      {language === "hi-IN" ? "किसान साथी Live" : "Kisan Saathi Live"}
+                    </span>
+                    <span className="text-[10px] text-emerald-300 font-bold bg-emerald-900/90 px-1.5 py-0.5 rounded-md border border-emerald-400/50 shadow-xs">
+                      AI
+                    </span>
+                    <span className={`inline-block size-1.5 rounded-full ${isListening ? "bg-emerald-400 animate-ping" : isSpeaking ? "bg-cyan-400 animate-ping" : "bg-emerald-400"}`} />
+                  </h3>
+                  <span className="text-[9px] text-slate-300 font-medium">वॉयस व नेविगेशन कंट्रोल • Real-time AI</span>
                 </div>
               </div>
-              <div>
-                <h3 className="text-xs font-black text-white flex items-center gap-1.5 leading-none">
-                  <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-emerald-300 bg-clip-text text-transparent font-black tracking-wide">
-                    {language === "hi-IN" ? "किसान साथी Live" : "Kisan Saathi Live"}
-                  </span>
-                  <span className="text-[10px] text-emerald-300 font-bold bg-emerald-900/90 px-1.5 py-0.5 rounded-md border border-emerald-400/50 shadow-xs">
-                    AI
-                  </span>
-                  <span className={`inline-block size-1.5 rounded-full ${isListening ? "bg-emerald-400 animate-ping" : isSpeaking ? "bg-cyan-400 animate-ping" : "bg-emerald-400"}`} />
-                </h3>
-                <span className="text-[9px] text-slate-300 font-medium">वॉयस व नेविगेशन कंट्रोल • Real-time AI</span>
+
+              <div className="flex items-center gap-1">
+                {/* Language Switch */}
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange(language === "hi-IN" ? "en-IN" : "hi-IN")}
+                  className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/15 transition-all flex items-center gap-1 active:scale-95"
+                  title="Change Voice Language"
+                >
+                  <Languages className="size-2.5 text-cyan-400" />
+                  <span>{language === "hi-IN" ? "हिन्दी" : "Eng"}</span>
+                </button>
+
+                {/* Audio Mute/Unmute */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isSpeaking) stopSpeaking();
+                    setAudioFeedbackEnabled(v => !v);
+                  }}
+                  className="rounded-full p-1.5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors active:scale-90"
+                  title={audioFeedbackEnabled ? "आवाज़ बंद करें (Mute)" : "आवाज़ चालू करें (Unmute)"}
+                >
+                  {audioFeedbackEnabled ? (
+                    <Volume2 className="size-3.5 text-cyan-400" />
+                  ) : (
+                    <VolumeX className="size-3.5 text-slate-400" />
+                  )}
+                </button>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="rounded-full p-1.5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors active:scale-90"
+                  title="बंद करें"
+                >
+                  <X className="size-4" />
+                </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-1">
-              {/* Language Switch */}
-              <button
-                type="button"
-                onClick={() => handleLanguageChange(language === "hi-IN" ? "en-IN" : "hi-IN")}
-                className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-slate-800/90 text-slate-300 hover:text-white border border-slate-700 hover:border-slate-600 transition-colors flex items-center gap-1"
-                title="Change Voice Language"
-              >
-                <Languages className="size-2.5 text-cyan-400" />
-                <span>{language === "hi-IN" ? "हिन्दी" : "Eng"}</span>
-              </button>
+            {/* Dynamic Live Activity Box */}
+            <div className="rounded-2xl bg-black/40 border border-white/10 p-3 text-xs space-y-2 backdrop-blur-md">
+              {/* User prompt preview if any */}
+              {lastUserQuery && (
+                <div className="text-[10px] text-emerald-400 font-semibold truncate">
+                  <span>आप: &ldquo;{lastUserQuery}&rdquo;</span>
+                </div>
+              )}
 
-              {/* Audio Mute/Unmute */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (isSpeaking) stopSpeaking();
-                  setAudioFeedbackEnabled(v => !v);
-                }}
-                className="rounded-full p-1 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                title={audioFeedbackEnabled ? "आवाज़ बंद करें (Mute)" : "आवाज़ चालू करें (Unmute)"}
-              >
-                {audioFeedbackEnabled ? (
-                  <Volume2 className="size-3.5 text-cyan-400" />
-                ) : (
-                  <VolumeX className="size-3.5 text-slate-400" />
-                )}
-              </button>
+              {/* Listening state with animated soundwave */}
+              {isListening && (
+                <div className="flex items-center gap-2.5 py-1">
+                  <GeminiWaveform active variant="listening" className="shrink-0" />
+                  <p className="text-xs text-emerald-300 font-medium italic truncate">
+                    {interimTranscript ? `"${interimTranscript}..."` : "बोलिए, सुन रहे हैं..."}
+                  </p>
+                </div>
+              )}
 
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={handleClose}
-                className="rounded-full p-1 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                title="बंद करें"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-          </div>
+              {/* Thinking state */}
+              {isThinking && (
+                <div className="flex items-center gap-2 text-cyan-300 font-medium py-1">
+                  <GeminiSparkleIcon size={16} className="animate-spin" />
+                  <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-amber-200 bg-clip-text text-transparent font-semibold">
+                    Gemini विचार कर रहा है...
+                  </span>
+                </div>
+              )}
 
-          {/* Dynamic Live Activity Box */}
-          <div className="rounded-2xl bg-slate-900/85 border border-slate-800/90 p-3 text-xs space-y-2">
-            {/* User prompt preview if any */}
-            {lastUserQuery && (
-              <div className="text-[10px] text-emerald-400 font-semibold truncate">
-                <span>आप: &ldquo;{lastUserQuery}&rdquo;</span>
-              </div>
-            )}
-
-            {/* Listening state with animated soundwave */}
-            {isListening && (
-              <div className="flex items-center gap-2.5 py-1">
-                <GeminiWaveform active variant="listening" className="shrink-0" />
-                <p className="text-xs text-emerald-300 font-medium italic truncate">
-                  {interimTranscript ? `"${interimTranscript}..."` : "बोलिए, सुन रहे हैं..."}
+              {/* Assistant response message */}
+              {!isListening && !isThinking && (
+                <p className="text-slate-200 text-xs leading-relaxed">
+                  {latestResponse}
                 </p>
-              </div>
-            )}
+              )}
 
-            {/* Thinking state */}
-            {isThinking && (
-              <div className="flex items-center gap-2 text-cyan-300 font-medium py-1">
-                <GeminiSparkleIcon size={16} className="animate-spin" />
-                <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-amber-200 bg-clip-text text-transparent font-semibold">
-                  Gemini विचार कर रहा है...
-                </span>
-              </div>
-            )}
+              {/* Speaking animation & stop button */}
+              {isSpeaking && (
+                <div className="flex items-center justify-between pt-1 border-t border-white/[0.08] text-[11px]">
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <GeminiWaveform active variant="speaking" className="scale-90" />
+                    <span className="text-[10px] text-slate-300 ml-1">असिस्टेंट बोल रहा है</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={stopSpeaking}
+                    className="text-[10px] font-bold text-rose-300 hover:text-white bg-rose-950/80 hover:bg-rose-900 px-2 py-0.5 rounded-lg border border-rose-700/80 transition-colors cursor-pointer active:scale-95"
+                  >
+                    रोकें (Stop)
+                  </button>
+                </div>
+              )}
+            </div>
 
-            {/* Assistant response message */}
-            {!isListening && !isThinking && (
-              <p className="text-slate-200 text-xs leading-relaxed">
-                {latestResponse}
-              </p>
-            )}
-
-            {/* Speaking animation & stop button */}
-            {isSpeaking && (
-              <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-[11px]">
-                <div className="flex items-center gap-1.5 text-emerald-400">
-                  <GeminiWaveform active variant="speaking" className="scale-90" />
-                  <span className="text-[10px] text-slate-300 ml-1">असिस्टेंट बोल रहा है</span>
+            {/* Active Listing Badge with Instant Photo Prompt */}
+            {confirmedListing && (
+              <div className="rounded-2xl border border-emerald-500/50 bg-emerald-950/40 p-2.5 flex items-center justify-between gap-2 shadow-xs animate-in zoom-in-95">
+                <div className="min-w-0 text-xs">
+                  <div className="flex items-center gap-1 text-emerald-400 font-bold truncate">
+                    <CheckCircle2 className="size-3.5 shrink-0" />
+                    <span className="truncate">{confirmedListing.crop} ({confirmedListing.quantityKg}{confirmedListing.unit})</span>
+                  </div>
+                  <span className="text-[10px] text-slate-300 block mt-0.5">
+                    ₹{confirmedListing.pricePerKg}/{confirmedListing.unit} • फॉर्म भर गया
+                  </span>
                 </div>
                 <button
                   type="button"
-                  onClick={stopSpeaking}
-                  className="text-[10px] font-bold text-rose-300 hover:text-white bg-rose-950/80 hover:bg-rose-900 px-2 py-0.5 rounded-lg border border-rose-700/80 transition-colors cursor-pointer"
+                  onClick={() => {
+                    router.push("/farmer");
+                    setTimeout(() => {
+                      document.getElementById("opencv-scanner")?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }, 800);
+                  }}
+                  className="shrink-0 flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 text-[10px] shadow-xs active:scale-95 transition-all"
                 >
-                  रोकें (Stop)
+                  <Camera className="size-3" />
+                  <span>फोटो जोड़ें</span>
                 </button>
               </div>
             )}
-          </div>
 
-          {/* Active Listing Badge with Instant Photo Prompt */}
-          {confirmedListing && (
-            <div className="rounded-2xl border border-emerald-500/50 bg-emerald-950/40 p-2.5 flex items-center justify-between gap-2 shadow-xs animate-in zoom-in-95">
-              <div className="min-w-0 text-xs">
-                <div className="flex items-center gap-1 text-emerald-400 font-bold truncate">
-                  <CheckCircle2 className="size-3.5 shrink-0" />
-                  <span className="truncate">{confirmedListing.crop} ({confirmedListing.quantityKg}{confirmedListing.unit})</span>
-                </div>
-                <span className="text-[10px] text-slate-300 block mt-0.5">
-                  ₹{confirmedListing.pricePerKg}/{confirmedListing.unit} • फॉर्म भर गया
-                </span>
+            {/* Minimal Quick Actions (4 Clean Pills) */}
+            <div className="space-y-1.5 pt-0.5">
+              <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold px-0.5">
+                <span>त्वरित सुझाव (Quick Actions):</span>
+                <span className="text-[9px] text-slate-500">क्लिक करें या बोलें</span>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  router.push("/farmer");
-                  setTimeout(() => {
-                    document.getElementById("opencv-scanner")?.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }, 800);
-                }}
-                className="shrink-0 flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 text-[10px] shadow-xs active:scale-95 transition-all"
-              >
-                <Camera className="size-3" />
-                <span>फोटो जोड़ें</span>
-              </button>
+              <div className="grid grid-cols-2 gap-1.5">
+                {quickActions.map((item, idx) => (
+                  <motion.button
+                    key={idx}
+                    type="button"
+                    whileTap={{ scale: 0.97 }}
+                    transition={appleSpringSnappy}
+                    onClick={() => processWithGemini(item.text)}
+                    className="rounded-xl border border-white/10 bg-white/5 hover:bg-emerald-900/40 hover:border-emerald-500/40 px-2.5 py-1.5 text-left text-[11px] font-medium text-slate-200 hover:text-white transition-all truncate group flex items-center justify-between"
+                  >
+                    <span className="truncate">{item.label}</span>
+                    <ArrowRight className="size-2.5 text-slate-500 group-hover:text-emerald-400 shrink-0 transition-transform group-hover:translate-x-0.5 ml-1" />
+                  </motion.button>
+                ))}
+              </div>
             </div>
-          )}
 
-          {/* Minimal Quick Actions (4 Clean Pills) */}
-          <div className="space-y-1.5 pt-0.5">
-            <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold px-0.5">
-              <span>त्वरित सुझाव (Quick Actions):</span>
-              <span className="text-[9px] text-slate-500">क्लिक करें या बोलें</span>
+            {/* 1-Tap Portal Switcher Row (Direct Page Navigation Control) */}
+            <div className="pt-2 border-t border-white/[0.08] space-y-1">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block px-0.5">
+                पेज पर जाएं (Page Navigation):
+              </span>
+              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+                {portals.map((p) => (
+                  <motion.button
+                    key={p.route}
+                    type="button"
+                    whileTap={{ scale: 0.96 }}
+                    transition={appleSpringSnappy}
+                    onClick={() => executeNavigation(p.route, p.nameHi, p.nameEn)}
+                    className="shrink-0 rounded-lg px-2 py-1 text-[10px] font-semibold bg-white/5 border border-white/10 hover:bg-emerald-900/50 hover:border-emerald-500/50 text-slate-300 hover:text-white transition-colors"
+                  >
+                    {p.label}
+                  </motion.button>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {quickActions.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => processWithGemini(item.text)}
-                  className="rounded-xl border border-slate-800/90 bg-slate-900/70 hover:bg-emerald-950/60 hover:border-emerald-700/60 px-2.5 py-1.5 text-left text-[11px] font-medium text-slate-200 hover:text-white transition-all truncate group flex items-center justify-between"
-                >
-                  <span className="truncate">{item.label}</span>
-                  <ArrowRight className="size-2.5 text-slate-500 group-hover:text-emerald-400 shrink-0 transition-transform group-hover:translate-x-0.5 ml-1" />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 1-Tap Portal Switcher Row (Direct Page Navigation Control) */}
-          <div className="pt-2 border-t border-slate-800/80 space-y-1">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block px-0.5">
-              पेज पर जाएं (Page Navigation):
-            </span>
-            <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-              {portals.map((p) => (
-                <button
-                  key={p.route}
-                  type="button"
-                  onClick={() => executeNavigation(p.route, p.nameHi, p.nameEn)}
-                  className="shrink-0 rounded-lg px-2 py-1 text-[10px] font-semibold bg-slate-900 border border-slate-800 hover:bg-emerald-900/50 hover:border-emerald-600 text-slate-300 hover:text-white transition-colors"
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 2. FLOATING AI ASSISTANT WIDGET (FAB & EXPANDED PILL) */}
       <div 

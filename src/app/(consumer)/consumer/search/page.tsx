@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Mic, MicOff, Search, Sparkles } from "lucide-react";
@@ -161,8 +162,15 @@ function SearchContent() {
         {items.map((p) => (
           <Link key={p.id} href={`/consumer/product/${p.id}`} className="group">
             <Card className="h-full overflow-hidden rounded-2xl border-slate-200 hover:border-emerald-300 transition-all shadow-xs group-hover:shadow-md">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.photos[0] || "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600"} alt="" className="h-40 w-full object-cover group-hover:scale-102 transition-transform" />
+              <div className="relative h-40 w-full overflow-hidden">
+                <Image
+                  src={p.photos[0] || "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600"}
+                  alt={`${p.crop} - Grade ${p.grade} farm produce`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
               <CardContent className="space-y-1.5 p-4">
                 <div className="flex items-center justify-between">
                   <p className="font-extrabold text-slate-900 text-base">{p.crop}</p>

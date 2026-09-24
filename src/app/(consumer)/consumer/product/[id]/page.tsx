@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { productApi } from "@/features/api";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="space-y-4 pb-20">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={product.photos[0]} alt="" className="h-52 w-full rounded-2xl object-cover md:h-72" />
+      <div className="relative h-52 w-full overflow-hidden rounded-2xl md:h-72">
+        <Image
+          src={product.photos[0] || "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600"}
+          alt={`${product.crop} ${product.variety} - Grade ${product.grade} farm produce`}
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 800px"
+          className="object-cover"
+        />
+      </div>
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl">{product.crop}</h1>

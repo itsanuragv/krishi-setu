@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   ExternalLink, 
   Mic, 
@@ -19,6 +20,12 @@ import {
   HeartHandshake
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { 
+  appleSpring, 
+  appleSpringSnappy, 
+  tabLayoutTransition, 
+  modalSpringVariants 
+} from "@/lib/animations";
 
 const PLATFORM_PILLARS = [
   {
@@ -58,64 +65,64 @@ const PLATFORM_PILLARS = [
       "Secure 4-Digit Handover PIN: डिलीवरी आने पर पहले सामान की जांच करें, संतुष्ट होने पर ही 4-अंकीय पिन देकर भुगतान पूरा करें।",
     ],
     techStack: "PostGIS Spatial Corridor Indexing • 5-Factor Algorithmic Match • Live Order Tracking",
-    ctaText: "उपभोक्ता बाज़ार देखें (Shop Consumer Produce)",
+    ctaText: "उपभोक्ता बाज़ार खोलें (Open Consumer Store)",
   },
   {
     step: 3,
     tabLabel: "🏢 Bulk Buyer (थोक खरीदार)",
-    title: "Bulk Buyers & Institutional B2B Procurement",
-    hindiTitle: "थोक खरीदार: रेस्टोरेंट, होटल एवं FPO से सीधी संस्थागत खरीद",
+    title: "Institutional Bulk Buyer Contracting & Escrow",
+    hindiTitle: "थोक खरीदार: बड़े अनुबंध, सुरक्षित एस्क्रो और गुणवत्ता गारंटी",
     route: "/buyer/dashboard",
     icon: Warehouse,
-    color: "from-indigo-600 to-blue-700",
-    badge: "FPO Multi-Ton Batching",
+    color: "from-amber-600 to-orange-700",
+    badge: "Smart Escrow + Digital Contracts",
     summary:
-      "होटल, रेस्टोरेंट (HoReCa), रिटेल किराना चेन और खाद्य प्रसंस्करण इकाइयों के लिए सीधे किसान उत्पादक संगठनों (FPO) से थोक खरीद।",
+      "प्रोसेसर्स, रिटेल चेन और HoReCa खरीदारों के लिए पारदर्शी मूल्य पर सीधे किसानों से थोक आपूर्ति अनुबंध और एस्क्रो पेमेंट सुरक्षा।",
     details: [
-      "Multi-Tonnage Batch Orders: सीधे FPO समूहों से टन में उपज की खरीद, जिससे निरंतर आपूर्ति सुनिश्चित होती है।",
-      "Digital Assayer Certificates: प्रत्येक थोक बैच के साथ प्रयोगशाला-सत्यापित क्वालिटी सर्टिफिकेट और डिजिटल जीएसटी चालान।",
-      "Volume Discount Pricing: पारदर्शी थोक दरें और निर्धारित समय-सारणी के अनुसार सीधे गोदाम तक डिलीवरी।",
+      "Multi-Farmer Lot Pooling: बड़ी मांग होने पर कई किसानों की उपज को मिलाकर एक सुसंगत बड़ा लॉट तैयार करने की सुविधा।",
+      "Tri-Party Smart Escrow: डिलीवरी स्वीकार होने और क्वालिटी पास होने तक खरीदार का पैसा सुरक्षित ट्रस्ट खाते में रहता है।",
+      "Digital Legal Contract: डिजिटल रूप से हस्ताक्षरित स्पष्ट नियम, जिसमें विवाद की स्थिति में स्वचालित मध्यस्थता का प्रावधान है।",
     ],
-    techStack: "B2B Procurement Engine • FPO Cluster Aggregation • Digital GST Billing",
-    ctaText: "थोक डैशबोर्ड खोलें (Open Bulk Buyer Portal)",
+    techStack: "Smart Escrow Vaults • Multi-Lot Pooling Engine • Digital Bill of Lading",
+    ctaText: "थोक खरीदार पोर्टल खोलें (Open Buyer Portal)",
   },
   {
     step: 4,
-    tabLabel: "🔒 Smart Escrow (सुरक्षित भुगतान)",
-    title: "Zero-Fraud Escrow & 4-Digit Delivery PIN",
-    hindiTitle: "सुरक्षित एस्क्रो: 100% सुरक्षित भुगतान एवं 4-अंकीय हैंडओवर पिन",
-    route: "/consumer",
-    icon: Lock,
-    color: "from-amber-600 to-orange-700",
-    badge: "100% Financial Protection",
+    tabLabel: "⚡ Direct Matching (एआई मिलान)",
+    title: "5-Factor Real-time Algorithmic Matching",
+    hindiTitle: "एआई मिलान: दूरी, गुणवत्ता, भाव और साख का सटीक विश्लेषण",
+    route: "/farmer/matches",
+    icon: Sparkles,
+    color: "from-blue-600 to-indigo-700",
+    badge: "5-Factor Algorithm",
     summary:
-      "उपभोक्ता और किसान दोनों के पैसों की 100% सुरक्षा — डिलीवरी की सफल पुष्टि होने तक राशि एस्क्रो में सुरक्षित रहती है।",
+      "किसान और खरीदार के बीच केवल दूरी नहीं, बल्कि 5 वैज्ञानिक कारकों (दूरी 30%, गुणवत्ता 25%, मूल्य 20%, साख 15%, मात्रा 10%) का विश्लेषण कर सबसे उपयुक्त मिलान।",
     details: [
-      "Buyer Protection: ऑर्डर करते समय पैसे सुरक्षित प्लेटफ़ॉर्म एस्क्रो में सुरक्षित रख लिए जाते हैं।",
-      "Secret 4-Digit PIN: डिलीवरी के समय खरीदार के मोबाइल पर एक गोपनीय 4-अंकीय पिन भेजा जाता है।",
-      "Instant UPI Settlement: उपभोक्ता द्वारा सामान देखकर पिन साझा करते ही भुगतान सीधे किसान के बैंक/यूपीआई खाते में ट्रांसफर हो जाता है।",
+      "Distance & Corridor Optimization (30% Weight): न्यूनतम परिवहन लागत और समय के आधार पर पास के खरीदार।",
+      "Quality Compatibility (25% Weight): खरीदार की आवश्यकता और किसान के OpenCV ग्रेड का सटीक मिलान।",
+      "Dynamic Pricing Overlap (20% Weight): मंडी भाव और दोनों पक्षों की सहमत रेंज का स्वतः तालमेल।",
     ],
-    techStack: "Smart Escrow Ledger • Instant UPI Transfer • Cryptographic PIN Auth",
-    ctaText: "एस्क्रो सुरक्षा नियम देखें (View Escrow Rules)",
+    techStack: "Spatial Haversine Matching • Multi-Criteria Scoring (0-100) • Automated Push Alerts",
+    ctaText: "मैचिंग स्कोर देखें (View Match Engine)",
   },
   {
     step: 5,
-    tabLabel: "🚚 Delivery (लॉजिस्टिक्स)",
-    title: "Hyperlocal Logistics & Fleet VRP Routing",
-    hindiTitle: "लॉजिस्टिक्स: खेतों से सीधी पिकअप एवं रूट ऑप्टिमाइजेशन",
+    tabLabel: "🚚 Fleet (लॉजिस्टिक्स)",
+    title: "Rural-Urban Hyperlocal Delivery Fleet",
+    hindiTitle: "लॉजिस्टिक्स: ग्रामीण से शहरी आपूर्ति और लाइव जीपीएस ट्रैकिंग",
     route: "/delivery",
     icon: Truck,
-    color: "from-purple-600 to-indigo-700",
-    badge: "OR-Tools Multi-Stop",
+    color: "from-purple-600 to-violet-700",
+    badge: "Hyperlocal Fleet Corridor",
     summary:
-      "खेतों से सीधी पिकअप और कम से कम समय में उपभोक्ताओं व दुकानों तक डिलीवरी के लिए ऑप्टिमाइज्ड रूटिंग।",
+      "ग्रामीण पिकअप से लेकर शहरी उपभोक्ता के घर तक सुरक्षित और समयबद्ध डिलीवरी सुनिश्चित करने वाला एकीकृत लॉजिस्टिक्स नेटवर्क।",
     details: [
-      "Vehicle Routing Optimization: पास-पास स्थित खेतों के लॉट को एक ही वाहन में लोड करके परिवहन लागत 28% कम की जाती है।",
-      "Compressed Transit: 48-72 घंटे की पारंपरिक ढुलाई को घटाकर 12-24 घंटे में बदला गया है, जिससे फसल खराब नहीं होती।",
-      "Transparent Driver Payouts: ड्राइवरों को प्रति किलोमीटर पारदर्शी भाड़ा और तुरंत डिजिटल भुगतान मिलता है।",
+      "Dynamic Route Optimization: कई खेतों से पिकअप करके एक ही ट्रिप में अधिकतम दक्षता के साथ डिलीवरी।",
+      "Live GPS & Status Milestones: 'खेत से लोड हुआ' -> 'ट्रांजिट में' -> 'डोरस्टेप पर' की रीयल-टाइम ट्रैकिंग।",
+      "Cryptographic Handover Verification: 4-अंकीय गुप्त पिन की पुष्टि के बिना डिलीवरी पूरी नहीं मानी जाती।",
     ],
-    techStack: "Google OR-Tools VRP • OpenStreetMap / Leaflet Interactive Routing",
-    ctaText: "डिलीवरी फ्लीट खोलें (Open Delivery Fleet)",
+    techStack: "Leaflet OpenStreetMap Routing • Cryptographic Delivery Handshake • Fleet Dispatch API",
+    ctaText: "डिलीवरी पोर्टल खोलें (Open Delivery Portal)",
   },
   {
     step: 6,
@@ -155,18 +162,34 @@ export function PlatformGuideModal({
   const Icon = currentPillar.icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-3 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-emerald-200 bg-white p-5 sm:p-8 shadow-2xl space-y-6">
-        
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="fixed inset-0 bg-slate-950/70 backdrop-blur-md"
+        onClick={onClose}
+      />
+
+      {/* Modal Surface Window: Apple VisionOS Layering */}
+      <motion.div
+        variants={modalSpringVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-black/[0.08] dark:border-white/[0.12] bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl p-5 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.18),inset_0_1px_1.5px_rgba(255,255,255,0.7)] space-y-6 z-10"
+      >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+        <div className="flex items-start justify-between border-b border-black/[0.06] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-500/20 shadow-2xs backdrop-blur-md">
                 <Sparkles className="size-3.5 text-emerald-600" />
                 Krishi Setu Guide (यह कैसे काम करता है)
               </span>
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+              <span className="rounded-full bg-black/[0.04] px-2.5 py-0.5 text-xs font-semibold text-slate-600">
                 Direct Farm-to-Buyer Highway
               </span>
             </div>
@@ -177,92 +200,114 @@ export function PlatformGuideModal({
               जानिए कृषि सेतु किसानों, उपभोक्ताओं, थोक खरीदारों और लॉजिस्टिक्स को कैसे आपस में जोड़ता है।
             </p>
           </div>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            transition={appleSpringSnappy}
             onClick={onClose}
             aria-label="Close platform guide"
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors touch-target"
+            className="rounded-xl p-2 text-slate-400 hover:bg-black/[0.04] hover:text-slate-700 transition-colors touch-target cursor-pointer"
           >
             <X className="size-5" />
-          </button>
+          </motion.button>
         </div>
 
-        {/* Actor Quick Jump Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+        {/* Actor Quick Jump Chips with Framer Motion layoutId Gliding Highlight */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
           <span className="text-slate-400 font-bold shrink-0 text-[11px] mr-1">भूमिका चुनें:</span>
-          {PLATFORM_PILLARS.map((pillar, idx) => (
-            <button
-              key={pillar.step}
-              type="button"
-              onClick={() => setActiveStep(idx)}
-              className={`shrink-0 rounded-xl px-3 py-1.5 font-bold transition-all text-xs border ${
-                activeStep === idx
-                  ? "bg-emerald-700 text-white border-emerald-700 shadow-xs"
-                  : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-emerald-50 hover:border-emerald-300"
-              }`}
-            >
-              {pillar.tabLabel}
-            </button>
-          ))}
+          {PLATFORM_PILLARS.map((pillar, idx) => {
+            const isSelected = activeStep === idx;
+            return (
+              <button
+                key={pillar.step}
+                type="button"
+                onClick={() => setActiveStep(idx)}
+                className={`relative shrink-0 rounded-xl px-3.5 py-1.5 font-bold text-xs select-none transition-colors duration-200 cursor-pointer ${
+                  isSelected
+                    ? "text-white"
+                    : "text-slate-700 hover:text-slate-900 hover:bg-black/[0.03]"
+                }`}
+              >
+                {isSelected && (
+                  <motion.div
+                    layoutId="guideModalActiveTab"
+                    className="absolute inset-0 rounded-xl bg-emerald-700 shadow-[0_2px_10px_rgba(5,150,105,0.3),inset_0_1px_1px_rgba(255,255,255,0.35)] -z-10"
+                    transition={tabLayoutTransition}
+                  />
+                )}
+                <span>{pillar.tabLabel}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Main Content Card */}
-        <div className="rounded-3xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6 space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3.5">
-              <div className={`flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${currentPillar.color} text-white shadow-md`}>
-                <Icon className="size-7" />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900">
-                    {currentPillar.title}
-                  </h3>
-                  <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 border border-emerald-300">
-                    {currentPillar.badge}
-                  </span>
+        {/* Main Content Card with Apple Spring Motion */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentPillar.step}
+            initial={{ opacity: 0, y: 10, scale: 0.99 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.99 }}
+            transition={appleSpring}
+            className="rounded-3xl border border-black/[0.06] bg-slate-50/80 p-5 sm:p-6 space-y-5 shadow-xs"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5">
+                <div className={`flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${currentPillar.color} text-white shadow-md`}>
+                  <Icon className="size-7" />
                 </div>
-                <p className="text-xs font-bold text-emerald-700 mt-0.5">
-                  {currentPillar.hindiTitle}
-                </p>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                      {currentPillar.title}
+                    </h3>
+                    <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 border border-emerald-300 shadow-2xs">
+                      {currentPillar.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs font-bold text-emerald-700 mt-0.5">
+                    {currentPillar.hindiTitle}
+                  </p>
+                </div>
+              </div>
+
+              <Button asChild size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold gap-1.5 self-start sm:self-auto rounded-xl shadow-xs">
+                <Link href={currentPillar.route} onClick={onClose}>
+                  <span>{currentPillar.ctaText}</span>
+                  <ExternalLink className="size-3.5" />
+                </Link>
+              </Button>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-black/[0.04] shadow-2xs">
+              {currentPillar.summary}
+            </p>
+
+            {/* Key Architectural Details */}
+            <div className="space-y-2 rounded-2xl bg-white/90 backdrop-blur-md p-4 sm:p-5 border border-black/[0.04] shadow-2xs">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                मुख्य विशेषताएं एवं कार्यप्रणाली (Key Steps & Features):
+              </h4>
+              <div className="space-y-2.5 pt-1.5">
+                {currentPillar.details.map((detail, dIdx) => (
+                  <div key={dIdx} className="flex items-start gap-2.5 text-xs text-slate-800 leading-relaxed">
+                    <CheckCircle2 className="size-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>{detail}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <Button asChild size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold gap-1.5 self-start sm:self-auto rounded-xl shadow-xs">
-              <Link href={currentPillar.route} onClick={onClose}>
-                <span>{currentPillar.ctaText}</span>
-                <ExternalLink className="size-3.5" />
-              </Link>
-            </Button>
-          </div>
-
-          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs">
-            {currentPillar.summary}
-          </p>
-
-          {/* Key Architectural Details */}
-          <div className="space-y-2 rounded-2xl bg-white p-4 sm:p-5 border border-slate-200/80 shadow-2xs">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              मुख्य विशेषताएं एवं कार्यप्रणाली (Key Steps & Features):
-            </h4>
-            <div className="space-y-2.5 pt-1.5">
-              {currentPillar.details.map((detail, dIdx) => (
-                <div key={dIdx} className="flex items-start gap-2.5 text-xs text-slate-800 leading-relaxed">
-                  <CheckCircle2 className="size-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>{detail}</span>
-                </div>
-              ))}
+            {/* Technical Blueprint Badge */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl bg-slate-900 text-emerald-100 px-4 py-2.5 text-xs shadow-inner">
+              <span className="font-bold text-emerald-400">तकनीकी स्टैक (Underlying Tech):</span>
+              <span className="font-mono text-[11px] text-slate-200">{currentPillar.techStack}</span>
             </div>
-          </div>
-
-          {/* Technical Blueprint Badge */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl bg-slate-900 text-emerald-100 px-4 py-2.5 text-xs">
-            <span className="font-bold text-emerald-400">तकनीकी स्टैक (Underlying Tech):</span>
-            <span className="font-mono text-[11px] text-slate-200">{currentPillar.techStack}</span>
-          </div>
-        </div>
+          </motion.div>
+        </AnimatePresence>
 
         {/* Footer Navigation */}
-        <div className="flex items-center justify-between border-t border-slate-100 pt-4">
+        <div className="flex items-center justify-between border-t border-black/[0.06] pt-4">
           <div className="text-xs font-bold text-slate-500">
             भाग {activeStep + 1} / {PLATFORM_PILLARS.length}: <span className="text-slate-800">{currentPillar.tabLabel}</span>
           </div>
@@ -297,7 +342,7 @@ export function PlatformGuideModal({
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

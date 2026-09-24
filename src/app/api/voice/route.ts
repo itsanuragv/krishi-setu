@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { rateLimiter, getClientIp, rateLimitExceededResponse } from "@/lib/rate-limit";
+import { sanitizeString } from "@/lib/sanitize";
 
 export interface VoiceMessageHistory {
   role: "user" | "model" | "assistant";
@@ -255,22 +257,33 @@ function fallbackRuleBased(text: string, lang: string): GeminiVoiceResponse {
 }
 
 export async function POST(req: Request) {
-  let speechText = "";
-  let speechLang = "hi-IN";
-
   try {
-    const body = await req.json();
-    speechText = body.text || "";
-    speechLang = body.language || "hi-IN";
-    const history: VoiceMessageHistory[] = body.history || [];
-
-    if (!speechText || typeof speechText !== "string") {
-      return NextResponse.json({ error: "Missing speech text" }, { status: 400 });
+    // 1. Rate Limiting: 30 voice requests per minute per IP
+    const clientIp = getClientIp(req);
+    const rateCheck = rateLimiter.check(`voice:${clientIp}`, 30, 60 * 1000);
+    if (!rateCheck.success) {
+      return rateLimitExceededResponse(rateCheck.reset, "Voice Assistant rate limit reached (30 req/min). Please try again in a moment.");
     }
 
-    const text = speechText;
-    const language = speechLang;
+    const body = await req.json();
+    const rawSpeechText = body.text || "";
+    const speechLang = sanitizeString(body.language, 10) || "hi-IN";
+    const rawHistory = Array.isArray(body.history) ? body.history : [];
 
+    // 2. Input Sanitization: strip script/HTML tags, enforce max 500 characters
+    const text = sanitizeString(rawSpeechText, 500);
+
+    if (!text) {
+      return NextResponse.json({ error: "Missing or invalid speech text" }, { status: 400 });
+    }
+
+    // 3. Bound Conversation History to prevent payload/token exhaustion DDoS (max 10 entries)
+    const history: VoiceMessageHistory[] = rawHistory.slice(-10).map((h: any) => ({
+      role: h.role === "user" ? "user" : "model",
+      text: sanitizeString(h.text, 300),
+    }));
+
+    const language = speechLang;
     const apiKey = process.env.GEMINI_API_KEY;
 
     // Fast local rule-based fallback if no API key

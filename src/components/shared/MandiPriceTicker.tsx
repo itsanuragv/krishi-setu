@@ -156,12 +156,12 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
 
   return (
     <div
-      className={`relative w-full border-b border-emerald-100/80 bg-white/85 backdrop-blur-md h-11 flex items-center overflow-hidden select-none ${className}`}
+      className={`relative w-full border-b border-black/[0.05] dark:border-white/[0.06] bg-white/75 dark:bg-zinc-900/60 backdrop-blur-xl h-11 flex items-center overflow-hidden select-none shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] ${className}`}
       role="region"
       aria-label="Live Mandi Price Benchmark Ticker"
     >
       {/* Fixed Left Badge: Minimal live pulsing indicator dot & quick sync button without space-hogging text */}
-      <div className="relative z-20 shrink-0 h-full flex items-center gap-1.5 sm:gap-2 bg-white/95 sm:bg-white/90 backdrop-blur-md px-2 sm:px-3 border-r border-emerald-100/80 shadow-[4px_0_12px_rgba(255,255,255,0.95)]">
+      <div className="relative z-20 shrink-0 h-full flex items-center gap-1.5 sm:gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl px-2 sm:px-3 border-r border-black/[0.06] dark:border-white/[0.08] shadow-[4px_0_12px_rgba(255,255,255,0.9)]">
         <span
           className="relative flex size-2 shrink-0 ml-0.5"
           title={language === "hi" ? "लाइव मंडी बेंचमार्क सक्रिय" : "Live Mandi Benchmark Active"}
@@ -181,7 +181,7 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
               ? `मंडी भाव अभी सिंक करें ${lastSynced ? `(अंतिम: ${lastSynced})` : ""}`
               : `Sync live Agmarknet prices ${lastSynced ? `(Last: ${lastSynced})` : ""}`
           }
-          className="inline-flex items-center gap-1 rounded-full bg-emerald-50 hover:bg-emerald-100/90 text-emerald-800 p-1 sm:px-2 sm:py-0.5 text-[10px] font-bold border border-emerald-200 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+          className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 p-1 sm:px-2.5 sm:py-0.5 text-[10px] font-bold border border-emerald-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-2xs"
         >
           <RefreshCw
             className={`size-3 text-emerald-700 shrink-0 ${
@@ -189,7 +189,7 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
             }`}
           />
           {lastSynced && !isSyncing && (
-            <span className="hidden sm:inline text-[9px] text-emerald-600 font-normal">
+            <span className="hidden sm:inline text-[9px] text-emerald-700 font-semibold">
               {lastSynced}
             </span>
           )}
@@ -214,10 +214,10 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
             return (
               <div
                 key={idx}
-                className="bg-emerald-50/70 border border-emerald-200/60 rounded-full px-3 py-1 flex items-center gap-2 text-xs shrink-0 shadow-2xs hover:bg-emerald-100/70 transition-colors"
+                className="bg-white/80 dark:bg-zinc-800/80 border border-black/[0.06] dark:border-white/[0.08] backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-2 text-xs shrink-0 shadow-[0_1px_3px_rgba(0,0,0,0.03),inset_0_1px_0.5px_rgba(255,255,255,0.8)] hover:bg-emerald-50/80 hover:border-emerald-300/60 transition-all duration-200 cursor-pointer"
                 title={item.market ? `Market: ${item.market}` : undefined}
               >
-                <span className="text-slate-800 font-medium whitespace-nowrap">
+                <span className="text-slate-800 font-semibold whitespace-nowrap">
                   {cropName}
                 </span>
                 <div className="flex items-center gap-1.5 text-[11px] whitespace-nowrap">
@@ -226,11 +226,11 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
                     {item.mandi}
                   </span>
                 </div>
-                <span className="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-full text-[10px] whitespace-nowrap">
+                <span className="bg-emerald-500/15 text-emerald-800 font-bold px-1.5 py-0.5 rounded-full text-[10px] whitespace-nowrap border border-emerald-500/20">
                   {saving}
                 </span>
                 {item.market && (
-                  <span className="hidden lg:inline text-[9px] text-slate-500 font-medium bg-white/70 px-1.5 py-0.5 rounded-md border border-slate-200/60 whitespace-nowrap">
+                  <span className="hidden lg:inline text-[9px] text-slate-500 font-medium bg-black/[0.03] px-1.5 py-0.5 rounded-md border border-black/[0.04] whitespace-nowrap">
                     📍 {item.market}
                   </span>
                 )}

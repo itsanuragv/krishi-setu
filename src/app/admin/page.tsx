@@ -39,10 +39,10 @@ export default function AdminGovernancePage() {
 
       <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Header & DPDP Act 2023 Compliance Pill */}
-        <section className="glass rounded-3xl border border-rose-200/80 p-4 sm:p-6 shadow-sm">
+        <section className="apple-glass rounded-3xl p-4 sm:p-6 shadow-xs rim-light border border-rose-500/20">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-600 to-red-800 text-white shadow-md shrink-0">
+              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-600 to-red-800 text-white shadow-md shrink-0 rim-light">
                 <ShieldCheck className="size-6 sm:size-7" />
               </div>
               <div>
@@ -61,7 +61,7 @@ export default function AdminGovernancePage() {
             </div>
 
             {/* DPDP Act Compliance Badge */}
-            <div className="flex items-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 shadow-xs text-xs self-start md:self-auto">
+            <div className="flex items-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 shadow-xs text-xs self-start md:self-auto rim-light">
               <FileCheck className="size-4 text-emerald-600 shrink-0" />
               <div>
                 <span className="text-[10px] uppercase font-bold text-emerald-800">{t("admin_data_governance")}</span>
@@ -73,7 +73,7 @@ export default function AdminGovernancePage() {
 
         {/* Platform Governance & Impact Metrics Dashboard */}
         <section className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
-          <div className="glass rounded-2xl sm:rounded-3xl border border-emerald-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+          <div className="apple-glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs rim-light space-y-1.5 sm:space-y-2 hover:scale-[1.015] transition-all">
             <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
               <span>{t("admin_kpi_gmv_title")}</span>
               <Lock className="size-3.5 sm:size-4 text-emerald-600" />
@@ -82,7 +82,7 @@ export default function AdminGovernancePage() {
             <p className="text-[11px] sm:text-xs font-semibold text-emerald-700">{t("admin_kpi_gmv_sub")}</p>
           </div>
 
-          <div className="glass rounded-2xl sm:rounded-3xl border border-teal-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+          <div className="apple-glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs rim-light space-y-1.5 sm:space-y-2 hover:scale-[1.015] transition-all">
             <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
               <span>{t("admin_kpi_spoilage_title")}</span>
               <TrendingUp className="size-3.5 sm:size-4 text-teal-600" />
@@ -91,7 +91,7 @@ export default function AdminGovernancePage() {
             <p className="text-[11px] sm:text-xs font-semibold text-teal-700">{t("admin_kpi_spoilage_sub")}</p>
           </div>
 
-          <div className="glass rounded-2xl sm:rounded-3xl border border-blue-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+          <div className="apple-glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs rim-light space-y-1.5 sm:space-y-2 hover:scale-[1.015] transition-all">
             <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
               <span>{t("admin_kpi_nodes_title")}</span>
               <Sparkles className="size-3.5 sm:size-4 text-blue-600" />
@@ -100,7 +100,7 @@ export default function AdminGovernancePage() {
             <p className="text-[11px] sm:text-xs font-semibold text-blue-700">{t("admin_kpi_nodes_sub")}</p>
           </div>
 
-          <div className="glass rounded-2xl sm:rounded-3xl border border-purple-200 p-4 sm:p-5 shadow-xs space-y-1.5 sm:space-y-2">
+          <div className="apple-glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs rim-light space-y-1.5 sm:space-y-2 hover:scale-[1.015] transition-all">
             <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500">
               <span>{t("admin_kpi_speed_title")}</span>
               <Clock className="size-3.5 sm:size-4 text-purple-600" />
@@ -111,7 +111,7 @@ export default function AdminGovernancePage() {
         </section>
 
         {/* Dispute Workspace: Split-Screen Evidence View */}
-        <section className="glass rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-8 shadow-sm space-y-6">
+        <section className="apple-glass-elevated rounded-3xl p-5 sm:p-8 shadow-xs space-y-6 rim-light-lg">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <div className="flex items-center gap-2">

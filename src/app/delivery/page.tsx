@@ -104,7 +104,7 @@ export default function DeliveryPortalPage() {
 
       <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Fleet & Route Header */}
-        <section className="glass rounded-3xl border border-purple-200/80 p-4 sm:p-6 shadow-sm">
+        <section className="apple-glass rounded-3xl p-4 sm:p-6 shadow-xs rim-light border border-purple-500/20">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-md shrink-0">
@@ -160,7 +160,7 @@ export default function DeliveryPortalPage() {
         <section className="grid gap-8 lg:grid-cols-12">
           {/* Left Column: OR-Tools Timeline (7 Cols) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="glass rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-sm space-y-6">
+            <div className="apple-glass-elevated rounded-3xl p-6 sm:p-7 shadow-xs space-y-6 rim-light-lg">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
                   <h2 className="text-lg font-extrabold text-slate-900">
@@ -242,7 +242,7 @@ export default function DeliveryPortalPage() {
 
           {/* Right Column: 4-digit PIN Handover Settlement (5 Cols) */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="glass rounded-3xl border border-emerald-300 bg-white p-6 shadow-md space-y-6">
+            <div className="apple-glass-elevated rounded-3xl p-6 shadow-md space-y-6 rim-light-lg">
               <div className="flex items-center gap-3 border-b border-emerald-100 pb-4">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
                   <KeyRound className="size-5" />

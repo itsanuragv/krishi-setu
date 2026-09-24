@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { rateLimiter, getClientIp, rateLimitExceededResponse } from "@/lib/rate-limit";
+import { sanitizeString, isSafeRemoteUrl, validateBase64Image } from "@/lib/sanitize";
 
 export interface CropGradingResult {
   cropName: string;
@@ -287,34 +289,49 @@ function fallbackGrading(cropHint?: string, lang: string = "hi"): CropGradingRes
 
 export async function POST(req: Request) {
   try {
+    // 1. Rate Limiting: 15 requests per minute per IP
+    const clientIp = getClientIp(req);
+    const rateCheck = rateLimiter.check(`crop-grade:${clientIp}`, 15, 60 * 1000);
+    if (!rateCheck.success) {
+      return rateLimitExceededResponse(rateCheck.reset, "AI Crop Grading rate limit reached (15 req/min). Please try again shortly.");
+    }
+
     const body = await req.json();
-    const { imageBase64, imageUrl, cropHint, language = "hi" } = body;
+    const rawImageBase64 = body.imageBase64;
+    const rawImageUrl = body.imageUrl;
+    const cropHint = sanitizeString(body.cropHint, 80);
+    const language = sanitizeString(body.language, 10) || "hi";
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Prepare image payload
+    // Prepare image payload safely
     let mimeType = "image/jpeg";
     let base64Data = "";
 
-    if (imageBase64 && typeof imageBase64 === "string") {
-      const match = imageBase64.match(/^data:(image\/[a-zA-Z0-9.+]+);base64,(.+)$/);
-      if (match) {
-        mimeType = match[1];
-        base64Data = match[2];
-      } else {
-        base64Data = imageBase64.replace(/^data:.*,/, "");
+    if (rawImageBase64 && typeof rawImageBase64 === "string") {
+      const validated = validateBase64Image(rawImageBase64, 8 * 1024 * 1024);
+      if (validated.valid) {
+        mimeType = validated.mimeType;
+        base64Data = validated.base64;
       }
-    } else if (imageUrl && typeof imageUrl === "string" && !imageUrl.startsWith("blob:")) {
-      try {
-        const fetchRes = await fetch(imageUrl);
-        if (fetchRes.ok) {
-          const contentType = fetchRes.headers.get("content-type");
-          if (contentType) mimeType = contentType;
-          const arrayBuffer = await fetchRes.arrayBuffer();
-          base64Data = Buffer.from(arrayBuffer).toString("base64");
+    } else if (rawImageUrl && typeof rawImageUrl === "string" && !rawImageUrl.startsWith("blob:")) {
+      // 2. SSRF Protection: only fetch validated safe public URLs
+      if (isSafeRemoteUrl(rawImageUrl)) {
+        try {
+          const fetchRes = await fetch(rawImageUrl, {
+            signal: AbortSignal.timeout(5000), // 5s timeout
+          });
+          if (fetchRes.ok) {
+            const contentType = fetchRes.headers.get("content-type");
+            if (contentType && contentType.startsWith("image/")) mimeType = contentType;
+            const arrayBuffer = await fetchRes.arrayBuffer();
+            if (arrayBuffer.byteLength <= 8 * 1024 * 1024) {
+              base64Data = Buffer.from(arrayBuffer).toString("base64");
+            }
+          }
+        } catch (fetchErr) {
+          console.warn("Could not fetch remote imageUrl for Gemini grading:", fetchErr);
         }
-      } catch (fetchErr) {
-        console.warn("Could not fetch remote imageUrl for Gemini grading:", fetchErr);
       }
     }
 
