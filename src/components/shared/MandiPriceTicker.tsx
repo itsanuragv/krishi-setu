@@ -160,8 +160,8 @@ export function MandiPriceTicker({ className = "" }: { className?: string }) {
       role="region"
       aria-label="Live Mandi Price Benchmark Ticker"
     >
-      {/* Fixed Left Badge (Anchor) with Live Status & Manual Sync Button */}
-      <div className="relative z-20 shrink-0 h-full flex items-center gap-2 bg-white/95 sm:bg-white/90 backdrop-blur-md px-2.5 sm:px-4 border-r border-emerald-100/80 shadow-[6px_0_16px_rgba(255,255,255,0.95)]">
+      {/* Fixed Left Badge (Anchor) with Live Status & Manual Sync Button - Hidden on mobile so ticker gets 100% full width */}
+      <div className="hidden sm:flex relative z-20 shrink-0 h-full items-center gap-2 bg-white/95 sm:bg-white/90 backdrop-blur-md px-2.5 sm:px-4 border-r border-emerald-100/80 shadow-[6px_0_16px_rgba(255,255,255,0.95)]">
         <span className="relative flex size-2 shrink-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />

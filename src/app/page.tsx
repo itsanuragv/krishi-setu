@@ -304,15 +304,13 @@ export default function HomePage() {
           <div className="text-center space-y-1">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/90 px-3 py-1 text-xs font-bold text-emerald-900 border border-emerald-200">
               <Compass className="size-3.5 text-emerald-700" />
-              <span>{language === "hi" ? "कार्यप्रणाली (How It Works)" : "How It Works"}</span>
+              <span>{t("how_it_works_badge")}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-              {language === "hi" ? "खेत से रसोई तक: सीधा डिजिटल मार्ग" : "From Farm Gate to Kitchen in 3 Steps"}
+              {t("how_it_works_title")}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
-              {language === "hi" 
-                ? "बिना बिचौलियों के — किसान, उपभोक्ता और डिलीवरी नेटवर्क कैसे आपस में जुड़ते हैं"
-                : "Connecting farmers, consumers, and delivery partners with zero middlemen markups"}
+              {t("how_it_works_sub")}
             </p>
           </div>
 
@@ -334,19 +332,19 @@ export default function HomePage() {
                   1
                 </span>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  🌾 किसान (Farmer)
+                  {t("how_step1_badge")}
                 </span>
               </div>
-              <h3 className="text-base font-bold text-slate-900">बोलकर लिस्टिंग व एआई क्वालिटी जांच</h3>
+              <h3 className="text-base font-bold text-slate-900">{t("how_step1_title")}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                किसान अपनी भाषा में बोलकर फसल, मात्रा और भाव तय करते हैं। मोबाइल कैमरे से ऑन-डिवाइस OpenCV ग्रेड A/B/C की तुरंत जांच होती है।
+                {t("how_step1_desc")}
               </p>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                 <Link href="/farmer" className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800 transition-colors">
-                  <span>किसान पोर्टल</span>
+                  <span>{t("how_step1_link")}</span>
                   <ArrowRight className="size-3.5" />
                 </Link>
-                <span className="text-[10px] text-emerald-600 font-semibold">0% आढ़त कटौती</span>
+                <span className="text-[10px] text-emerald-600 font-semibold">{t("how_step1_tag")}</span>
               </div>
             </motion.div>
 
@@ -361,19 +359,19 @@ export default function HomePage() {
                   2
                 </span>
                 <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
-                  🛒 उपभोक्ता (Consumer)
+                  {t("how_step2_badge")}
                 </span>
               </div>
-              <h3 className="text-base font-bold text-slate-900">&lt;25km ताज़ा खोज व 30-40% बचत</h3>
+              <h3 className="text-base font-bold text-slate-900">{t("how_step2_title")}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                उपभोक्ता अपने पास के खेतों से 12 घंटे में कटी ताज़ा फसलें सीधे फार्म-गेट भाव पर खरीदते हैं। खरीदने से पहले एआई ग्रेड व शेल्फ लाइफ दिखती है।
+                {t("how_step2_desc")}
               </p>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                 <Link href="/consumer" className="inline-flex items-center gap-1 font-bold text-teal-700 hover:text-teal-800 transition-colors">
-                  <span>उपभोक्ता बाज़ार</span>
+                  <span>{t("how_step2_link")}</span>
                   <ArrowRight className="size-3.5" />
                 </Link>
-                <span className="text-[10px] text-teal-600 font-semibold">30-40% सीधी बचत</span>
+                <span className="text-[10px] text-teal-600 font-semibold">{t("how_step2_tag")}</span>
               </div>
             </motion.div>
 
@@ -388,12 +386,12 @@ export default function HomePage() {
                   3
                 </span>
                 <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                  🔒 सुरक्षित एस्क्रो व डिलीवरी
+                  {t("how_step3_badge")}
                 </span>
               </div>
-              <h3 className="text-base font-bold text-slate-900">4-अंकीय पिन से सुरक्षित हैंडओवर</h3>
+              <h3 className="text-base font-bold text-slate-900">{t("how_step3_title")}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                रुपये सुरक्षित एस्क्रो में रहते हैं। उपभोक्ता द्वारा दरवाज़े पर सामान देखकर 4-अंकीय पिन साझा करने पर ही किसान को तुरंत यूपीआई भुगतान मिलता है।
+                {t("how_step3_desc")}
               </p>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                 <button
@@ -401,10 +399,10 @@ export default function HomePage() {
                   onClick={() => setGuideModalOpen(true)}
                   className="inline-flex items-center gap-1 font-bold text-amber-700 hover:text-amber-800 transition-colors cursor-pointer"
                 >
-                  <span>विस्तृत गाइड देखें</span>
+                  <span>{t("how_step3_link")}</span>
                   <ArrowRight className="size-3.5" />
                 </button>
-                <span className="text-[10px] text-amber-600 font-semibold">100% सुरक्षित भुगतान</span>
+                <span className="text-[10px] text-amber-600 font-semibold">{t("how_step3_tag")}</span>
               </div>
             </motion.div>
           </motion.div>

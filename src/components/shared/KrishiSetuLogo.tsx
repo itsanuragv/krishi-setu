@@ -35,7 +35,7 @@ export function KrishiSetuLogo({
       </div>
 
       {showText && (
-        <div className="flex flex-col leading-none">
+        <div className="flex flex-col leading-normal overflow-visible">
           <span className={textClassName}>Kisan Setu</span>
           <span className={subtextClassName}>कृषि सेतु • Bharat Agri</span>
         </div>

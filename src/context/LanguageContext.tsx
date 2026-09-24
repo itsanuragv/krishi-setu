@@ -406,7 +406,81 @@ export const TRANSLATIONS: Translations = {
   crop_capsicum: { en: "Pioneer Hybrid Yellow Maize", hi: "देशी पीला मक्का (कॉर्न)" },
   crop_potato: { en: "Desi Pearl Millet (Bajra)", hi: "देशी बाजरा (श्री अन्न)" },
   lower_label: { en: "Lower", hi: "सस्ता" },
-  realization_label: { en: "Realization", hi: "अधिक लाभ" },
+  // How Krishi Setu Works: 3 Steps
+  how_it_works_badge: {
+    en: "How It Works",
+    hi: "कार्यप्रणाली (How It Works)",
+  },
+  how_it_works_title: {
+    en: "From Farm Gate to Kitchen: Direct Digital Highway",
+    hi: "खेत से रसोई तक: सीधा डिजिटल मार्ग",
+  },
+  how_it_works_sub: {
+    en: "Zero middlemen markups — seamless direct highway connecting farmers, consumers, and delivery partners",
+    hi: "बिना बिचौलियों के — किसान, उपभोक्ता और डिलीवरी नेटवर्क कैसे आपस में जुड़ते हैं",
+  },
+  how_step1_badge: {
+    en: "🌾 Farmer",
+    hi: "🌾 किसान (Farmer)",
+  },
+  how_step1_title: {
+    en: "Voice-Assisted Listing & AI Quality QC",
+    hi: "बोलकर लिस्टिंग व एआई क्वालिटी जांच",
+  },
+  how_step1_desc: {
+    en: "Farmers speak in their local dialect to set crop, quantity, and price. On-device camera pre-check instantly validates Grade A/B/C quality.",
+    hi: "किसान अपनी भाषा में बोलकर फसल, मात्रा और भाव तय करते हैं। मोबाइल कैमरे से ऑन-डिवाइस OpenCV ग्रेड A/B/C की तुरंत जांच होती है।",
+  },
+  how_step1_link: {
+    en: "Farmer Portal",
+    hi: "किसान पोर्टल",
+  },
+  how_step1_tag: {
+    en: "0% Commission Deduction",
+    hi: "0% आढ़त कटौती",
+  },
+
+  how_step2_badge: {
+    en: "🛒 Consumer",
+    hi: "🛒 उपभोक्ता (Consumer)",
+  },
+  how_step2_title: {
+    en: "<25km Hyperlocal Discovery & 30-40% Savings",
+    hi: "<25km ताज़ा खोज व 30-40% बचत",
+  },
+  how_step2_desc: {
+    en: "Consumers discover farm produce harvested <12h ago directly at farm-gate rates with certified AI grade and transparent shelf-life.",
+    hi: "उपभोक्ता अपने पास के खेतों से 12 घंटे में कटी ताज़ा फसलें सीधे फार्म-गेट भाव पर खरीदते हैं। खरीदने से पहले एआई ग्रेड व शेल्फ लाइफ दिखती है।",
+  },
+  how_step2_link: {
+    en: "Consumer Marketplace",
+    hi: "उपभोक्ता बाज़ार",
+  },
+  how_step2_tag: {
+    en: "30-40% Direct Savings",
+    hi: "30-40% सीधी बचत",
+  },
+
+  how_step3_badge: {
+    en: "🔒 Secure Escrow & Logistics",
+    hi: "🔒 सुरक्षित एस्क्रो व डिलीवरी",
+  },
+  how_step3_title: {
+    en: "4-Digit PIN Handover & Direct UPI Release",
+    hi: "4-अंकीय पिन से सुरक्षित हैंडओवर",
+  },
+  how_step3_desc: {
+    en: "Funds stay locked in smart escrow. Upon doorstep inspection and 4-digit PIN handover, the farmer receives instant direct UPI payout.",
+    hi: "रुपये सुरक्षित एस्क्रो में रहते हैं। उपभोक्ता द्वारा दरवाज़े पर सामान देखकर 4-अंकीय पिन साझा करने पर ही किसान को तुरंत यूपीआई भुगतान मिलता है।",
+  },
+  how_step3_link: {
+    en: "View Detailed Architecture",
+    hi: "विस्तृत गाइड देखें",
+  },
+  how_step3_tag: {
+    en: "100% Protected Payout",
+    hi: "100% सुरक्षित भुगतान",
+  },
 
   // Ecosystem Portals
   ecosystem_title: {

@@ -66,18 +66,18 @@ export function Navbar({ hideTicker = false }: { hideTicker?: boolean }) {
         <div className="mx-auto flex h-[72px] sm:h-[76px] max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8 border-b border-emerald-100/70">
           {/* Brand Logo with Krishi Setu Emblem */}
           <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
-            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group touch-target min-w-0">
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group touch-target min-w-0 overflow-visible">
               <KrishiSetuLogo size={42} className="size-9 sm:size-11 shrink-0" />
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="font-black text-base sm:text-xl tracking-tight text-slate-900 leading-none truncate">
+              <div className="flex flex-col min-w-0 justify-center py-1 overflow-visible">
+                <div className="flex items-center gap-1.5 min-w-0 overflow-visible">
+                  <span className="font-black text-base sm:text-xl text-slate-900 leading-normal py-0.5 tracking-normal whitespace-nowrap overflow-visible">
                     {t("brand_title")}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-bold text-emerald-600 hidden xs:inline shrink-0">
+                  <span className="text-[11px] sm:text-xs font-bold text-emerald-700 leading-normal py-0.5 hidden xs:inline shrink-0 overflow-visible">
                     {t("brand_hindi")}
                   </span>
                 </div>
-                <span className="text-xs font-medium text-slate-500 tracking-tight leading-normal mt-0.5 hidden sm:inline truncate">
+                <span className="text-xs font-medium text-slate-500 tracking-normal leading-normal hidden sm:inline truncate">
                   {t("brand_subtitle")}
                 </span>
               </div>
