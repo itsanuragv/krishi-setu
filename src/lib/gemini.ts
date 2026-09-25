@@ -1,5 +1,3 @@
-import "server-only";
-
 /**
  * Google AI Studio (Gemini API) Integration
  * Provides intelligent vernacular voice command parsing and crop quality reasoning.

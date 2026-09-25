@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { rateLimiter, getClientIp, rateLimitExceededResponse } from "@/lib/rate-limit";
 
 export interface LiveCropBenchmark {
   cropEn: string;
@@ -94,23 +93,8 @@ const TARGET_CROPS = [
 ];
 
 export async function GET(request: Request) {
-  const clientIp = getClientIp(request);
   const { searchParams } = new URL(request.url);
   const forceRefresh = searchParams.get("refresh") === "true";
-
-  // Rate Limiting: 60 req/min for cached reads, 5 req/min for forceRefresh
-  const limit = forceRefresh ? 5 : 60;
-  const key = `mandi:${clientIp}:${forceRefresh ? "refresh" : "read"}`;
-  const rateCheck = rateLimiter.check(key, limit, 60 * 1000);
-  if (!rateCheck.success) {
-    return rateLimitExceededResponse(
-      rateCheck.reset,
-      forceRefresh 
-        ? "Mandi sync rate limit reached (5 refreshes/min). Please try again in a minute." 
-        : "Mandi price query limit reached (60 req/min). Please try again shortly."
-    );
-  }
-
   const now = Date.now();
 
   // Return cached result if valid and not force-refreshing

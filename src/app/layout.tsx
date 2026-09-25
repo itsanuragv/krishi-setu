@@ -31,13 +31,17 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://krishi-setu-lovat.vercel.app"),
-  title: {
-    default: "Krishi Setu (कृषि सेतु) | Bharat's Direct Farm-to-Buyer Digital Highway",
-    template: "%s | Krishi Setu (कृषि सेतु)",
-  },
+  title: "Krishi Setu (कृषि सेतु) | Bharat's Direct Farm-to-Buyer Digital Highway",
   description:
     "Direct farm-to-kitchen digital marketplace connecting smallholder farmers with consumers, retail grocers, and HoReCa buyers with vernacular voice AI, OpenCV quality pre-check, and smart escrow payments.",
+  icons: {
+    icon: [
+      { url: "/kisan-setu-emblem.png", type: "image/png" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/kisan-setu-emblem.png",
+    apple: "/kisan-setu-emblem.png",
+  },
   keywords: [
     "Krishi Setu",
     "कृषि सेतु",
@@ -48,68 +52,14 @@ export const metadata: Metadata = {
     "FPO procurement",
     "mandi rates",
     "hyperlocal agritech",
-    "fresh vegetables India",
-    "organic produce direct",
-    "Agmarknet prices live",
   ],
-  authors: [{ name: "Krishi Setu Network", url: "https://krishi-setu-lovat.vercel.app" }],
-  creator: "Krishi Setu Team",
-  publisher: "Krishi Setu Network",
-  formatDetection: {
-    email: false,
-    address: true,
-    telephone: true,
-  },
-  alternates: {
-    canonical: "/",
-    languages: {
-      "en-IN": "/",
-      "hi-IN": "/",
-    },
-  },
+  authors: [{ name: "Krishi Setu Network" }],
   openGraph: {
     title: "Krishi Setu (कृषि सेतु) — Direct Farm-to-Buyer Marketplace",
     description:
       "Empowering Indian farmers with direct farm-gate sales, OpenCV quality grading, and guaranteed UPI escrow settlement.",
-    url: "https://krishi-setu-lovat.vercel.app",
-    siteName: "Krishi Setu (कृषि सेतु)",
-    images: [
-      {
-        url: "/kisan-setu-emblem.png",
-        width: 800,
-        height: 800,
-        alt: "Krishi Setu Emblem & Agri Network",
-      },
-    ],
-    locale: "en_IN",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Krishi Setu (कृषि सेतु) — Direct Farm-to-Buyer Marketplace",
-    description:
-      "Direct farm-to-kitchen marketplace connecting smallholder farmers with buyers via voice AI, OpenCV grading, and UPI escrow.",
-    images: ["/kisan-setu-emblem.png"],
-    creator: "@KrishiSetu",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  icons: {
-    icon: [
-      { url: "/kisan-setu-emblem.png", type: "image/png" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    shortcut: "/kisan-setu-emblem.png",
-    apple: "/kisan-setu-emblem.png",
+    locale: "en_IN",
   },
 };
 

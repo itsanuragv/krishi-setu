@@ -26,7 +26,7 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/shared/Navbar";
 import { MatchScoreModal } from "@/components/shared/MatchScoreModal";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
-import { cardHover, staggerContainer, tabLayoutTransition, appleSpringSnappy, modalSpringVariants } from "@/lib/animations";
+import { cardHover, staggerContainer } from "@/lib/animations";
 import { getSpeechRecognition, type SpeechRecognitionEvent } from "@/lib/speech-types";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -306,8 +306,8 @@ export default function ConsumerPortalPage() {
         </section>
 
         {/* Hyperlocal Proximity Slider & Category Filters (Phase 4 Masterplan) */}
-        <section className="apple-glass rounded-3xl p-6 shadow-xs space-y-6 rim-light">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-black/[0.05] dark:border-white/[0.08] pb-5">
+        <section className="glass rounded-3xl border border-emerald-200/90 bg-white/95 p-6 shadow-sm space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-emerald-100 pb-5">
             {/* Proximity Slider */}
             <div className="flex-1 max-w-xl space-y-2">
               <div className="flex items-center justify-between">
@@ -345,29 +345,21 @@ export default function ConsumerPortalPage() {
               </div>
             </div>
 
-            {/* Category Filter Pills with Apple Gliding Highlight */}
-            <div className="flex flex-wrap gap-1 p-1 rounded-2xl bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] backdrop-blur-md">
-              {CATEGORIES.map((cat) => {
-                const isActive = selectedCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`relative rounded-xl px-4 py-2 text-xs font-bold transition-colors cursor-pointer select-none active:scale-95 ${
-                      isActive ? "text-white" : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="consumerCategoryIndicator"
-                        className="absolute inset-0 rounded-xl bg-emerald-600 shadow-sm rim-light"
-                        transition={tabLayoutTransition}
-                      />
-                    )}
-                    <span className="relative z-10">{cat.label}</span>
-                  </button>
-                );
-              })}
+            {/* Category Filter Pills */}
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                    selectedCategory === cat.id
+                      ? "bg-emerald-600 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -384,7 +376,7 @@ export default function ConsumerPortalPage() {
                 variants={cardHover}
                 initial="rest"
                 whileHover="hover"
-                className="apple-glass-elevated flex flex-col justify-between rounded-3xl p-5 shadow-xs transition-all space-y-4 rim-light"
+                className="glass flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all space-y-4"
               >
                 <div className="space-y-3">
                   {/* Image & Match Badge */}
@@ -504,19 +496,8 @@ export default function ConsumerPortalPage() {
         {/* Escrow Lock Simulation Sheet / Modal (Phase 4 Masterplan) */}
         <AnimatePresence>
           {escrowListing && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
-            >
-              <motion.div
-                variants={modalSpringVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="apple-glass-elevated relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-6 sm:p-7 rim-light-lg"
-              >
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="glass relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-emerald-300 bg-white p-6 shadow-2xl space-y-6 sm:p-7">
                 {/* Header */}
                 <div className="flex items-start justify-between border-b border-emerald-100 pb-4">
                   <div className="flex items-center gap-3">
@@ -643,8 +624,8 @@ export default function ConsumerPortalPage() {
                     </div>
                   </div>
                 )}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           )}
         </AnimatePresence>
       </main>

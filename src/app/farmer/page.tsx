@@ -27,29 +27,14 @@ import {
   X,
   ArrowRight
 } from "lucide-react";
-import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Navbar } from "@/components/shared/Navbar";
+import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan";
 import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
-import type { CropGradingData } from "@/components/shared/OpenCVScan";
-
-const OpenCVScan = dynamic(
-  () => import("@/components/shared/OpenCVScan").then((mod) => mod.OpenCVScan),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-64 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/50 p-6 text-center">
-        <div className="size-8 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin mb-3" />
-        <p className="text-sm font-semibold text-emerald-800">Initializing OpenCV AI Edge Assayer…</p>
-        <p className="text-xs text-slate-500 mt-1">Calibrating RGB colorimetry and edge-defect neural networks</p>
-      </div>
-    ),
-  }
-);
 
 // Crop quick presets organized by category - Focus on major Field Crops, Grains, Millets & Oilseeds
 const CROP_PRESETS = [
@@ -420,25 +405,25 @@ export default function FarmerPortalPage() {
       <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 pb-28 sm:pb-24">
         
         {/* 1. Farmer Profile & Verified Ledger Bar */}
-        <section className="apple-glass rounded-2xl sm:rounded-3xl py-4 px-4 sm:px-6 shadow-xs mb-6 sm:mb-8 rim-light">
+        <section className="rounded-2xl sm:rounded-3xl border border-emerald-200/90 bg-white/95 py-3.5 px-4 sm:px-6 shadow-sm backdrop-blur-md mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3 sm:gap-3.5">
-              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-800 text-white shadow-sm shrink-0 rim-light">
+              <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-800 text-white shadow-sm shrink-0">
                 <Sprout className="size-6 sm:size-7" />
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-base sm:text-xl font-black text-slate-900 dark:text-white leading-tight">
+                  <h1 className="text-base sm:text-xl font-black text-slate-900 leading-tight">
                     {t("farmer_name")}
                   </h1>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 shrink-0 backdrop-blur-md">
-                    <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-800 shrink-0">
+                    <ShieldCheck className="size-3.5 text-emerald-600" aria-hidden="true" />
                     <span>{t("pm_kisan_verified")}</span>
-                    <span className="rounded bg-emerald-500/15 px-1.5 py-0.2 font-mono text-[11px] text-emerald-900 dark:text-emerald-200">#IND-84920</span>
+                    <span className="rounded bg-emerald-200/80 px-1.5 py-0.2 font-mono text-[11px] text-emerald-900">#IND-84920</span>
                   </span>
                 </div>
-                <p className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400 mt-0.5 truncate">
-                  <MapPin className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <p className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5 truncate">
+                  <MapPin className="size-3.5 text-emerald-600 shrink-0" />
                   <span>{t("farmer_location")}</span>
                 </p>
               </div>
@@ -446,13 +431,13 @@ export default function FarmerPortalPage() {
 
             {/* Financial Telemetry Pills */}
             <div className="flex items-center gap-2 sm:gap-3 text-xs w-full md:w-auto">
-              <div className="apple-glass rounded-xl px-3.5 py-2.5 shadow-2xs flex-1 sm:flex-initial rim-light">
-                <span className="text-[11px] font-semibold text-slate-600 dark:text-zinc-400 block">{t("escrow_balance_label")}</span>
-                <p className="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-400">₹42,500</p>
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 shadow-2xs flex-1 sm:flex-initial">
+                <span className="text-[11px] font-semibold text-slate-600 block">{t("escrow_balance_label")}</span>
+                <p className="text-sm sm:text-base font-black text-emerald-700">₹42,500</p>
               </div>
-              <div className="apple-glass rounded-xl px-3.5 py-2.5 shadow-2xs flex-1 sm:flex-initial rim-light">
-                <span className="text-[11px] font-semibold text-slate-600 dark:text-zinc-400 block">{t("trust_rating_label")}</span>
-                <p className="text-sm sm:text-base font-black text-slate-900 dark:text-white">4.9 ★ <span className="text-[11px] font-normal text-slate-500 dark:text-zinc-400">(99.4%)</span></p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 shadow-2xs flex-1 sm:flex-initial">
+                <span className="text-[11px] font-semibold text-slate-600 block">{t("trust_rating_label")}</span>
+                <p className="text-sm sm:text-base font-black text-slate-900">4.9 ★ <span className="text-[11px] font-normal text-slate-500">(99.4%)</span></p>
               </div>
             </div>
           </div>
@@ -463,7 +448,7 @@ export default function FarmerPortalPage() {
           
           {/* Left Column: Smart Crop Listing Studio (7 Columns) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="apple-glass-elevated rounded-3xl p-5 sm:p-7 shadow-xs space-y-6 rim-light-lg">
+            <div className="rounded-3xl border border-emerald-200/90 bg-white/95 p-5 sm:p-7 shadow-sm backdrop-blur-md space-y-6">
               
               {/* Studio Header */}
               <div className="border-b border-slate-100 pb-4 space-y-2.5">
@@ -750,7 +735,7 @@ export default function FarmerPortalPage() {
             {listings.map((item) => (
               <div
                 key={item.id}
-                className="group rounded-3xl apple-glass p-4.5 shadow-xs hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 space-y-3.5 rim-light"
+                className="group rounded-3xl border border-slate-200 bg-white p-4 shadow-xs hover:shadow-lg transition-all space-y-3"
               >
                 {/* Crop Photo with Badges */}
                 <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-950">

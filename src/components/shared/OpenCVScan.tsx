@@ -513,8 +513,8 @@ export function OpenCVScan({ initialImage, cropHint, isVoiceHighlighted = false,
         className={`relative rounded-3xl border transition-all duration-300 ${
           isVoiceHighlighted 
             ? "border-emerald-400 ring-4 ring-emerald-400/80 shadow-[0_0_35px_rgba(16,185,129,0.3)] scale-[1.01]" 
-            : "border-white/10 shadow-2xl"
-        } glass-dark apple-glass-elevated p-3.5 sm:p-4 text-white overflow-hidden rim-light-lg`}
+            : "border-slate-800 shadow-xl"
+        } bg-slate-950 p-3.5 sm:p-4 text-white overflow-hidden`}
       >
         {/* Subtle Iridescent Top Glow */}
         <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500" />

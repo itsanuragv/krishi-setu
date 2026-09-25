@@ -9,8 +9,6 @@ import {
   Star, 
   ShieldCheck 
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { modalSpringVariants, appleSpringSnappy } from "@/lib/animations";
 import type { ProduceListing } from "@/lib/mock-data";
 
 interface MatchScoreModalProps {
@@ -83,34 +81,23 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
   ];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
-    >
-      <motion.div 
-        variants={modalSpringVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        className="apple-glass-elevated relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-6 sm:p-7 rim-light-lg apple-scrollbar"
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="glass relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-emerald-200 bg-white p-6 shadow-2xl space-y-6 sm:p-7">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-black/[0.05] dark:border-white/[0.08] pb-4">
+        <div className="flex items-start justify-between border-b border-emerald-100 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+              <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
                 5-Factor Smart Matching Engine
               </span>
-              <span className="text-xs text-slate-500 dark:text-zinc-400">
+              <span className="text-xs text-slate-500">
                 PostGIS + Algorithmic Scoring
               </span>
             </div>
-            <h2 className="mt-2 text-xl font-extrabold text-slate-900 dark:text-white">
+            <h2 className="mt-2 text-xl font-extrabold text-slate-900">
               {listing.name} ({listing.hindiName})
             </h2>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Farmer: {listing.farmerName} • {listing.village}, {listing.district}
             </p>
           </div>
@@ -118,14 +105,14 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
           <button
             onClick={onClose}
             aria-label="Close match score details"
-            className="rounded-full p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors active:scale-90"
+            className="rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
           >
             <X className="size-5" />
           </button>
         </div>
 
         {/* Overall Composite Score Hero */}
-        <div className="flex items-center justify-between rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 p-5 text-white shadow-md rim-light">
+        <div className="flex items-center justify-between rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 p-5 text-white shadow-md">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-emerald-100">
               Composite Match Score
@@ -141,14 +128,14 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
             </p>
           </div>
 
-          <div className="flex size-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 rim-light">
+          <div className="flex size-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md border border-white/20">
             <ShieldCheck className="size-8 text-white" />
           </div>
         </div>
 
         {/* 5 Factors Breakdown */}
         <div className="space-y-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
             Algorithmic Factor Breakdown
           </p>
 
@@ -158,20 +145,20 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
               return (
                 <div
                   key={factor.key}
-                  className="rounded-2xl border border-black/[0.05] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.03] p-3.5 space-y-2 backdrop-blur-xs"
+                  className="rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 space-y-2"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={`flex size-7 items-center justify-center rounded-lg ${factor.color}`}>
                         <Icon className="size-4" />
                       </div>
-                      <span className="text-xs font-bold text-slate-900 dark:text-white">
+                      <span className="text-xs font-bold text-slate-900">
                         {factor.title}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-extrabold text-slate-900 dark:text-white">
+                      <span className="text-sm font-extrabold text-slate-900">
                         {factor.score}
                       </span>
                       <span className="text-[10px] text-slate-400">/ 100</span>
@@ -179,7 +166,7 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
                     <div
                       className={`h-full rounded-full ${factor.barColor} transition-all duration-500`}
                       style={{ width: `${factor.score}%` }}
@@ -188,10 +175,10 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
 
                   {/* Detail Text */}
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span className="font-semibold text-emerald-700">
                       {factor.metric}
                     </span>
-                    <span className="text-slate-500 dark:text-zinc-400">{factor.detail}</span>
+                    <span className="text-slate-500">{factor.detail}</span>
                   </div>
                 </div>
               );
@@ -200,21 +187,19 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t border-black/[0.05] dark:border-white/[0.08] pt-4 text-xs text-slate-500 dark:text-zinc-400">
+        <div className="flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500">
           <div className="flex items-center gap-1.5">
-            <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
+            <ShieldCheck className="size-4 text-emerald-600" />
             <span>DPDP Act 2023 Compliant & Razorpay Smart Escrow Verified</span>
           </div>
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            transition={appleSpringSnappy}
+          <button
             onClick={onClose}
-            className="rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 px-4 py-2 text-xs font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-xs"
+            className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
           >
             Done
-          </motion.button>
+          </button>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }

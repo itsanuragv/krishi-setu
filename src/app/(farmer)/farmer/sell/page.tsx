@@ -15,8 +15,6 @@ import {
   Camera, 
   RotateCcw 
 } from "lucide-react";
-import dynamic from "next/dynamic";
-import Image from "next/image";
 import { createProductSchema, type CreateProductInput } from "@/lib/schemas/product";
 import { productApi } from "@/features/api";
 import { Button } from "@/components/ui/button";
@@ -26,21 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { getSpeechRecognition, type SpeechRecognitionInstance, type SpeechRecognitionEvent, type SpeechRecognitionErrorEvent } from "@/lib/speech-types";
-import type { CropGradingData } from "@/components/shared/OpenCVScan";
-
-const OpenCVScan = dynamic(
-  () => import("@/components/shared/OpenCVScan").then((mod) => mod.OpenCVScan),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-64 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/50 p-6 text-center">
-        <div className="size-8 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin mb-3" />
-        <p className="text-sm font-semibold text-emerald-800">Initializing OpenCV AI Edge Assayer…</p>
-        <p className="text-xs text-slate-500 mt-1">Calibrating RGB colorimetry and edge-defect neural networks</p>
-      </div>
-    ),
-  }
-);
+import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan";
 
 const STEPS = ["Details", "Grade & harvest", "Photos", "Review"];
 
@@ -457,14 +441,8 @@ export default function SellPage() {
                 <div className="grid grid-cols-3 gap-2">
                   {photos.map((u, i) => (
                     <div key={i} className="relative aspect-video rounded-xl overflow-hidden border border-slate-200">
-                      <Image
-                        src={u}
-                        alt={`Harvest upload sample ${i + 1}`}
-                        fill
-                        unoptimized
-                        sizes="33vw"
-                        className="object-cover"
-                      />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={u} alt="" className="h-full w-full object-cover" />
                     </div>
                   ))}
                 </div>
