@@ -20,11 +20,13 @@ import {
   PhoneCall, 
   Star,
   Scan,
-  Award
+  Award,
+  Play
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/shared/Navbar";
 import { PlatformGuideModal } from "@/components/shared/PlatformGuideModal";
+import { TrustJourneySection } from "@/components/shared/TrustJourneySection";
 import { 
   heroContainerVariants, 
   heroChildVariants, 
@@ -226,10 +228,14 @@ export default function HomePage() {
               <Button
                 size="lg"
                 variant="ghost"
-                onClick={() => setGuideModalOpen(true)}
+                onClick={() => {
+                  document
+                    .getElementById("trust-journey")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="w-full sm:w-auto text-slate-700 hover:bg-slate-100 gap-2 font-semibold text-xs sm:text-sm h-12 rounded-xl"
               >
-                <Compass className="size-4 text-emerald-700 shrink-0" />
+                <Play className="size-4 text-emerald-700 fill-emerald-700 shrink-0" />
                 <span>{t("btn_how_it_works")}</span>
               </Button>
             </motion.div>
@@ -407,6 +413,9 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
         </section>
+
+        {/* Visual Trust Journey: 5-Step Explainer (See How It Works) */}
+        <TrustJourneySection />
 
         {/* Ecosystem Portals (5 Core Role Gateways) */}
         <section className="space-y-6">
