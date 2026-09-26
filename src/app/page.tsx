@@ -17,7 +17,6 @@ import {
   CheckCircle2, 
   Lock, 
   PhoneCall, 
-  Star,
   Scan,
   Award,
   Play
@@ -33,7 +32,6 @@ import {
 } from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
 import { KrishiSetuLogo } from "@/components/shared/KrishiSetuLogo";
-import { RATING_CONFIG } from "@/config/rating-config";
 
 export default function HomePage() {
   const { language, t } = useLanguage();
@@ -104,33 +102,6 @@ export default function HomePage() {
     },
   ];
 
-  const TESTIMONIALS = [
-    {
-      name: t("test_1_name"),
-      role: t("test_1_role"),
-      crop: t("test_1_crop"),
-      badge: t("badge_pmkisan_verified"),
-      text: t("test_1_text"),
-      rating: 5,
-    },
-    {
-      name: t("test_2_name"),
-      role: t("test_2_role"),
-      crop: t("test_2_crop"),
-      badge: t("badge_buyer_verified"),
-      text: t("test_2_text"),
-      rating: 5,
-    },
-    {
-      name: t("test_3_name"),
-      role: t("test_3_role"),
-      crop: t("test_3_crop"),
-      badge: t("badge_institutional_partner"),
-      text: t("test_3_text"),
-      rating: 5,
-    },
-  ];
-
   return (
     <div className="min-h-screen w-full max-w-[100vw] overflow-x-clip bg-[radial-gradient(at_top_left,#ecfdf5,#ffffff)] bg-grid-subtle flex flex-col justify-between">
       <Navbar />
@@ -143,18 +114,6 @@ export default function HomePage() {
           animate="visible"
           className="text-center max-w-4xl mx-auto w-full min-w-0 space-y-5 sm:space-y-6 pt-1 sm:pt-6"
         >
-          {/* Top Badge */}
-          <motion.div
-            variants={heroChildVariants}
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-100/90 px-3.5 py-1 text-xs font-bold text-emerald-900 border border-emerald-200/80 shadow-2xs backdrop-blur-xs"
-          >
-            <span className="relative flex size-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full size-2 bg-emerald-600" />
-            </span>
-            <span>{language === "hi" ? "भारत का पहला प्रत्यक्ष कृषि मंच" : "India's Direct Farm-to-Fork Platform"}</span>
-          </motion.div>
-
           {/* Main Headline */}
           <motion.h1
             variants={heroChildVariants}
@@ -303,9 +262,6 @@ export default function HomePage() {
 
 
 
-        {/* Visual Trust Journey: 5-Step Explainer (See How It Works) */}
-        <TrustJourneySection />
-
         {/* Ecosystem Portals (5 Core Role Gateways) */}
         <section className="space-y-6">
           <div className="text-center space-y-1">
@@ -426,6 +382,9 @@ export default function HomePage() {
           </motion.div>
         </section>
 
+        {/* Visual Trust Journey: 5-Step Explainer (See How It Works) */}
+        <TrustJourneySection />
+
         {/* Technology & Trust Innovation Grid */}
         <section className="glass rounded-3xl border border-emerald-200/90 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/70 p-5 sm:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -501,74 +460,6 @@ export default function HomePage() {
                 {t("tech_card3_desc")}
               </p>
             </motion.div>
-          </motion.div>
-        </section>
-
-        {/* Verified Farmer & Buyer Testimonials */}
-        <section className="space-y-6">
-          <div className="text-center space-y-1.5">
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-                {t("testimonials_title")}
-              </h2>
-              {RATING_CONFIG.SHOW_PROTOTYPE_DISCLAIMER && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200/90 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 shadow-2xs">
-                  <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  {t("dummy_rating_disclaimer")}
-                </span>
-              )}
-            </div>
-            <p className="text-xs sm:text-sm text-slate-600">
-              {t("testimonials_sub")}
-            </p>
-          </div>
-
-          <motion.div
-            variants={scrollStaggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid gap-4 sm:grid-cols-3"
-          >
-            {TESTIMONIALS.map((tItem, idx) => (
-              <motion.div
-                key={idx}
-                variants={scrollCardItem}
-                whileHover={{ y: -3, scale: 1.01 }}
-                className="glass flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-3 hover:border-emerald-300 hover:shadow-md transition-all duration-200"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    {RATING_CONFIG.SHOW_STAR_RATINGS && (
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex items-center gap-0.5 text-amber-500">
-                          {[...Array(tItem.rating)].map((_, rIdx) => (
-                            <Star key={rIdx} className="size-3.5 fill-amber-400 text-amber-400" />
-                          ))}
-                        </div>
-                        {RATING_CONFIG.SHOW_DUMMY_RATING_BADGE && (
-                          <span className="rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[9px] font-bold text-amber-800 tracking-wide">
-                            {t("dummy_rating_badge")}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                      {tItem.badge}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-700 italic leading-relaxed">
-                    &ldquo;{tItem.text}&rdquo;
-                  </p>
-                </div>
-
-                <div className="border-t border-slate-100 pt-3">
-                  <p className="font-bold text-xs text-slate-900">{tItem.name}</p>
-                  <p className="text-[11px] text-slate-500">{tItem.role}</p>
-                  <p className="text-[10px] font-semibold text-emerald-700 mt-0.5">{tItem.crop}</p>
-                </div>
-              </motion.div>
-            ))}
           </motion.div>
         </section>
 

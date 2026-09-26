@@ -370,10 +370,7 @@ export const TRANSLATIONS: Translations = {
     en: "Shop Fresh Produce (उपज खरीदें)",
     hi: "ताज़ा उपज खरीदें",
   },
-  btn_how_it_works: {
-    en: "How It Works (गाइड)",
-    hi: "यह कैसे काम करता है (गाइड)",
-  },
+  btn_how_it_works: { en: "How It Works", hi: "यह कैसे काम करता है" },
 
   // 4-Pillar Telemetry
   stat_farmer_realization: { en: "Farmer Realization", hi: "किसान की आय" },
@@ -577,7 +574,6 @@ export const TRANSLATIONS: Translations = {
   // Innovation & Architecture
   tech_infra_tag: { en: "Decentralized Agritech Infrastructure", hi: "पारदर्शी आधुनिक कृषि तकनीक" },
   tech_infra_title: { en: "How Krishi Setu Disintermediates Agricultural Trade", hi: "कृषि सेतु कैसे बिचौलियों की निर्भरता को समाप्त करता है" },
-  btn_arch_tour: { en: "Interactive Architecture Guide", hi: "इंटरैक्टिव आर्किटेक्चर गाइड" },
   tech_card1_title: { en: "Zero Intermediaries (Pure P2P)", hi: "शून्य बिचौलिए (सीधा लेन-देन)" },
   tech_card1_desc: { en: "Eliminates multiple commission agent cuts. Direct farm-gate pickup completed within 12-24 hours.", hi: "आढ़तियों और दलालों का कमीशन शून्य। खेत से सीधे 12 से 24 घंटे में उठाव और डिलीवरी।" },
   tech_card2_title: { en: "Edge OpenCV Pre-QC", hi: "मोबाइल पर गुणवत्ता की पूर्व-जांच" },
@@ -586,17 +582,6 @@ export const TRANSLATIONS: Translations = {
   tech_card3_desc: { en: "Hyperlocal proximity (<25km) matching coupled with escrow release exclusively upon 4-digit handover PIN.", hi: "25 किमी के भीतर त्वरित मिलान और खरीदार द्वारा 4-अंकीय पिन दर्ज करने पर ही किसान को भुगतान रिलीज।" },
 
   // Testimonials
-  testimonials_title: { en: "Verified Farmer & Buyer Impact Stories", hi: "सत्यापित किसान और खरीदारों के अनुभव" },
-  testimonials_sub: { en: "Real-world results from farmers, grocers, and consumers across Madhya Pradesh", hi: "मध्य प्रदेश और भारत के किसानों, खुदरा विक्रेताओं और परिवारों के वास्तविक अनुभव" },
-  badge_pmkisan_verified: { en: "PM-KISAN Verified", hi: "पीएम-किसान सत्यापित" },
-  badge_buyer_verified: { en: "Verified Buyer", hi: "सत्यापित खरीदार" },
-  badge_institutional_partner: { en: "Institutional Partner", hi: "व्यावसायिक भागीदार" },
-  dummy_rating_badge: { en: "Sample Demo Rating", hi: "डमी रेटिंग (डेमो)" },
-  dummy_rating_disclaimer: { 
-    en: "Prototype Showcase · Simulated demonstration ratings & feedback", 
-    hi: "प्रोटोटाइप प्रदर्शन · प्रदर्शन हेतु नमूना डमी रेटिंग व अनुभव" 
-  },
-
   test_1_name: { en: "Rameshwar Patil", hi: "रामेश्वर पाटिल" },
   test_1_role: { en: "Smallholder Farmer (Indore, Madhya Pradesh)", hi: "छोटे किसान (इंदौर, मध्य प्रदेश)" },
   test_1_crop: { en: "MP Sharbati Wheat & Basmati Paddy", hi: "शरबती गेहूं एवं बासमती धान" },
