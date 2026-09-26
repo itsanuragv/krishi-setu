@@ -482,6 +482,92 @@ export const TRANSLATIONS: Translations = {
     hi: "100% सुरक्षित भुगतान",
   },
 
+  // Trust Journey: 5-Step Visual Explainer (See How It Works)
+  tj_badge: {
+    en: "The Trust Loop",
+    hi: "भरोसे का चक्र",
+  },
+  tj_title: {
+    en: "See How Every Deal Stays Safe",
+    hi: "देखें: हर सौदा कैसे सुरक्षित रहता है",
+  },
+  tj_sub: {
+    en: "Tap any stage to follow money, produce, and trust — from listing to payout.",
+    hi: "किसी भी चरण पर क्लिक करें — लिस्टिंग से भुगतान तक पैसा, उपज और भरोसा कैसे साथ चलते हैं।",
+  },
+  tj_step1_title: {
+    en: "Farmer Lists with AI Quality Check",
+    hi: "AI क्वालिटी जांच के साथ लिस्टिंग",
+  },
+  tj_step1_desc: {
+    en: "Farmers list crops by voice or form; the phone camera pre-checks grade A/B/C on-device.",
+    hi: "किसान बोलकर या फॉर्म से फसल जोड़ते हैं; फोन कैमरा ग्रेड A/B/C की जांच करता है।",
+  },
+  tj_step1_detail: {
+    en: "No listing goes live without passing the OpenCV blur and brightness check — buyers see the certified grade before paying a rupee.",
+    hi: "OpenCV जांच पास किए बिना कोई लिस्टिंग लाइव नहीं होती — खरीदार एक रुपया देने से पहले प्रमाणित ग्रेड देखता है।",
+  },
+  tj_step2_title: {
+    en: "Smart Match Within 25 km",
+    hi: "25 किमी में स्मार्ट मिलान",
+  },
+  tj_step2_desc: {
+    en: "A transparent 5-factor score ranks listings by price, distance, grade, freshness, and farmer trust.",
+    hi: "पारदर्शी 5-कारक स्कोर कीमत, दूरी, ग्रेड, ताज़गी और किसान रेटिंग से मिलान करता है।",
+  },
+  tj_step2_detail: {
+    en: "Every score is explainable — open any listing to see exactly why it ranks where it does. No black box.",
+    hi: "हर स्कोर समझने लायक है — किसी भी लिस्टिंग को खोलकर देखें कि वह क्यों ऊपर है। कोई ब्लैक बॉक्स नहीं।",
+  },
+  tj_step3_title: {
+    en: "Money Locked in Escrow",
+    hi: "पैसा एस्क्रो में सुरक्षित",
+  },
+  tj_step3_desc: {
+    en: "The buyer's payment locks into a tamper-evident escrow ledger — held by neither side.",
+    hi: "खरीदार का भुगतान छेड़छाड़-रोधी एस्क्रो लेजर में लॉक होता है — किसी भी पक्ष के पास नहीं।",
+  },
+  tj_step3_detail: {
+    en: "Funds move only on delivery confirmation or a resolved dispute — never before, never by accident.",
+    hi: "पैसा सिर्फ डिलीवरी पुष्टि या सुलझे विवाद पर ही निकलता है — पहले कभी नहीं, गलती से कभी नहीं।",
+  },
+  tj_step4_title: {
+    en: "Delivery + 4-Digit Handover PIN",
+    hi: "डिलीवरी + 4-अंकीय हैंडओवर पिन",
+  },
+  tj_step4_desc: {
+    en: "Produce is handed over only after the buyer shares the one-time 4-digit PIN.",
+    hi: "खरीदार का एकमुश्त 4-अंकीय पिन मिलने पर ही उपज सौंपी जाती है।",
+  },
+  tj_step4_detail: {
+    en: "Wrong PIN, no handover — this single step kills most delivery fraud before it starts.",
+    hi: "गलत पिन तो कोई हैंडओवर नहीं — यही एक कदम डिलीवरी धोखाधड़ी को शुरू होने से पहले रोकता है।",
+  },
+  tj_step5_title: {
+    en: "Instant Payout + Trust Rating",
+    hi: "तुरंत भुगतान + भरोसा रेटिंग",
+  },
+  tj_step5_desc: {
+    en: "The farmer gets instant UPI payout; both sides rate each other, disputes go to review.",
+    hi: "किसान को तुरंत UPI भुगतान मिलता है; दोनों एक-दूसरे को रेट करते हैं, विवाद समीक्षा में जाते हैं।",
+  },
+  tj_step5_detail: {
+    en: "Every completed deal strengthens the farmer's trust score — good actors rise, bad actors get flagged.",
+    hi: "हर पूरा सौदा किसान का भरोसा स्कोर बढ़ाता है — अच्छे ऊपर उठते हैं, गलत फ्लैग होते हैं।",
+  },
+  tj_cta_title: {
+    en: "Now try it yourself — live",
+    hi: "अब खुद आज़माएं — लाइव",
+  },
+  tj_cta_farmer: {
+    en: "List as Farmer",
+    hi: "किसान बनकर देखें",
+  },
+  tj_cta_consumer: {
+    en: "Shop as Consumer",
+    hi: "खरीदार बनकर देखें",
+  },
+
   // Ecosystem Portals
   ecosystem_title: {
     en: "Ecosystem Portals & Actor Gateways",
