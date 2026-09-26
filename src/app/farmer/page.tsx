@@ -3,29 +3,28 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  Sprout, 
-  Scan, 
-  Sparkles, 
-  CheckCircle2, 
-  TrendingUp, 
-  MapPin, 
-  ShieldCheck, 
-  Zap, 
+import {
+  Sprout,
+  Scan,
+  Sparkles,
+  CheckCircle2,
+  TrendingUp,
+  MapPin,
+  ShieldCheck,
   Plus,
   Camera,
-  Layers,
-  Scale,
-  Calendar,
   IndianRupee,
-  Award,
   ChevronRight,
-  Warehouse,
-  ShoppingBag,
-  ExternalLink,
-  Info,
+  ChevronLeft,
   X,
-  ArrowRight
+  ArrowRight,
+  Mic,
+  Rocket,
+  Package,
+  HandCoins,
+  Truck,
+  BadgeCheck,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,213 +34,211 @@ import { Navbar } from "@/components/shared/Navbar";
 import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan";
 import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_PRODUCE_LISTINGS, type ProduceListing } from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
 
-// Crop quick presets organized by category - Focus on major Field Crops, Grains, Millets & Oilseeds
+// Crop presets with photos - major field crops, grains, millets & oilseeds
 const CROP_PRESETS = [
-  { 
-    name: "शरबती गेहूं (Wheat)", 
-    category: "Grains", 
-    variety: "सीहोर 306 शरबती (Sehore Golden)", 
-    defaultPrice: 3400, 
-    unit: "quintal", 
-    defaultQty: 100, 
+  {
+    name: "शरबती गेहूं (Wheat)",
+    category: "Grains",
+    variety: "सीहोर 306 शरबती (Sehore Golden)",
+    defaultPrice: 3400,
+    unit: "quintal",
+    defaultQty: 100,
     hint: "Wheat",
     image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "बासमती धान/चावल (Rice)", 
-    category: "Grains", 
-    variety: "Pusa 1121 Export Grade", 
-    defaultPrice: 7200, 
-    unit: "quintal", 
-    defaultQty: 150, 
+  {
+    name: "बासमती धान/चावल (Rice)",
+    category: "Grains",
+    variety: "Pusa 1121 Export Grade",
+    defaultPrice: 7200,
+    unit: "quintal",
+    defaultQty: 150,
     hint: "Rice",
     image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "पीला सोयाबीन (Soyabean)", 
-    category: "Grains", 
-    variety: "JS-9560 / JS-2034 (बोल्ड दाना)", 
-    defaultPrice: 4850, 
-    unit: "quintal", 
-    defaultQty: 120, 
+  {
+    name: "पीला सोयाबीन (Soyabean)",
+    category: "Grains",
+    variety: "JS-9560 / JS-2034 (बोल्ड दाना)",
+    defaultPrice: 4850,
+    unit: "quintal",
+    defaultQty: 120,
     hint: "Soyabean",
     image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "देशी पीला मक्का (Corn)", 
-    category: "Grains", 
-    variety: "Pioneer 3302 Hybrid Yellow", 
-    defaultPrice: 2350, 
-    unit: "quintal", 
-    defaultQty: 200, 
+  {
+    name: "देशी पीला मक्का (Corn)",
+    category: "Grains",
+    variety: "Pioneer 3302 Hybrid Yellow",
+    defaultPrice: 2350,
+    unit: "quintal",
+    defaultQty: 200,
     hint: "Corn",
     image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "संकर देशी बाजरा (Bajra)", 
-    category: "Grains", 
-    variety: "ProAgro Pearl Millet (श्री अन्न)", 
-    defaultPrice: 2600, 
-    unit: "quintal", 
-    defaultQty: 80, 
+  {
+    name: "संकर देशी बाजरा (Bajra)",
+    category: "Grains",
+    variety: "ProAgro Pearl Millet (श्री अन्न)",
+    defaultPrice: 2600,
+    unit: "quintal",
+    defaultQty: 80,
     hint: "Bajra",
     image: "https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "मालदांडी सफेद ज्वार (Jowar)", 
-    category: "Grains", 
-    variety: "M-35-1 Maldandi (श्री अन्न)", 
-    defaultPrice: 5200, 
-    unit: "quintal", 
-    defaultQty: 60, 
+  {
+    name: "मालदांडी सफेद ज्वार (Jowar)",
+    category: "Grains",
+    variety: "M-35-1 Maldandi (श्री अन्न)",
+    defaultPrice: 5200,
+    unit: "quintal",
+    defaultQty: 60,
     hint: "Jowar",
     image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "मालवा डॉलर चना (Chickpea)", 
-    category: "Grains", 
-    variety: "Dollar Chana Extra Bold", 
-    defaultPrice: 6800, 
-    unit: "quintal", 
-    defaultQty: 90, 
+  {
+    name: "मालवा डॉलर चना (Chickpea)",
+    category: "Grains",
+    variety: "Dollar Chana Extra Bold",
+    defaultPrice: 6800,
+    unit: "quintal",
+    defaultQty: 90,
     hint: "Chana",
     image: "https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "देशी रागी / मडुआ (Ragi)", 
-    category: "Grains", 
-    variety: "GPU-28 Organic Millet", 
-    defaultPrice: 4200, 
-    unit: "quintal", 
-    defaultQty: 50, 
+  {
+    name: "देशी रागी / मडुआ (Ragi)",
+    category: "Grains",
+    variety: "GPU-28 Organic Millet",
+    defaultPrice: 4200,
+    unit: "quintal",
+    defaultQty: 50,
     hint: "Millet",
     image: "https://images.unsplash.com/photo-1543158266-0066955047b1?w=600&auto=format&fit=crop&q=80"
   },
-  { 
-    name: "पीली सरसों (Mustard)", 
-    category: "Grains", 
-    variety: "Pusa Bold 42% Oil Content", 
-    defaultPrice: 5600, 
-    unit: "quintal", 
-    defaultQty: 70, 
+  {
+    name: "पीली सरसों (Mustard)",
+    category: "Grains",
+    variety: "Pusa Bold 42% Oil Content",
+    defaultPrice: 5600,
+    unit: "quintal",
+    defaultQty: 70,
     hint: "Mustard",
     image: "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?w=600&auto=format&fit=crop&q=80"
   },
 ];
 
+type MyListing = ProduceListing & { status: "live" | "in_escrow" | "sold" };
+
+const STEPS = [
+  { id: 1, icon: Sprout },
+  { id: 2, icon: IndianRupee },
+  { id: 3, icon: Scan },
+  { id: 4, icon: Rocket },
+] as const;
+
 export default function FarmerPortalPage() {
   const { t, language } = useLanguage();
-  
-  // Listing Form State - Defaulting to MP Sharbati Wheat crop
-  const [cropName, setCropName] = useState("शरबती गेहूं (Wheat)");
+  const hi = language === "hi";
+
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [published, setPublished] = useState(false);
+
+  // Listing form state
+  const [cropName, setCropName] = useState("");
   const [cropCategory, setCropCategory] = useState<"Vegetables" | "Fruits" | "Grains" | "Organic">("Grains");
-  const [variety, setVariety] = useState("सीहोर 306 शरबती (Sehore Golden)");
-  const [quantity, setQuantity] = useState<number | "">(100);
+  const [variety, setVariety] = useState("");
+  const [quantity, setQuantity] = useState<number | "">("");
   const [unit, setUnit] = useState("quintal");
-  const [floorPrice, setFloorPrice] = useState<number | "">(3400);
-  const [harvestDate, setHarvestDate] = useState(new Date().toISOString().slice(0, 10));
+  const [floorPrice, setFloorPrice] = useState<number | "">("");
+  const [harvestDate] = useState(new Date().toISOString().slice(0, 10));
   const [isTyping, setIsTyping] = useState(false);
-  const [isListed, setIsListed] = useState(false);
+  const [customCrop, setCustomCrop] = useState("");
 
-  // Attached Photo & AI Quality Grade - Defaulted to Sharbati Wheat
-  const [attachedPhoto, setAttachedPhoto] = useState<string>(
-    "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80"
+  // Photo & AI grade
+  const [attachedPhoto, setAttachedPhoto] = useState<string>("");
+  const [scannedGrade, setScannedGrade] = useState<CropGradingData | null>(null);
+
+  // My listings
+  const [listings, setListings] = useState<MyListing[]>(() =>
+    MOCK_PRODUCE_LISTINGS.slice(0, 3).map((l, i) => ({
+      ...l,
+      status: (["live", "in_escrow", "sold"] as const)[i],
+    }))
   );
-  const [scannedGrade, setScannedGrade] = useState<CropGradingData | null>({
-    cropName: "शरबती गेहूं (MP Sharbati Wheat)",
-    variety: "सीहोर 306 शरबती (Sehore Golden)",
-    grade: "Grade A",
-    gradeReason: "10.4% नमी (मानक <12%), चमकदार सुनहरा दाना, उच्च प्रोटीन व शून्य कचरा।",
-    ripenessPct: 95,
-    ripenessStage: "Fully Matured Golden Grain (पूर्ण परिपक्व दाना)",
-    defectPct: 1,
-    defectNotes: "Clean harvested grain, zero pest infestation, uniform bold size.",
-    shelfLifeDays: 365,
-    marketFit: "Direct Flour Mills, Premium Atta Brands & Bulk Buyers",
-    recommendedPriceDeltaPct: 18,
-    feedbackEn: "Grade-A export quality Sharbati wheat. Low moisture (10.4%) and high test weight. Eligible for +18% premium over local Mandi.",
-    feedbackHi: "ग्रेड-ए शरबती गेहूं। 10.4% नमी, चमकदार दाना और उच्च प्रोटीन। न्यूनतम समर्थन मूल्य (MSP) से 18% अधिक भाव के योग्य।",
-    assayerVerificationId: "KS-QC-918234",
-  });
-  
-  // Active listings list
-  const [listings, setListings] = useState<ProduceListing[]>(MOCK_PRODUCE_LISTINGS.slice(0, 3));
-  const activeListingsRef = useRef<HTMLDivElement | null>(null);
-
-  // Scanner Voice Highlight & Notice State
-  const [highlightScanner, setHighlightScanner] = useState(false);
+  const listingsRef = useRef<HTMLDivElement | null>(null);
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
 
-  const triggerPhotoPrompt = useCallback((cropNameHint?: string) => {
-    const textNotice = cropNameHint
-      ? `📸 वॉइस AI: ${cropNameHint} का विवरण दर्ज हो गया है! अब कृपया दाईं ओर फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।`
-      : "📸 वॉइस AI: फसल का विवरण दर्ज हो गया है! अब कृपया दाईं ओर फसल की फोटो अपलोड करें या AI कैमरा स्कैन करें।";
-    setVoiceNotice(textNotice);
-    setTimeout(() => {
-      const scannerEl = document.getElementById("opencv-scanner");
-      if (scannerEl) {
-        scannerEl.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      setHighlightScanner(true);
-      setTimeout(() => setHighlightScanner(false), 9000);
-    }, 1200);
-  }, []);
+  const stepLabels = [
+    hi ? "फसल चुनें" : "Pick crop",
+    hi ? "मात्रा व भाव" : "Qty & price",
+    hi ? "गुणवत्ता जांच" : "Quality check",
+    hi ? "प्रकाशित करें" : "Publish",
+  ];
 
-  // Handle Preset Click - Real-time sync with photo and grading to eliminate mismatch
+  // ---- helpers ----
+  const makeGradeFor = (name: string, varietyName: string, photo: string): CropGradingData => ({
+    cropName: name,
+    variety: varietyName,
+    grade: "Grade A",
+    gradeReason: hi ? `सत्यापित उच्च गुणवत्ता ${name}` : `Verified premium quality ${name}`,
+    ripenessPct: 92,
+    ripenessStage: hi ? "बाज़ार हेतु उपयुक्त" : "Optimal market grade",
+    defectPct: 2,
+    defectNotes: "Clean surface, zero rot.",
+    shelfLifeDays: 180,
+    marketFit: hi ? "सीधे खरीदार व थोक व्यापारी" : "Direct buyers & bulk traders",
+    recommendedPriceDeltaPct: 14,
+    feedbackEn: `Grade-A verified quality for ${name}.`,
+    feedbackHi: `${name} ग्रेड-ए प्रमाणित। सीधे खरीदार को बिक्री हेतु तैयार।`,
+    assayerVerificationId: `KS-QC-${Math.floor(100000 + Math.random() * 900000)}`,
+  });
+
   const handlePresetSelect = (preset: typeof CROP_PRESETS[0]) => {
     setCropName(preset.name);
-    setCropCategory(preset.category as "Vegetables" | "Grains");
+    setCropCategory(preset.category as "Grains");
     setVariety(preset.variety);
     setQuantity(preset.defaultQty);
     setUnit(preset.unit);
     setFloorPrice(preset.defaultPrice);
-    if (preset.image) {
-      setAttachedPhoto(preset.image);
-    }
+    if (preset.image) setAttachedPhoto(preset.image);
     setScannedGrade((prev) => ({
-      cropName: preset.name,
-      variety: preset.variety,
-      grade: prev?.grade || "Grade A",
-      gradeReason: `सत्यापित उच्च गुणवत्ता ${preset.name}`,
-      ripenessPct: 90,
-      ripenessStage: "Optimal Market Grade",
-      defectPct: 3,
-      defectNotes: "Clean surface, zero rot.",
-      shelfLifeDays: preset.category === "Grains" ? 180 : 7,
-      marketFit: "Direct Consumer Kitchens & Verified Buyers",
-      recommendedPriceDeltaPct: 12,
-      feedbackEn: `Grade-A verified quality for ${preset.name}.`,
-      feedbackHi: `${preset.name} ग्रेड-ए प्रमाणित। सीधे खरीदार को बिक्री हेतु तैयार।`,
+      ...makeGradeFor(preset.name, preset.variety, preset.image),
       assayerVerificationId: prev?.assayerVerificationId || `KS-QC-${Math.floor(100000 + Math.random() * 900000)}`,
     }));
-    toast.success(`चुना गया: ${preset.name}`);
+    toast.success(`${hi ? "चुना गया: " : "Selected: "}${preset.name}`);
   };
 
-  // Voice-to-Form Auto-Typing Simulation
-  const simulateVoiceToForm = (targetData: {
-    crop: string;
-    variety: string;
-    quantity: number;
-    price: number;
-    unit: string;
+  const handleCustomCrop = () => {
+    if (!customCrop.trim()) return;
+    const name = customCrop.trim();
+    setCropName(name);
+    setVariety("");
+    setQuantity("");
+    setFloorPrice("");
+    setAttachedPhoto("");
+    setScannedGrade(null);
+    setCustomCrop("");
+    toast.success(`${hi ? "फसल जोड़ी गई: " : "Crop added: "}${name}`);
+  };
+
+  // Voice-to-form: fills the form as if spoken, then jumps to step 2
+  const simulateVoiceToForm = useCallback((targetData: {
+    crop: string; variety: string; quantity: number; price: number; unit: string;
   }) => {
     setIsTyping(true);
-    setIsListed(false);
+    setPublished(false);
     setCropName("");
     setVariety("");
     setQuantity("");
     setFloorPrice("");
-
-    // Find preset image if available
-    const matchedPreset = CROP_PRESETS.find((p) => 
-      p.hint.toLowerCase().includes(targetData.crop.toLowerCase()) || 
+    const matchedPreset = CROP_PRESETS.find((p) =>
+      p.hint.toLowerCase().includes(targetData.crop.toLowerCase()) ||
       p.name.toLowerCase().includes(targetData.crop.toLowerCase())
     );
-    if (matchedPreset?.image) {
-      setAttachedPhoto(matchedPreset.image);
-    }
-
+    if (matchedPreset?.image) setAttachedPhoto(matchedPreset.image);
     let cropIndex = 0;
     const cropStr = targetData.crop;
     const timer1 = setInterval(() => {
@@ -255,89 +252,30 @@ export default function FarmerPortalPage() {
         setUnit(targetData.unit);
         setFloorPrice(targetData.price);
         setIsTyping(false);
+        setStep(2);
         toast.success(
-          `Voice AI Populated: ${targetData.quantity} ${targetData.unit} ${targetData.crop} @ ₹${targetData.price}/${targetData.unit}`
+          hi
+            ? `वॉइस AI: ${targetData.quantity} ${targetData.unit} ${targetData.crop} @ ₹${targetData.price}`
+            : `Voice AI: ${targetData.quantity} ${targetData.unit} ${targetData.crop} @ ₹${targetData.price}`
+        );
+        setVoiceNotice(
+          hi
+            ? `अब चरण 3 में फसल की फोटो जोड़ें या AI स्कैन करें — इससे बेहतर भाव मिलेगा!`
+            : `Now add a crop photo or AI scan in step 3 — it earns a better price!`
         );
       }
-    }, 40);
-  };
+    }, 35);
+  }, [hi]);
 
-  // Callback when OpenCV scan completes or user clicks "Apply to Form"
   const handleApplyScanResult = (gradingData: CropGradingData, photoUrl: string) => {
     setScannedGrade(gradingData);
     setAttachedPhoto(photoUrl);
-    setCropName(gradingData.cropName);
-    if (gradingData.variety) {
-      setVariety(gradingData.variety);
-    }
-    toast.success(
-      language === "hi"
-        ? `एआई ग्रेडिंग लागू: ${gradingData.cropName} (${gradingData.grade}) फॉर्म में सेट हो गया!`
-        : `AI Grading applied: ${gradingData.cropName} (${gradingData.grade}) synced to form!`
-    );
+    if (gradingData.cropName) setCropName(gradingData.cropName);
+    if (gradingData.variety) setVariety(gradingData.variety);
+    toast.success(hi ? `AI ग्रेडिंग: ${gradingData.grade} — फॉर्म में जुड़ गया!` : `AI grading: ${gradingData.grade} — synced to form!`);
   };
 
-  // Handle Listing Submission
-  const handlePublishListing = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!cropName || !quantity || !floorPrice) {
-      toast.error("कृपया फसल का नाम, मात्रा और भाव भरें");
-      return;
-    }
-
-    const appliedGrade = scannedGrade?.grade || "Grade A";
-    const appliedVerif = scannedGrade?.assayerVerificationId || `KS-QC-${Math.floor(100000 + Math.random() * 900000)}`;
-
-    const newListing: ProduceListing = {
-      id: `prod-${Date.now()}`,
-      name: `${cropName} (Fresh Farm Gate)`,
-      hindiName: language === "hi" ? `${cropName} (ताजा फसल)` : `${cropName} (Farm Gate)`,
-      category: cropCategory,
-      farmerName: "रामेश्वर पाटिल (Rameshwar Patil)",
-      farmerPhone: "+91 98221 45019",
-      village: "Sanwer (सांवेर)",
-      district: "Indore, Madhya Pradesh",
-      distanceKm: 4.8,
-      quantityAvailable: Number(quantity),
-      unit: unit,
-      farmGatePrice: Number(floorPrice),
-      mandiBenchmarkPrice: Math.round(Number(floorPrice) * 1.38),
-      imageUrl: attachedPhoto,
-      matchScore: 99,
-      breakdown: {
-        priceIndex: { score: 98, detail: "32% below traditional Mandi markup" },
-        distance: { score: 99, detail: "4.8 km hyperlocal farm radius" },
-        qualityGrade: { 
-          score: appliedGrade === "Grade A" ? 99 : appliedGrade === "Grade B" ? 92 : 82, 
-          detail: `${appliedGrade} Gemini Vision Assayed (${appliedVerif})`, 
-          grade: appliedGrade 
-        },
-        quantityFit: { score: 96, detail: "Direct match for verified retail buyer batch" },
-        reliability: { score: 99, detail: "4.9★ PM-KISAN Verified Ledger", rating: 4.9 },
-      },
-      openCvMetrics: {
-        blurScore: 95,
-        brightnessPct: 90,
-        resolution: "1080p Verified",
-        status: `Assayed ${appliedGrade} - Auto-Listed`,
-      },
-    };
-
-    setListings([newListing, ...listings]);
-    setIsListed(true);
-    toast.success(
-      language === "hi"
-        ? "🎉 बधाई! आपकी फसल कृषि सेतु डायरेक्ट बाज़ार में सफलतापूर्वक लिस्ट हो गई!"
-        : "🎉 Congratulations! Your crop has been successfully published to Krishi Setu direct market!"
-    );
-
-    // Smooth scroll down to active listings
-    setTimeout(() => {
-      activeListingsRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 200);
-  };
-
-  // Preload initial crop or handle incoming voice listing
+  // Voice handoff from the global voice assistant
   useEffect(() => {
     const stored = typeof window !== "undefined" ? sessionStorage.getItem("krishi_pending_voice_crop") : null;
     if (stored) {
@@ -345,67 +283,134 @@ export default function FarmerPortalPage() {
         const parsed = JSON.parse(stored);
         sessionStorage.removeItem("krishi_pending_voice_crop");
         simulateVoiceToForm({
-          crop: parsed.crop || "सीहोर शरबती गेहूं (MP Sharbati Wheat)",
+          crop: parsed.crop || "शरबती गेहूं (Wheat)",
           variety: parsed.variety || "MP Sharbati Golden A+",
           quantity: parsed.quantityKg || 100,
           price: parsed.pricePerKg || 3400,
           unit: parsed.unit || "quintal",
         });
-        triggerPhotoPrompt(parsed.crop || "फसल");
       } catch (err) {
         console.error("Failed to parse voice crop:", err);
       }
     }
-  }, [triggerPhotoPrompt]);
+  }, [simulateVoiceToForm]);
 
-  // Listen for real-time voice listing confirmed events & photo highlight
   useEffect(() => {
     const handleVoiceList = (e: Event) => {
-      const customEvent = e as CustomEvent<{
-        crop: string;
-        variety: string;
-        quantityKg: number;
-        pricePerKg: number;
-        unit: string;
-      }>;
-      if (customEvent.detail) {
+      const d = (e as CustomEvent<{ crop: string; variety: string; quantityKg: number; pricePerKg: number; unit: string }>).detail;
+      if (d) {
         simulateVoiceToForm({
-          crop: customEvent.detail.crop,
-          variety: customEvent.detail.variety || "Standard Grade-A",
-          quantity: customEvent.detail.quantityKg,
-          price: customEvent.detail.pricePerKg,
-          unit: customEvent.detail.unit || "kg",
+          crop: d.crop,
+          variety: d.variety || "Standard Grade-A",
+          quantity: d.quantityKg,
+          price: d.pricePerKg,
+          unit: d.unit || "kg",
         });
-        triggerPhotoPrompt(customEvent.detail.crop);
       }
     };
-
-    const handleVoiceHighlight = () => {
-      triggerPhotoPrompt();
-    };
-
     window.addEventListener("krishi-voice-list-crop", handleVoiceList);
-    window.addEventListener("krishi-voice-highlight-photo", handleVoiceHighlight);
-    return () => {
-      window.removeEventListener("krishi-voice-list-crop", handleVoiceList);
-      window.removeEventListener("krishi-voice-highlight-photo", handleVoiceHighlight);
-    };
-  }, [triggerPhotoPrompt]);
+    return () => window.removeEventListener("krishi-voice-list-crop", handleVoiceList);
+  }, [simulateVoiceToForm]);
 
-  // Calculate Mandi Price comparison delta
+  // Demo voice fill
+  const demoVoiceFill = () => {
+    simulateVoiceToForm({
+      crop: "शरबती गेहूं (Wheat)",
+      variety: "सीहोर 306 शरबती (Sehore Golden)",
+      quantity: 100,
+      price: 3400,
+      unit: "quintal",
+    });
+  };
+
+  // ---- pricing math ----
   const priceNum = Number(floorPrice) || 0;
-  const traditionalMandiNet = Math.round(priceNum * 0.74); // After commission, wastage, weigh fees
-  const extraGainPerUnit = Math.max(0, priceNum - traditionalMandiNet);
-  const totalExtraProfit = Math.round(extraGainPerUnit * (Number(quantity) || 0));
+  const qtyNum = Number(quantity) || 0;
+  const traditionalMandiNet = Math.round(priceNum * 0.74);
+  const extraPerUnit = Math.max(0, priceNum - traditionalMandiNet);
+  const totalExtra = Math.round(extraPerUnit * qtyNum);
+  const lotValue = Math.round(priceNum * qtyNum);
+
+  const canNext = (s: number) => {
+    if (s === 1) return cropName.trim().length > 0;
+    if (s === 2) return qtyNum > 0 && priceNum > 0;
+    return true;
+  };
+
+  const handlePublish = () => {
+    if (!cropName || !qtyNum || !priceNum) {
+      toast.error(hi ? "फसल, मात्रा और भाव ज़रूरी है" : "Crop, quantity and price are required");
+      return;
+    }
+    const grade = scannedGrade ?? makeGradeFor(cropName, variety || (hi ? "मानक" : "Standard"), attachedPhoto);
+    const verif = grade.assayerVerificationId;
+    const newListing: MyListing = {
+      id: `prod-${Date.now()}`,
+      name: `${cropName} (Fresh Farm Gate)`,
+      hindiName: hi ? `${cropName} (ताजा फसल)` : `${cropName} (Farm Gate)`,
+      category: cropCategory,
+      farmerName: "रामेश्वर पाटिल (Rameshwar Patil)",
+      farmerPhone: "+91 98221 45019",
+      village: "Sanwer (सांवेर)",
+      district: "Indore, Madhya Pradesh",
+      distanceKm: 4.8,
+      quantityAvailable: qtyNum,
+      unit,
+      farmGatePrice: priceNum,
+      mandiBenchmarkPrice: Math.round(priceNum * 1.32),
+      imageUrl: attachedPhoto || CROP_PRESETS[0].image,
+      matchScore: 97,
+      breakdown: {
+        priceIndex: { score: 97, detail: hi ? "मंडी आढ़त से सीधी बचत" : "Direct saving over mandi markup" },
+        distance: { score: 99, detail: "4.8 km hyperlocal farm radius" },
+        qualityGrade: {
+          score: grade.grade === "Grade A" ? 98 : 90,
+          detail: `${grade.grade} OpenCV Assayed (${verif})`,
+          grade: grade.grade,
+        },
+        quantityFit: { score: 95, detail: hi ? "थोक खरीदार हेतु उपयुक्त लॉट" : "Bulk-buyer friendly lot" },
+        reliability: { score: 99, detail: "4.9★ PM-KISAN Verified Ledger", rating: 4.9 },
+      },
+      openCvMetrics: {
+        blurScore: 95,
+        brightnessPct: 90,
+        resolution: "1080p Verified",
+        status: `Assayed ${grade.grade} - Auto-Listed`,
+      },
+      status: "live",
+    };
+    setListings([newListing, ...listings]);
+    setPublished(true);
+    toast.success(hi ? "बधाई! फसल लाइव हो गई" : "Congratulations! Your listing is live");
+  };
+
+  const resetWizard = () => {
+    setStep(1);
+    setPublished(false);
+    setCropName("");
+    setVariety("");
+    setQuantity("");
+    setFloorPrice("");
+    setAttachedPhoto("");
+    setScannedGrade(null);
+    setVoiceNotice(null);
+  };
+
+  const statusMeta = (s: MyListing["status"]) =>
+    s === "live"
+      ? { label: hi ? "लाइव" : "LIVE", cls: "bg-emerald-100 text-emerald-800 border-emerald-300" }
+      : s === "in_escrow"
+      ? { label: hi ? "एस्क्रो में" : "IN ESCROW", cls: "bg-amber-100 text-amber-800 border-amber-300" }
+      : { label: hi ? "बिक गई" : "SOLD", cls: "bg-slate-200 text-slate-600 border-slate-300" };
 
   return (
     <div className="min-h-screen bg-[radial-gradient(at_top_left,#ecfdf5,#ffffff)] bg-grid-subtle">
       <Navbar />
 
       <main className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 pb-28 sm:pb-24">
-        
-        {/* 1. Farmer Profile & Verified Ledger Bar */}
-        <section className="rounded-2xl sm:rounded-3xl border border-emerald-200/90 bg-white/95 py-3.5 px-4 sm:px-6 shadow-sm backdrop-blur-md mb-6 sm:mb-8">
+
+        {/* 1. Farmer identity bar */}
+        <section className="rounded-2xl sm:rounded-3xl border border-emerald-200/90 bg-white/95 py-3.5 px-4 sm:px-6 shadow-sm backdrop-blur-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3 sm:gap-3.5">
               <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-800 text-white shadow-sm shrink-0">
@@ -419,7 +424,6 @@ export default function FarmerPortalPage() {
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-xs font-bold text-emerald-800 shrink-0">
                     <ShieldCheck className="size-3.5 text-emerald-600" aria-hidden="true" />
                     <span>{t("pm_kisan_verified")}</span>
-                    <span className="rounded bg-emerald-200/80 px-1.5 py-0.2 font-mono text-[11px] text-emerald-900">#IND-84920</span>
                   </span>
                 </div>
                 <p className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5 truncate">
@@ -428,8 +432,6 @@ export default function FarmerPortalPage() {
                 </p>
               </div>
             </div>
-
-            {/* Financial Telemetry Pills */}
             <div className="flex items-center gap-2 sm:gap-3 text-xs w-full md:w-auto">
               <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 shadow-2xs flex-1 sm:flex-initial">
                 <span className="text-[11px] font-semibold text-slate-600 block">{t("escrow_balance_label")}</span>
@@ -439,363 +441,453 @@ export default function FarmerPortalPage() {
                 <span className="text-[11px] font-semibold text-slate-600 block">{t("trust_rating_label")}</span>
                 <p className="text-sm sm:text-base font-black text-slate-900">4.9 ★ <span className="text-[11px] font-normal text-slate-500">(99.4%)</span></p>
               </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 shadow-2xs flex-1 sm:flex-initial">
+                <span className="text-[11px] font-semibold text-slate-600 block">{hi ? "इस माह आय" : "Month's income"}</span>
+                <p className="text-sm sm:text-base font-black text-slate-900">₹1,18,400</p>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* 2. Main Two-Column Listing Studio */}
-        <section className="grid gap-6 lg:grid-cols-12 items-start">
-          
-          {/* Left Column: Smart Crop Listing Studio (7 Columns) */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="rounded-3xl border border-emerald-200/90 bg-white/95 p-5 sm:p-7 shadow-sm backdrop-blur-md space-y-6">
-              
-              {/* Studio Header */}
-              <div className="border-b border-slate-100 pb-4 space-y-2.5">
-                {voiceNotice && (
-                  <div className="rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 p-3 text-xs text-white font-bold flex items-center justify-between shadow-md animate-in fade-in slide-in-from-top-1">
-                    <div className="flex items-center gap-2">
-                      <Camera className="size-4 animate-bounce text-emerald-200 shrink-0" />
-                      <span>{voiceNotice}</span>
+        {/* 2. Listing wizard */}
+        <section className="overflow-hidden rounded-3xl border border-emerald-200/80 bg-white/95 shadow-sm backdrop-blur-md">
+          {/* Wizard header + stepper */}
+          <div className="border-b border-slate-100 p-4 sm:p-6 pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-emerald-700">
+                  <Sparkles className="size-3.5" />
+                  {hi ? "स्मार्ट लिस्टिंग स्टूडियो" : "Smart listing studio"}
+                </p>
+                <h2 className="mt-1 text-xl sm:text-2xl font-black text-slate-900">
+                  {hi ? "अपनी फसल 2 मिनट में बेचें" : "Sell your harvest in 2 minutes"}
+                </h2>
+              </div>
+              <Button
+                onClick={demoVoiceFill}
+                variant="outline"
+                className="h-11 gap-2 rounded-2xl border-emerald-300 bg-emerald-50 px-4 text-xs font-black text-emerald-800 hover:bg-emerald-100"
+              >
+                <span className="flex size-7 items-center justify-center rounded-full bg-emerald-600 text-white">
+                  <Mic className="size-3.5" />
+                </span>
+                {hi ? "बोलकर भरें" : "Fill by voice"}
+              </Button>
+            </div>
+
+            {/* Stepper */}
+            <div className="mt-5">
+              <div className="flex items-center">
+                {STEPS.map((s, i) => {
+                  const done = s.id < step || published;
+                  const current = s.id === step && !published;
+                  const Icon = s.icon;
+                  return (
+                    <div key={s.id} className={cn("flex items-center", i < STEPS.length - 1 && "flex-1")}>
+                      <div className="flex flex-col items-center gap-1.5">
+                        <span className={cn(
+                          "flex size-9 sm:size-10 items-center justify-center rounded-2xl border-2 transition-all",
+                          done && "border-emerald-600 bg-emerald-600 text-white",
+                          current && "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-md scale-105",
+                          !done && !current && "border-slate-200 bg-slate-50 text-slate-400"
+                        )}>
+                          {done ? <CheckCircle2 className="size-5" /> : <Icon className="size-4.5" />}
+                        </span>
+                        <span className={cn(
+                          "whitespace-nowrap text-[10px] sm:text-[11px] font-bold",
+                          done || current ? "text-emerald-800" : "text-slate-400"
+                        )}>
+                          {stepLabels[i]}
+                        </span>
+                      </div>
+                      {i < STEPS.length - 1 && (
+                        <div className={cn("mx-1 sm:mx-2 mb-5 h-1 flex-1 rounded-full", s.id < step || published ? "bg-emerald-500" : "bg-slate-200")} />
+                      )}
                     </div>
-                    <button 
-                      type="button"
-                      onClick={() => setVoiceNotice(null)}
-                      className="p-1 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors shrink-0"
-                    >
-                      <X className="size-3.5" />
-                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-6">
+            {voiceNotice && !published && (
+              <div className="mb-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 p-3 text-xs text-white font-bold flex items-center justify-between shadow-md">
+                <div className="flex items-center gap-2">
+                  <Camera className="size-4 text-emerald-200 shrink-0" />
+                  <span>{voiceNotice}</span>
+                </div>
+                <button type="button" onClick={() => setVoiceNotice(null)} className="p-1 text-white/80 hover:text-white rounded-lg hover:bg-white/20 shrink-0">
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* SUCCESS STATE */}
+            {published ? (
+              <div className="mx-auto max-w-2xl py-4 text-center">
+                <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-emerald-100">
+                  <CheckCircle2 className="size-9 text-emerald-600" />
+                </div>
+                <h3 className="mt-4 text-xl sm:text-2xl font-black text-slate-900">
+                  {hi ? "बधाई! आपकी फसल लाइव है" : "Congratulations! Your crop is live"}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {hi ? "25 किमी के दायरे के खरीदारों को सूचना भेज दी गई है" : "Buyers within 25 km have been notified"}
+                </p>
+                <div className="mt-6 space-y-0 text-left">
+                  {[
+                    { icon: Package, title: hi ? "लिस्टिंग लाइव" : "Listing live", sub: hi ? "अभी" : "Right now", done: true },
+                    { icon: TrendingUp, title: hi ? "खरीदार मिलान (24 घंटे)" : "Buyer matching (24 hrs)", sub: hi ? "AI 5-फैक्टर स्कोर से" : "Via AI 5-factor score", done: false },
+                    { icon: ShieldCheck, title: hi ? "एस्क्रो लॉक" : "Escrow lock", sub: hi ? "खरीदार पेमेंट सुरक्षित" : "Buyer payment secured", done: false },
+                    { icon: Truck, title: hi ? "पिकअप + 4-अंकीय PIN" : "Pickup + 4-digit PIN", sub: hi ? "डिलीवरी पर भुगतान" : "Pay on delivery", done: false },
+                    { icon: HandCoins, title: hi ? "तुरंत भुगतान" : "Instant payout", sub: hi ? "4 घंटे में UPI" : "UPI within 4 hours", done: false },
+                  ].map((s, i, arr) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="flex flex-col items-center">
+                        <span className={cn(
+                          "flex size-9 items-center justify-center rounded-xl border",
+                          s.done ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-200 bg-slate-50 text-slate-400"
+                        )}>
+                          {s.done ? <CheckCircle2 className="size-4.5" /> : <s.icon className="size-4" />}
+                        </span>
+                        {i < arr.length - 1 && <span className={cn("h-5 w-0.5", s.done ? "bg-emerald-400" : "bg-slate-200")} />}
+                      </div>
+                      <div className="pb-4">
+                        <p className="text-sm font-black text-slate-900">{s.title}</p>
+                        <p className="text-xs text-slate-500">{s.sub}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex flex-col sm:flex-row gap-2.5 justify-center">
+                  <Button onClick={resetWizard} className="h-12 rounded-2xl bg-emerald-700 px-6 text-sm font-black text-white hover:bg-emerald-800">
+                    <Plus className="size-4" />
+                    {hi ? "एक और फसल लिस्ट करें" : "List another crop"}
+                  </Button>
+                  <Button asChild variant="outline" className="h-12 rounded-2xl px-6 text-sm font-bold">
+                    <Link href="/consumer">
+                      {hi ? "बाज़ार में देखें" : "View in market"}
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* STEP 1: crop picker */}
+                {step === 1 && (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-slate-900">{hi ? "कौन सी फसल बेचनी है?" : "Which crop are you selling?"}</h3>
+                      <p className="text-xs text-slate-500">{hi ? "फोटो पर टैप करें — बाकी विवरण खुद भर जाएगा" : "Tap a photo — the details fill in automatically"}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {CROP_PRESETS.map((preset) => {
+                        const selected = cropName === preset.name;
+                        return (
+                          <button
+                            key={preset.name}
+                            type="button"
+                            onClick={() => handlePresetSelect(preset)}
+                            className={cn(
+                              "group overflow-hidden rounded-2xl border-2 text-left transition-all active:scale-98",
+                              selected
+                                ? "border-emerald-600 shadow-lg shadow-emerald-600/15 ring-2 ring-emerald-200"
+                                : "border-slate-200 hover:border-emerald-300 hover:shadow-md"
+                            )}
+                          >
+                            <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
+                              <Image src={preset.image} alt={preset.name} fill sizes="300px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                              {selected && (
+                                <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-emerald-600 text-white shadow">
+                                  <CheckCircle2 className="size-4" />
+                                </span>
+                              )}
+                            </div>
+                            <div className="p-2.5">
+                              <p className="truncate text-xs font-black text-slate-900">{preset.name}</p>
+                              <p className="truncate text-[10px] text-slate-500">{preset.variety}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        value={customCrop}
+                        onChange={(e) => setCustomCrop(e.target.value)}
+                        placeholder={hi ? "सूची में नहीं है? फसल का नाम लिखें…" : "Not listed? Type your crop name…"}
+                        className="h-12 rounded-2xl text-sm font-semibold"
+                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleCustomCrop())}
+                      />
+                      <Button onClick={handleCustomCrop} variant="outline" className="h-12 shrink-0 rounded-2xl border-emerald-300 px-4 text-xs font-black text-emerald-800">
+                        <Plus className="size-4" />
+                        {hi ? "जोड़ें" : "Add"}
+                      </Button>
+                    </div>
                   </div>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700">
-                    <Sparkles className="size-4" />
-                    <span>{t("farmer_studio_badge")}</span>
-                  </div>
-                  <span className="rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 border border-emerald-200">
-                    {t("farmer_no_commission")}
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
-                  {t("farmer_studio_title")}
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {t("farmer_studio_sub")}
-                </p>
-              </div>
-
-              {/* Quick Preset Crop Selector */}
-              <div className="space-y-2.5 rounded-2xl bg-emerald-50/50 p-4 border border-emerald-100">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-800">
-                  <span className="flex items-center gap-1.5 text-emerald-900">
-                    <Zap className="size-4 text-amber-500" />
-                    <span>{t("farmer_quick_crops")}</span>
-                  </span>
-                  <span className="text-[11px] text-emerald-700 font-semibold">{t("farmer_autofill_tag")}</span>
-                </div>
-
-                <div className="flex flex-wrap gap-2.5 sm:gap-3 pt-1">
-                  {CROP_PRESETS.map((preset, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handlePresetSelect(preset)}
-                      className={`min-h-[44px] inline-flex items-center justify-center rounded-full border px-4 py-2.5 text-xs font-bold transition-all truncate active:scale-95 ${
-                        cropName.includes(preset.name.split(" ")[0])
-                          ? "bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-300"
-                          : "bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50"
-                      }`}
-                    >
-                      {preset.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Comprehensive Harvest Listing Form */}
-              <form onSubmit={handlePublishListing} className="space-y-6">
-                
-                {/* 1. Crop Name & Variety */}
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="crop" className="text-xs font-bold text-slate-800 mb-1 block">
-                      {t("crop_name_field")} <span className="text-rose-500">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="crop"
-                        value={cropName}
-                        onChange={(e) => setCropName(e.target.value)}
-                        placeholder={t("crop_name_ph")}
-                        required
-                        className={`font-bold text-slate-900 h-12 text-sm rounded-xl ${
-                          isTyping ? "border-emerald-500 ring-2 ring-emerald-200" : ""
-                        }`}
-                      />
-                      {isTyping && (
-                        <span className="absolute right-3 top-3.5 size-2 rounded-full bg-emerald-500 animate-ping" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="variety" className="text-xs font-bold text-slate-800 mb-1 block">
-                      {t("variety_field")}
-                    </Label>
-                    <Input
-                      id="variety"
-                      value={variety}
-                      onChange={(e) => setVariety(e.target.value)}
-                      placeholder={t("variety_ph")}
-                      className="text-slate-900 font-semibold h-12 text-sm rounded-xl"
-                    />
-                  </div>
-                </div>
-
-                {/* 2. Quantity, Unit & Bag Packaging */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="qty" className="text-xs font-bold text-slate-800 mb-1 block">
-                      {t("quantity_field")} <span className="text-rose-500">*</span>
-                    </Label>
-                    <Input
-                      id="qty"
-                      type="number"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value ? Number(e.target.value) : "")}
-                      placeholder="100"
-                      min={1}
-                      required
-                      className="font-bold text-slate-900 h-12 text-sm rounded-xl"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="unit" className="text-xs font-bold text-slate-800 mb-1 block">
-                      {t("unit_field")}
-                    </Label>
-                    <select
-                      id="unit"
-                      value={unit}
-                      onChange={(e) => setUnit(e.target.value)}
-                      className="h-12 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    >
-                      <option value="quintal">{language === "hi" ? "क्विंटल (Quintal ~100kg)" : "Quintal (~100kg)"}</option>
-                      <option value="ton">{language === "hi" ? "टन (Metric Ton)" : "Metric Ton (Ton)"}</option>
-                      <option value="bori">{language === "hi" ? "बोरी / कट्टे (~50kg Bag)" : "Bori / Bags (~50kg)"}</option>
-                      <option value="kg">{language === "hi" ? "किलोग्राम (kg)" : "Kilogram (kg)"}</option>
-                    </select>
-                  </div>
-
-                  <div className="col-span-2 sm:col-span-1 space-y-2">
-                    <Label htmlFor="price" className="text-xs font-bold text-slate-800 mb-1 block">
-                      {t("floor_price_field")} (₹ / {unit}) <span className="text-rose-500">*</span>
-                    </Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-3.5 text-xs font-black text-emerald-700">₹</span>
-                      <Input
-                        id="price"
-                        type="number"
-                        value={floorPrice}
-                        onChange={(e) => setFloorPrice(e.target.value ? Number(e.target.value) : "")}
-                        placeholder="40"
-                        min={1}
-                        required
-                        className="pl-7 font-black text-emerald-700 text-base h-12 rounded-xl"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Interactive Mandi vs Direct Farm-Gate Comparison */}
-                {priceNum > 0 && (
-                  <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-teal-50/60 to-white p-4 text-xs text-slate-800 space-y-2 shadow-xs animate-in fade-in">
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 font-black text-emerald-950">
-                        <TrendingUp className="size-4 text-emerald-600" />
-                        <span>{t("mandi_calc_heading")}</span>
-                      </span>
-                      <span className="rounded-full bg-emerald-600 text-white font-bold px-2.5 py-0.5 text-xs">
-                        +{Math.round((extraGainPerUnit / (traditionalMandiNet || 1)) * 100)}% {t("mandi_extra_profit")}
-                      </span>
+                {/* STEP 2: qty & price */}
+                {step === 2 && (
+                  <div className="mx-auto max-w-2xl space-y-5">
+                    <div className="text-center">
+                      <h3 className="text-base sm:text-lg font-black text-slate-900">
+                        {hi ? "मात्रा और भाव बताएं" : "Quantity & your price"}
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        {cropName || (hi ? "आपकी फसल" : "your crop")}
+                        {variety ? ` • ${variety}` : ""}
+                      </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-emerald-200/60">
-                      <div className="bg-white/90 p-2.5 rounded-xl border border-slate-200">
-                        <span className="text-slate-500 block text-[11px]">{t("mandi_after_deduction")}</span>
-                        <p className="text-sm font-bold text-slate-700">₹{traditionalMandiNet} /{unit}</p>
-                        <span className="text-xs text-rose-600 font-medium">{t("mandi_cut_note")}</span>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-700">{hi ? "मात्रा" : "Quantity"} *</Label>
+                        <Input
+                          type="number" min={1} value={quantity}
+                          onChange={(e) => setQuantity(e.target.value ? Number(e.target.value) : "")}
+                          placeholder="100"
+                          className="h-14 rounded-2xl text-center text-xl font-black"
+                        />
                       </div>
-                      <div className="bg-emerald-100/70 p-2.5 rounded-xl border border-emerald-300">
-                        <span className="text-emerald-800 font-semibold block text-[11px]">{t("krishi_farmgate_direct")}</span>
-                        <p className="text-sm font-black text-emerald-800">₹{priceNum} /{unit}</p>
-                        <span className="text-xs text-emerald-700 font-bold">{t("krishi_direct_payout")}</span>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-700">{hi ? "इकाई" : "Unit"}</Label>
+                        <select
+                          value={unit} onChange={(e) => setUnit(e.target.value)}
+                          className="h-14 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        >
+                          <option value="quintal">{hi ? "क्विंटल (~100kg)" : "Quintal (~100kg)"}</option>
+                          <option value="ton">{hi ? "टन" : "Metric Ton"}</option>
+                          <option value="bori">{hi ? "बोरी (~50kg)" : "Bags (~50kg)"}</option>
+                          <option value="kg">{hi ? "किलोग्राम" : "Kilogram"}</option>
+                        </select>
                       </div>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-emerald-950 font-bold leading-normal">
-                      {t("calculator_lot_note_prefix")} {quantity || 0} {unit} {t("calculator_lot_note_middle")}{" "}
-                      <span className="underline font-black text-emerald-800">₹{totalExtraProfit.toLocaleString("en-IN")}</span>{" "}
-                      {t("calculator_lot_note_suffix")}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-bold text-slate-700">
+                        {hi ? `आपका भाव (₹ प्रति ${unit})` : `Your price (₹ per ${unit})`} *
+                      </Label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-emerald-700">₹</span>
+                        <Input
+                          type="number" min={1} value={floorPrice}
+                          onChange={(e) => setFloorPrice(e.target.value ? Number(e.target.value) : "")}
+                          placeholder="3400"
+                          className="h-14 rounded-2xl pl-9 text-center text-xl font-black text-emerald-700"
+                        />
+                      </div>
+                      <p className="text-center text-[11px] text-slate-400">
+                        {hi ? "टिप: मंडी भाव से थोड़ा कम रखें — जल्दी बिकेगा" : "Tip: price slightly below mandi — it sells faster"}
+                      </p>
+                    </div>
+
+                    {/* Money motivator card */}
+                    {priceNum > 0 && qtyNum > 0 && (
+                      <div className="overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50/60 p-4 shadow-xs">
+                        <div className="flex items-center justify-between">
+                          <p className="flex items-center gap-1.5 text-xs font-black text-emerald-950">
+                            <TrendingUp className="size-4 text-emerald-600" />
+                            {hi ? "मंडी बनाम सीधी बिक्री" : "Mandi vs direct sale"}
+                          </p>
+                          <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-black text-white">
+                            +{Math.round((extraPerUnit / (traditionalMandiNet || 1)) * 100)}% {hi ? "अधिक" : "more"}
+                          </span>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <div className="rounded-xl border border-slate-200 bg-white p-3">
+                            <p className="text-[10px] font-semibold text-slate-500">{hi ? "मंडी में (कटौती बाद)" : "At mandi (after cuts)"}</p>
+                            <p className="text-base font-black text-slate-500">₹{traditionalMandiNet.toLocaleString("en-IN")}<span className="text-[10px] font-semibold">/{unit}</span></p>
+                          </div>
+                          <div className="rounded-xl border border-emerald-300 bg-emerald-100/70 p-3">
+                            <p className="text-[10px] font-bold text-emerald-800">{hi ? "कृषि सेतु सीधा भाव" : "Krishi Setu direct"}</p>
+                            <p className="text-base font-black text-emerald-800">₹{priceNum.toLocaleString("en-IN")}<span className="text-[10px] font-semibold">/{unit}</span></p>
+                          </div>
+                        </div>
+                        <p className="mt-3 rounded-xl bg-emerald-600 p-3 text-center text-sm font-black text-white">
+                          {hi ? `इस लॉट पर अतिरिक्त कमाई: ₹${totalExtra.toLocaleString("en-IN")}` : `Extra earnings on this lot: ₹${totalExtra.toLocaleString("en-IN")}`}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* STEP 3: quality */}
+                {step === 3 && (
+                  <div className="mx-auto max-w-3xl space-y-4">
+                    <div className="text-center">
+                      <h3 className="text-base sm:text-lg font-black text-slate-900">{hi ? "गुणवत्ता जांच" : "Quality check"}</h3>
+                      <p className="text-xs text-slate-500">
+                        {hi
+                          ? "फसल की फोटो लें — AI ग्रेड देगा, अच्छी ग्रेड = बेहतर भाव"
+                          : "Snap your crop — AI grades it, better grade = better price"}
+                      </p>
+                    </div>
+                    <OpenCVScan
+                      initialImage={attachedPhoto}
+                      cropHint={cropName}
+                      isVoiceHighlighted={false}
+                      onApplyToForm={handleApplyScanResult}
+                    />
+                    {scannedGrade && (
+                      <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                        <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-slate-900">
+                          {attachedPhoto && <Image src={attachedPhoto} alt={cropName} fill className="object-cover" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <p className="truncate text-sm font-black text-slate-900">{cropName}</p>
+                            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black text-white">{scannedGrade.grade}</span>
+                          </div>
+                          <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                            {hi ? "प्रमाणन: " : "Certification: "}
+                            <span className="font-mono font-bold">{scannedGrade.assayerVerificationId}</span>
+                          </p>
+                        </div>
+                        <BadgeCheck className="size-6 shrink-0 text-emerald-600" />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* STEP 4: review */}
+                {step === 4 && (
+                  <div className="mx-auto max-w-2xl space-y-4">
+                    <div className="text-center">
+                      <h3 className="text-base sm:text-lg font-black text-slate-900">{hi ? "जांचें और प्रकाशित करें" : "Review & publish"}</h3>
+                      <p className="text-xs text-slate-500">{hi ? "सब सही है? एक टैप में लाइव करें" : "All good? Go live in one tap"}</p>
+                    </div>
+                    <div className="overflow-hidden rounded-2xl border border-slate-200">
+                      <div className="relative aspect-[16/8] w-full bg-slate-100">
+                        {attachedPhoto ? (
+                          <Image src={attachedPhoto} alt={cropName} fill className="object-cover" />
+                        ) : (
+                          <div className="flex size-full items-center justify-center text-slate-300">
+                            <Camera className="size-10" />
+                          </div>
+                        )}
+                        <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black text-white">
+                          {scannedGrade?.grade ?? (hi ? "बिना स्कैन" : "Unscanned")}
+                        </span>
+                      </div>
+                      <div className="space-y-2.5 p-4">
+                        {[
+                          { label: hi ? "फसल" : "Crop", value: `${cropName}${variety ? ` • ${variety}` : ""}` },
+                          { label: hi ? "मात्रा" : "Quantity", value: `${qtyNum} ${unit}` },
+                          { label: hi ? "आपका भाव" : "Your price", value: `₹${priceNum.toLocaleString("en-IN")} / ${unit}`, hot: true },
+                          { label: hi ? "कुल लॉट मूल्य" : "Total lot value", value: `₹${lotValue.toLocaleString("en-IN")}`, hot: true },
+                          { label: hi ? "मंडी से अतिरिक्त" : "Extra over mandi", value: `+₹${totalExtra.toLocaleString("en-IN")}` },
+                          { label: hi ? "कटाई तिथि" : "Harvest date", value: harvestDate },
+                        ].map((row) => (
+                          <div key={row.label} className="flex items-center justify-between border-b border-dashed border-slate-100 pb-2 text-xs last:border-0 last:pb-0">
+                            <span className="font-semibold text-slate-500">{row.label}</span>
+                            <span className={cn("font-black", row.hot ? "text-emerald-700" : "text-slate-900")}>{row.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handlePublish}
+                      className="h-14 w-full gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 text-base font-black text-white shadow-lg shadow-emerald-800/20 hover:from-emerald-500 hover:to-teal-600 active:scale-98"
+                    >
+                      <Rocket className="size-5" />
+                      {hi ? "लिस्टिंग लाइव करें" : "Publish listing live"}
+                    </Button>
+                    <p className="text-center text-[11px] text-slate-400">
+                      {hi
+                        ? "प्रकाशित करते ही 0% कमीशन — पूरा पैसा सीधे आपको"
+                        : "Zero commission on publish — the full amount comes to you"}
                     </p>
                   </div>
                 )}
 
-                {/* 4. Attached Quality Grade & Photo Status Card */}
-                <div className="rounded-2xl border border-slate-200 p-3.5 bg-slate-50 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="relative size-12 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-300">
-                      <Image
-                        src={attachedPhoto}
-                        alt={cropName || "Crop Preview"}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-xs text-slate-900 truncate">
-                          {cropName || scannedGrade?.cropName || (language === "hi" ? "फसल" : "Crop Produce")}
-                        </span>
-                        <span className="rounded-full bg-emerald-600 text-white font-bold text-xs px-2.5 py-0.5">
-                          {scannedGrade?.grade || "Grade A"}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-600 truncate mt-0.5">
-                        {t("verification_code_label")} {scannedGrade?.assayerVerificationId || "KS-QC-748291"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 text-right">
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700">
-                      <CheckCircle2 className="size-3.5 text-emerald-600" />
-                      <span>{t("qc_verified_badge")}</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  disabled={isTyping}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-black text-sm h-12 rounded-2xl gap-2 shadow-lg shadow-emerald-800/20 active:scale-98 transition-all"
-                >
-                  <Plus className="size-5" />
-                  <span>{t("publish_harvest_btn")}</span>
-                </Button>
-              </form>
-
-              {/* Success Banner */}
-              {isListed && (
-                <div className="rounded-2xl border border-emerald-400 bg-emerald-100/90 p-3.5 text-xs text-emerald-950 flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
-                    <span className="font-bold">{t("listing_live_banner")}</span>
-                  </div>
-                  <Button asChild size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs shrink-0">
-                    <Link href="/consumer">{t("view_in_market_btn")}</Link>
+                {/* Wizard nav */}
+                <div className="mx-auto mt-6 flex max-w-2xl items-center justify-between gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep((s) => (s > 1 ? ((s - 1) as typeof step) : s))}
+                    disabled={step === 1}
+                    className="h-12 rounded-2xl px-5 text-sm font-bold"
+                  >
+                    <ChevronLeft className="size-4" />
+                    {hi ? "पीछे" : "Back"}
                   </Button>
+                  {step < 4 ? (
+                    <Button
+                      onClick={() => setStep((s) => ((s + 1) as typeof step))}
+                      disabled={!canNext(step) || isTyping}
+                      className="h-12 flex-1 rounded-2xl bg-emerald-700 text-sm font-black text-white hover:bg-emerald-800 sm:flex-none sm:px-10"
+                    >
+                      {isTyping ? (hi ? "वॉइस भर रहा है…" : "Voice filling…") : step === 3 ? (hi ? "समीक्षा करें" : "Review") : (hi ? "आगे बढ़ें" : "Continue")}
+                      <ChevronRight className="size-4" />
+                    </Button>
+                  ) : (
+                    <span className="text-[11px] font-semibold text-slate-400">
+                      {hi ? "ऊपर बटन से प्रकाशित करें" : "Use the button above to publish"}
+                    </span>
+                  )}
                 </div>
-              )}
-
-            </div>
-          </div>
-
-          {/* Right Column: AI Laser Scanner & Quality Lab (5 Columns) */}
-          <div className="lg:col-span-5">
-            {/* OpenCV Scanner Component */}
-            <OpenCVScan 
-              initialImage={attachedPhoto}
-              cropHint={cropName}
-              isVoiceHighlighted={highlightScanner}
-              onApplyToForm={handleApplyScanResult}
-            />
+              </>
+            )}
           </div>
         </section>
 
-        {/* 3. Active Listings from Farmer's Field */}
-        <section ref={activeListingsRef} className="space-y-4 pt-4 border-t border-slate-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        {/* 3. My listings */}
+        <section ref={listingsRef} className="space-y-4 pt-2">
+          <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg sm:text-xl font-black text-slate-900">
-                {t("active_listings_heading")}
-              </h3>
-              <p className="text-xs text-slate-500">
-                {t("active_listings_subtitle")}
-              </p>
+              <h3 className="text-lg sm:text-xl font-black text-slate-900">{hi ? "मेरी फसलें" : "My listings"}</h3>
+              <p className="text-xs text-slate-500">{hi ? "लाइव, एस्क्रो और बिकी हुई फसलें" : "Live, in-escrow and sold harvests"}</p>
             </div>
-            <span className="self-start sm:self-auto rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 text-xs font-black">
-              {listings.length} {t("active_listings_live_count")}
+            <span className="rounded-full bg-emerald-100 border border-emerald-300 px-3 py-1 text-xs font-black text-emerald-800">
+              {listings.length} {hi ? "सक्रिय" : "active"}
             </span>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {listings.map((item) => (
-              <div
-                key={item.id}
-                className="group rounded-3xl border border-slate-200 bg-white p-4 shadow-xs hover:shadow-lg transition-all space-y-3"
-              >
-                {/* Crop Photo with Badges */}
-                <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-950">
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 380px"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2.5 left-2.5 rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-md border border-white/20">
-                    {item.category}
-                  </div>
-                  <div className="absolute top-2.5 right-2.5 rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
-                    {item.breakdown?.qualityGrade?.grade || "Grade A"}
-                  </div>
-                  <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/70 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 backdrop-blur-md">
-                    <Sparkles className="size-2.5 text-amber-300" />
-                    <span>{item.matchScore}% {t("market_demand")}</span>
-                  </div>
-                </div>
-
-                {/* Crop Name & Rate */}
-                <div>
-                  <div className="flex items-center justify-between gap-1">
-                    <h4 className="font-black text-slate-900 text-sm truncate">{item.name}</h4>
-                  </div>
-                  
-                  <div className="flex items-baseline justify-between text-xs mt-2 w-full">
-                    <div>
-                      <span className="text-lg font-black text-emerald-700">
-                        ₹{item.farmGatePrice}
-                      </span>
-                      <span className="text-xs font-semibold text-slate-500">/{item.unit}</span>
-                      <span className="ml-2 text-xs font-normal text-slate-400 line-through">
-                        ₹{item.mandiBenchmarkPrice}
-                      </span>
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg shrink-0">
-                      {item.quantityAvailable} {item.unit} {t("available_text")}
+            {listings.map((item) => {
+              const meta = statusMeta(item.status);
+              return (
+                <div key={item.id} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition-all hover:shadow-lg">
+                  <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
+                    <Image src={item.imageUrl} alt={item.name} fill sizes="380px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                    <span className={cn("absolute left-2.5 top-2.5 rounded-full border px-2.5 py-0.5 text-[10px] font-black", meta.cls)}>
+                      {meta.label}
+                    </span>
+                    <span className="absolute right-2.5 top-2.5 rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black text-white">
+                      {item.breakdown?.qualityGrade?.grade || "Grade A"}
                     </span>
                   </div>
+                  <div className="space-y-2.5 p-4">
+                    <h4 className="truncate text-sm font-black text-slate-900">{hi ? item.hindiName : item.name}</h4>
+                    <div className="flex items-baseline justify-between">
+                      <p className="text-lg font-black text-emerald-700">
+                        ₹{item.farmGatePrice.toLocaleString("en-IN")}
+                        <span className="text-[11px] font-semibold text-slate-500">/{item.unit}</span>
+                      </p>
+                      <span className="rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-bold text-slate-700">
+                        {item.quantityAvailable} {item.unit}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 border-t border-slate-100 pt-2.5">
+                      <Button variant="outline" size="sm" className="h-9 flex-1 rounded-xl text-[11px] font-bold"
+                        onClick={() => toast.success(hi ? "संपादन जल्द आ रहा है" : "Editing coming soon")}>
+                        <Pencil className="size-3.5" />
+                        {hi ? "बदलें" : "Edit"}
+                      </Button>
+                      <Button asChild size="sm" className="h-9 flex-1 rounded-xl bg-emerald-700 text-[11px] font-bold text-white hover:bg-emerald-800">
+                        <Link href="/consumer">
+                          {hi ? "बाज़ार में देखें" : "View in market"}
+                          <ArrowRight className="size-3.5" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Bottom Footer Info */}
-                <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 w-full">
-                  <span className="flex items-center gap-1.5 text-emerald-700 font-bold truncate">
-                    <CheckCircle2 className="size-3.5 shrink-0 text-emerald-600" />
-                    <span>OpenCV Assayed</span>
-                  </span>
-                  <Link
-                    href="/consumer"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 min-h-[38px] text-xs font-bold transition-all shadow-xs hover:shadow active:scale-95 group shrink-0"
-                  >
-                    <span>{t("inspect_market")}</span>
-                    <ArrowRight className="size-3.5 text-white/90 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
-                  </Link>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
