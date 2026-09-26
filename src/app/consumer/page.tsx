@@ -13,6 +13,7 @@ import {
   CheckCircle2, 
   Sliders, 
   TrendingDown, 
+  TrendingUp, 
   Truck, 
   Copy, 
   X,
@@ -441,13 +442,28 @@ export default function ConsumerPortalPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 pt-0.5">
-                      <TrendingDown className="size-3.5" />
-                      <span>
-                        {t("card_save_label")} ₹{listing.mandiBenchmarkPrice - listing.farmGatePrice}/{listing.unit} (
-                        {Math.round(((listing.mandiBenchmarkPrice - listing.farmGatePrice) / listing.mandiBenchmarkPrice) * 100)}% {t("card_cheaper_label")})
-                      </span>
-                    </div>
+                    {(() => {
+                      const savings = listing.mandiBenchmarkPrice - listing.farmGatePrice;
+                      if (savings > 0) {
+                        const pct = Math.round((savings / listing.mandiBenchmarkPrice) * 100);
+                        return (
+                          <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 pt-0.5">
+                            <TrendingDown className="size-3.5" />
+                            <span>
+                              {t("card_save_label")} ₹{savings}/{listing.unit} ({pct}% {t("card_cheaper_label")})
+                            </span>
+                          </div>
+                        );
+                      }
+                      return (
+                        <div className="flex items-center gap-1 text-[11px] font-semibold text-amber-700 pt-0.5">
+                          <TrendingUp className="size-3.5" />
+                          <span>
+                            ₹{Math.abs(savings)}/{listing.unit} {t("card_above_mandi_label")}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Quality & Reliability pills */}

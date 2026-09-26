@@ -661,6 +661,7 @@ export const TRANSLATIONS: Translations = {
   card_mandi_rate_label: { en: "APMC Mandi Rate", hi: "मंडी भाव" },
   card_save_label: { en: "Save", hi: "बचत" },
   card_cheaper_label: { en: "Cheaper", hi: "सस्ता" },
+  card_above_mandi_label: { en: "above mandi rate", hi: "मंडी भाव से ऊपर" },
   card_trust_score: { en: "Trust Score", hi: "रेटिंग" },
   btn_view_match: { en: "View 5 Factors", hi: "5-कारक विवरण" },
   btn_secure_escrow_order: { en: "Buy via Escrow", hi: "एस्क्रो से खरीदें" },
