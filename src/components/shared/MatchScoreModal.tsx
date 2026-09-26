@@ -31,7 +31,7 @@ export function MatchScoreModal({ listing, isOpen, onClose }: MatchScoreModalPro
       color: "text-emerald-700 bg-emerald-100",
       barColor: "bg-emerald-500",
       detail: breakdown.priceIndex.detail,
-      metric: `₹${listing.farmGatePrice}/kg vs APMC ₹${listing.mandiBenchmarkPrice}/kg`,
+      metric: `₹${listing.farmGatePrice}/${listing.unit} vs APMC ₹${listing.mandiBenchmarkPrice}/${listing.unit}`,
       sub: "Eliminates 3-5 middleman cuts directly",
     },
     {
