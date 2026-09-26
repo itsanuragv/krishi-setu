@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
@@ -25,7 +24,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/shared/Navbar";
-import { PlatformGuideModal } from "@/components/shared/PlatformGuideModal";
 import { TrustJourneySection } from "@/components/shared/TrustJourneySection";
 import { 
   heroContainerVariants, 
@@ -39,7 +37,6 @@ import { RATING_CONFIG } from "@/config/rating-config";
 
 export default function HomePage() {
   const { language, t } = useLanguage();
-  const [guideModalOpen, setGuideModalOpen] = useState(false);
 
   const PRIMARY_ROLES = [
     {
@@ -305,114 +302,6 @@ export default function HomePage() {
 
 
 
-        {/* How Krishi Setu Works: 3-Pillar Direct Highway (Farmer, Consumer, Logistics) */}
-        <section id="how-it-works" className="space-y-5 pt-2">
-          <div className="text-center space-y-1">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/90 px-3 py-1 text-xs font-bold text-emerald-900 border border-emerald-200">
-              <Compass className="size-3.5 text-emerald-700" />
-              <span>{t("how_it_works_badge")}</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-              {t("how_it_works_title")}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
-              {t("how_it_works_sub")}
-            </p>
-          </div>
-
-          <motion.div
-            variants={scrollStaggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid gap-4 sm:grid-cols-3"
-          >
-            {/* Step 1: Farmer */}
-            <motion.div
-              variants={scrollCardItem}
-              whileHover={{ y: -4, scale: 1.01 }}
-              className="rounded-3xl border border-emerald-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-lg hover:border-emerald-300 transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 font-black text-sm">
-                  1
-                </span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  {t("how_step1_badge")}
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-slate-900">{t("how_step1_title")}</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {t("how_step1_desc")}
-              </p>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                <Link href="/farmer" className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800 transition-colors">
-                  <span>{t("how_step1_link")}</span>
-                  <ArrowRight className="size-3.5" />
-                </Link>
-                <span className="text-[10px] text-emerald-600 font-semibold">{t("how_step1_tag")}</span>
-              </div>
-            </motion.div>
-
-            {/* Step 2: Consumer */}
-            <motion.div
-              variants={scrollCardItem}
-              whileHover={{ y: -4, scale: 1.01 }}
-              className="rounded-3xl border border-teal-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-lg hover:border-teal-300 transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-teal-100 text-teal-800 font-black text-sm">
-                  2
-                </span>
-                <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
-                  {t("how_step2_badge")}
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-slate-900">{t("how_step2_title")}</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {t("how_step2_desc")}
-              </p>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                <Link href="/consumer" className="inline-flex items-center gap-1 font-bold text-teal-700 hover:text-teal-800 transition-colors">
-                  <span>{t("how_step2_link")}</span>
-                  <ArrowRight className="size-3.5" />
-                </Link>
-                <span className="text-[10px] text-teal-600 font-semibold">{t("how_step2_tag")}</span>
-              </div>
-            </motion.div>
-
-            {/* Step 3: Delivery & Escrow */}
-            <motion.div
-              variants={scrollCardItem}
-              whileHover={{ y: -4, scale: 1.01 }}
-              className="rounded-3xl border border-amber-200 bg-white/95 p-5 shadow-xs space-y-3 relative overflow-hidden group hover:shadow-lg hover:border-amber-300 transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-amber-100 text-amber-800 font-black text-sm">
-                  3
-                </span>
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                  {t("how_step3_badge")}
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-slate-900">{t("how_step3_title")}</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {t("how_step3_desc")}
-              </p>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                <button
-                  type="button"
-                  onClick={() => setGuideModalOpen(true)}
-                  className="inline-flex items-center gap-1 font-bold text-amber-700 hover:text-amber-800 transition-colors cursor-pointer"
-                >
-                  <span>{t("how_step3_link")}</span>
-                  <ArrowRight className="size-3.5" />
-                </button>
-                <span className="text-[10px] text-amber-600 font-semibold">{t("how_step3_tag")}</span>
-              </div>
-            </motion.div>
-          </motion.div>
-        </section>
 
         {/* Visual Trust Journey: 5-Step Explainer (See How It Works) */}
         <TrustJourneySection />
@@ -551,11 +440,15 @@ export default function HomePage() {
             </div>
             <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
-                onClick={() => setGuideModalOpen(true)}
+                onClick={() => {
+                  document
+                    .getElementById("trust-journey")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs gap-1.5 self-start sm:self-auto rounded-xl shadow-xs"
               >
                 <Compass className="size-3.5" />
-                <span>{t("btn_arch_tour")}</span>
+                <span>{t("btn_how_it_works")}</span>
               </Button>
             </motion.div>
           </div>
@@ -748,7 +641,11 @@ export default function HomePage() {
                 <li><Link href="/farmer" className="hover:text-emerald-700 transition-colors">{t("footer_link_opencv")}</Link></li>
                 <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">{t("footer_link_proximity")}</Link></li>
                 <li><Link href="/consumer" className="hover:text-emerald-700 transition-colors">{t("footer_link_match")}</Link></li>
-                <li><button onClick={() => setGuideModalOpen(true)} className="hover:text-emerald-700 transition-colors text-left">{t("footer_link_arch")}</button></li>
+                <li><button onClick={() => {
+                  document
+                    .getElementById("trust-journey")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }} className="hover:text-emerald-700 transition-colors text-left">{t("footer_link_arch")}</button></li>
               </ul>
             </div>
 
@@ -774,11 +671,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Interactive Platform Architecture Guide Modal */}
-      <PlatformGuideModal
-        isOpen={guideModalOpen}
-        onClose={() => setGuideModalOpen(false)}
-      />
     </div>
   );
 }
