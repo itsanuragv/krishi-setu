@@ -106,9 +106,8 @@ export async function GET(request: Request) {
     });
   }
 
-  const apiKey =
-    process.env.DATA_GOV_IN_API_KEY ||
-    "579b464db66ec23bdd000001ef9a51ef474845bc75bc2f219dbaf443";
+  // Server-only env key. Never hardcode API keys in source (public repo).
+  const apiKey = process.env.DATA_GOV_IN_API_KEY || "";
 
   try {
     const fetchPromises = TARGET_CROPS.map(async (cropDef) => {
@@ -116,6 +115,8 @@ export async function GET(request: Request) {
         cropDef.apiKey
       )}&limit=3`;
 
+      // Skip live fetch entirely when no key is configured -> straight to fallback
+      if (apiKey) {
       try {
         const res = await fetch(url, {
           headers: { Accept: "application/json" },
@@ -158,7 +159,7 @@ export async function GET(request: Request) {
       } catch (err) {
         console.warn(`[Agmarknet API] Fallback used for ${cropDef.cropEn}:`, err);
       }
-
+      } // end if (apiKey) - no key configured, use fallback below
       // Safe fallback calculation
       const rawMandiPrice = cropDef.fallbackMandi;
       const rawFarmGatePrice = Math.round(rawMandiPrice * cropDef.multiplier);
