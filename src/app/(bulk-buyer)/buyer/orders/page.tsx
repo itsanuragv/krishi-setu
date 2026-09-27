@@ -1,174 +1,253 @@
 "use client";
 
-import { useState } from "react";
-import {
-  BadgeCheck,
-  Truck,
-  FileDown,
-  MessageSquareWarning,
-  Eye,
-  EyeOff,
-  PackageCheck,
-} from "lucide-react";
+import { useMemo, useState } from "react";
+import { BadgeCheck, CalendarClock, Eye, EyeOff, Lock, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
-import { MOCK_CONTRACTS } from "@/lib/buyer-mock";
+import { MOCK_CONTRACTS, type BuyerContract } from "@/lib/buyer-mock";
+import { PortalShell, PortalHero } from "@/components/portals";
 import { EscrowStages } from "@/components/buyer/EscrowStages";
-import { cn } from "@/lib/utils";
+import { cn, formatInr } from "@/lib/utils";
 
-const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
-
-const STATUS_STYLE: Record<string, string> = {
+const STATUS_STYLE: Record<BuyerContract["status"], string> = {
   active: "bg-sky-100 text-sky-800",
   in_transit: "bg-amber-100 text-amber-800",
   qc_pending: "bg-violet-100 text-violet-800",
   settled: "bg-emerald-100 text-emerald-800",
 };
 
+function statusLabel(t: (k: string) => string, s: BuyerContract["status"]) {
+  switch (s) {
+    case "active":
+      return t("buyer_orders_status_active");
+    case "in_transit":
+      return t("buyer_orders_status_in_transit");
+    case "qc_pending":
+      return t("buyer_orders_status_qc_pending");
+    case "settled":
+      return t("buyer_orders_status_settled");
+  }
+}
+
+interface VendorGroup {
+  vendor: string;
+  vendorType: "FPO" | "Farmer";
+  contracts: BuyerContract[];
+  totalValue: number;
+  totalSaved: number;
+}
+
 export default function BuyerOrdersPage() {
-  const { language } = useLanguage();
-  const hi = language === "hi";
-  const [showPin, setShowPin] = useState<Record<string, boolean>>({});
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<"all" | "active" | "settled">("all");
+  const [showPin, setShowPin] = useState<Record<string, boolean>>({});
 
-  const orders = MOCK_CONTRACTS.filter((c) =>
-    filter === "all" ? true : filter === "settled" ? c.status === "settled" : c.status !== "settled"
-  );
-
-  const statusLabel = (s: string) =>
-    s === "active" ? (hi ? "सक्रिय" : "Active")
-    : s === "in_transit" ? (hi ? "रास्ते में" : "In transit")
-    : s === "qc_pending" ? (hi ? "गुणवत्ता जांच" : "QC pending")
-    : (hi ? "निपटान पूर्ण" : "Settled");
+  const groups = useMemo<VendorGroup[]>(() => {
+    const filtered = MOCK_CONTRACTS.filter((c) =>
+      filter === "all" ? true : filter === "settled" ? c.status === "settled" : c.status !== "settled"
+    );
+    const map = new Map<string, VendorGroup>();
+    for (const c of filtered) {
+      const g = map.get(c.counterparty) ?? {
+        vendor: c.counterparty,
+        vendorType: c.counterpartyType,
+        contracts: [],
+        totalValue: 0,
+        totalSaved: 0,
+      };
+      g.contracts.push(c);
+      g.totalValue += c.quantity * c.agreedPrice;
+      g.totalSaved += (c.mandiPrice - c.agreedPrice) * c.quantity;
+      map.set(c.counterparty, g);
+    }
+    return [...map.values()];
+  }, [filter]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h1 className="text-xl font-black text-slate-900 sm:text-2xl">{hi ? "मेरे ऑर्डर" : "My orders"}</h1>
-          <p className="text-xs text-slate-500 sm:text-sm">
-            {hi ? "एस्क्रो-सुरक्षित थोक खरीद — लॉक से निपटान तक" : "Escrow-protected bulk purchases — from lock to settlement"}
-          </p>
-        </div>
-        <div className="flex gap-1.5 rounded-xl border border-slate-200 bg-white p-1">
-          {(["all", "active", "settled"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={cn(
-                "rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all",
-                filter === f ? "bg-emerald-700 text-white" : "text-slate-500 hover:bg-slate-100"
-              )}
-            >
-              {f === "all" ? (hi ? "सभी" : "All") : f === "active" ? (hi ? "सक्रिय" : "Active") : (hi ? "पूर्ण" : "Done")}
-            </button>
-          ))}
-        </div>
-      </div>
+    <PortalShell accent="buyer">
+      <div className="space-y-5 sm:space-y-6">
+        <PortalHero
+          eyebrow={t("buyer_orders_eyebrow")}
+          title={t("buyer_orders_title")}
+          subtitle={t("buyer_orders_sub")}
+          stats={[
+            {
+              label: t("buyer_orders_vendor_pos"),
+              value: String(MOCK_CONTRACTS.length),
+            },
+            {
+              label: t("buyer_orders_escrow"),
+              value: formatInr(MOCK_CONTRACTS.reduce((s, c) => s + c.escrowAmount, 0)),
+            },
+          ]}
+          actions={
+            <div className="flex gap-1.5 rounded-xl bg-white/15 p-1.5">
+              {(["all", "active", "settled"] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    "min-h-[44px] rounded-lg px-4 text-xs font-bold transition-all",
+                    filter === f ? "bg-white text-[var(--portal-dark)]" : "text-white/80 hover:text-white"
+                  )}
+                >
+                  {f === "all"
+                    ? t("buyer_orders_all")
+                    : f === "active"
+                      ? t("buyer_orders_active")
+                      : t("buyer_orders_settled")}
+                </button>
+              ))}
+            </div>
+          }
+        />
 
-      <div className="space-y-4">
-        {orders.map((c) => {
-          const lotValue = c.quantity * c.agreedPrice;
-          return (
-            <div key={c.id} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs sm:p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                    <PackageCheck className="size-5" />
+        {groups.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#D1D5DB] bg-white p-8 text-center">
+            <BadgeCheck className="mx-auto h-10 w-10 text-[#9CA3AF]" />
+            <p className="mt-3 text-sm font-semibold text-[#4B5563]">
+              {t("buyer_orders_empty")}
+            </p>
+          </div>
+        ) : (
+          groups.map((g) => (
+            <section
+              key={g.vendor}
+              aria-label={g.vendor}
+              className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm sm:p-5"
+            >
+              {/* Vendor header */}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F3F4F6] pb-3.5">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--portal-light)] font-heading text-lg font-bold text-[var(--portal-dark)]">
+                    {g.vendor.charAt(0)}
                   </span>
                   <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm font-black text-slate-900 sm:text-base">{hi ? c.lotNameHi : c.lotName}</h3>
-                      <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-black", STATUS_STYLE[c.status])}>
-                        {statusLabel(c.status)}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[11px] text-slate-500">
-                      <span className="font-mono font-bold text-slate-600">{c.contractNo}</span>
-                      {" • "}{hi ? c.counterpartyHi : c.counterparty}
-                      {" • "}{c.quantity} {c.unit} @ {inr(c.agreedPrice)}/{c.unit}
+                    <h2 className="font-heading text-base font-bold text-[#1F2937]">{g.vendor}</h2>
+                    <p className="text-xs text-[#6B7280]">
+                      {g.vendorType} · {g.contracts.length} {t("buyer_orders_vendor_pos")}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-black text-slate-900">{inr(lotValue)}</p>
-                  <p className="text-[10px] text-slate-500">{hi ? "अनुबंध मूल्य" : "Contract value"}</p>
-                </div>
-              </div>
-
-              <div className="rounded-xl bg-slate-50 p-3">
-                <EscrowStages stage={c.escrowStage} />
-              </div>
-
-              <div className="grid gap-2.5 sm:grid-cols-3">
-                <div className="rounded-xl border border-slate-200 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{hi ? "डिलीवरी तिथि" : "Delivery date"}</p>
-                  <p className="mt-0.5 flex items-center gap-1.5 text-xs font-black text-slate-800">
-                    <Truck className="size-3.5 text-slate-400" />
-                    {c.deliveryDate}
+                  <p className="font-heading text-base font-bold text-[#1F2937]">
+                    {formatInr(g.totalValue)}
+                  </p>
+                  <p className="text-[11px] font-bold text-emerald-700">
+                    {formatInr(g.totalSaved)} {t("buyer_orders_saved")}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-200 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{hi ? "हैंडओवर PIN" : "Handover PIN"}</p>
-                  {c.status === "settled" ? (
-                    <p className="mt-0.5 text-xs font-bold text-emerald-700">{hi ? "सत्यापित ✓" : "Verified ✓"}</p>
-                  ) : (
-                    <button
-                      onClick={() => setShowPin({ ...showPin, [c.id]: !showPin[c.id] })}
-                      className="mt-0.5 inline-flex items-center gap-1.5 font-mono text-xs font-black text-slate-800"
+              </div>
+
+              {/* Contracts */}
+              <div className="mt-3 space-y-4">
+                {g.contracts.map((c) => {
+                  const lotValue = c.quantity * c.agreedPrice;
+                  return (
+                    <div
+                      key={c.id}
+                      className="rounded-xl border border-[#F3F4F6] bg-[#F9FAFB] p-3.5 sm:p-4"
                     >
-                      {showPin[c.id] ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                      {showPin[c.id] ? c.handoverPin : "••••"}
-                      <span className="font-sans text-[10px] font-semibold text-slate-400">
-                        {hi ? "ड्राइवर को बताएं" : "share with driver"}
-                      </span>
-                    </button>
-                  )}
-                </div>
-                <div className="rounded-xl border border-slate-200 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{hi ? "मंडी बनाम बचत" : "Saved vs mandi"}</p>
-                  <p className="mt-0.5 text-xs font-black text-emerald-700">
-                    {inr((c.mandiPrice - c.agreedPrice) * c.quantity)}
-                    <span className="ml-1 font-semibold text-slate-400">
-                      ({Math.round(((c.mandiPrice - c.agreedPrice) / c.mandiPrice) * 100)}%)
-                    </span>
-                  </p>
-                </div>
-              </div>
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-sm font-bold text-[#1F2937]">{c.lotName}</h3>
+                            <span className="rounded bg-[#E5E7EB] px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#4B5563]">
+                              {c.contractNo}
+                            </span>
+                            <span
+                              className={cn(
+                                "rounded-full px-2.5 py-0.5 text-[11px] font-bold",
+                                STATUS_STYLE[c.status]
+                              )}
+                            >
+                              {statusLabel(t, c.status)}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-[#6B7280]">
+                            {c.quantity} {c.unit} @ {formatInr(c.agreedPrice)}/{c.unit} ·{" "}
+                            <span className="font-bold text-[#1F2937]">{formatInr(lotValue)}</span>
+                          </p>
+                        </div>
+                      </div>
 
-              <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
-                <Button
-                  size="sm" variant="outline"
-                  className="h-9 rounded-xl text-[11px] font-bold"
-                  onClick={() => toast.success(hi ? "GST इनवॉइस डाउनलोड हो रहा है" : "Downloading GST invoice")}
-                >
-                  <FileDown className="size-3.5" />
-                  {hi ? "GST इनवॉइस" : "GST invoice"}
-                </Button>
-                <Button
-                  size="sm" variant="outline"
-                  className="h-9 rounded-xl text-[11px] font-bold"
-                  onClick={() => toast.success(hi ? "गुणवत्ता प्रमाणपत्र खुल रहा है" : "Opening assay certificate")}
-                >
-                  <BadgeCheck className="size-3.5" />
-                  {hi ? "गुणवत्ता प्रमाणपत्र" : "Assay certificate"}
-                </Button>
-                {c.status !== "settled" && (
-                  <Button
-                    size="sm" variant="outline"
-                    className="h-9 rounded-xl border-rose-200 text-[11px] font-bold text-rose-700 hover:bg-rose-50"
-                    onClick={() => toast.success(hi ? "विवाद एडमिन को भेजा गया" : "Dispute sent to admin")}
-                  >
-                    <MessageSquareWarning className="size-3.5" />
-                    {hi ? "विवाद दर्ज करें" : "Raise dispute"}
-                  </Button>
-                )}
+                      <div className="mt-3">
+                        <EscrowStages stage={c.escrowStage} />
+                      </div>
+
+                      <div className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-2 text-[#4B5563]">
+                          <CalendarClock className="h-3.5 w-3.5 shrink-0 text-[var(--portal)]" />
+                          {t("buyer_orders_slot")}: <strong>{c.deliveryDate}</strong>
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-2 text-[#4B5563]">
+                          <Lock className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+                          {t("buyer_orders_escrow")}:{" "}
+                          <strong>
+                            {c.escrowAmount > 0
+                              ? `${formatInr(c.escrowAmount)} ${t("buyer_orders_locked")}`
+                              : "—"}
+                          </strong>
+                        </span>
+                        {c.status !== "settled" && (
+                          <button
+                            type="button"
+                            onClick={() => setShowPin({ ...showPin, [c.id]: !showPin[c.id] })}
+                            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-white px-2.5 py-2 font-mono text-[#1F2937]"
+                          >
+                            {showPin[c.id] ? (
+                              <EyeOff className="h-3.5 w-3.5 shrink-0 text-[#6B7280]" />
+                            ) : (
+                              <Eye className="h-3.5 w-3.5 shrink-0 text-[#6B7280]" />
+                            )}
+                            <span className="text-[11px] text-[#6B7280]">
+                              {t("buyer_orders_pin")}:
+                            </span>
+                            <strong className="tracking-widest">
+                              {showPin[c.id] ? c.handoverPin : "••••"}
+                            </strong>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#F3F4F6] pt-3">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] text-[#6B7280]">
+                          <Truck className="h-3.5 w-3.5" />
+                          {c.deliveryDate}
+                        </span>
+                        {c.status !== "settled" ? (
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => toast.success(t("buyer_orders_dispute_toast"))}
+                              className="min-h-[44px] rounded-xl text-xs font-bold"
+                            >
+                              {t("buyer_orders_dispute")}
+                            </Button>
+                            <Button
+                              onClick={() => toast.success(t("buyer_orders_tracking_toast"))}
+                              className="min-h-[44px] rounded-xl bg-[var(--portal)] text-xs font-bold text-white hover:bg-[var(--portal-dark)]"
+                            >
+                              {t("buyer_orders_track")}
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1.5 text-[11px] font-bold text-emerald-800">
+                            <BadgeCheck className="h-3.5 w-3.5" />
+                            {t("buyer_orders_status_settled")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          );
-        })}
+            </section>
+          ))
+        )}
       </div>
-    </div>
+    </PortalShell>
   );
 }

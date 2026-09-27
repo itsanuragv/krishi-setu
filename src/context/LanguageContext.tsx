@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { PORTAL_TRANSLATIONS } from "./portal-i18n";
 
 export type Language = "en" | "hi";
 
@@ -832,7 +833,62 @@ export const TRANSLATIONS: Translations = {
   shelf_life_meter: { en: "Shelf Life", hi: "शेल्फ लाइफ" },
   days_suffix: { en: "days", hi: "दिन" },
   btn_apply_grade: { en: "✓ Apply Grade & Photo to Listing Form", hi: "✓ यह ग्रेड व फोटो लिस्टिंग फॉर्म में लगाएं" },
+  // ---- Portal v2 shared kit ----
+  kit_voice_sell: { en: "🎤 Sell by Voice", hi: "🎤 बोलकर बेचें" },
+  kit_voice_listening: { en: "Listening… speak now", hi: "सुन रहे हैं… बोलिए" },
+  kit_voice_not_supported: { en: "Voice not supported in this browser — you can type instead", hi: "इस ब्राउज़र में वॉइस नहीं है — टाइप करके भी जोड़ सकते हैं" },
+  kit_mandi_rate: { en: "Mandi Rate", hi: "मंडी भाव" },
+  kit_mandi_takehome: { en: "Mandi take-home", hi: "मंडी में हाथ आता" },
+  kit_middlemen_cut: { en: "middleman cut", hi: "बिचौलिया कटौती" },
+  kit_no_middlemen_note: { en: "Full amount — zero middlemen", hi: "पूरा पैसा — कोई बिचौलिया नहीं" },
+  kit_your_price: { en: "Your Price", hi: "आपका दाम" },
+  kit_extra_earning: { en: "extra earning", hi: "अतिरिक्त कमाई" },
+  kit_payout_title: { en: "Payout Incoming", hi: "आने वाला भुगतान" },
+  kit_this_week: { en: "This week", hi: "इस हफ़्ते" },
+  kit_payout_coming: { en: "will arrive in your UPI", hi: "आपके UPI में आएगा" },
+  kit_payout_today: { en: "Arriving today", hi: "आज ही आ रहा है" },
+  kit_days_suffix: { en: "days", hi: "दिन" },
+  kit_remaining: { en: "left", hi: "बाकी" },
+  kit_farmer_gets: { en: "Farmer gets", hi: "किसान को" },
+  kit_retail_price: { en: "Retail price", hi: "बाज़ार भाव" },
+  kit_you_save: { en: "You save", hi: "आपकी बचत" },
+  kit_away: { en: "away", hi: "दूर" },
+  kit_harvested: { en: "Harvested", hi: "तुड़ाई" },
+  kit_grade: { en: "Grade", hi: "ग्रेड" },
+  kit_radius_title: { en: "How far should your food travel?", hi: "आपका खाना कितनी दूर से आए?" },
+  kit_radius_hint: { en: "Shorter distance = fresher produce, same-day harvest.", hi: "कम दूरी = ताज़ा उपज, उसी दिन की तुड़ाई।" },
+  kit_backspace: { en: "Delete digit", hi: "अंक मिटाएं" },
+  kit_order: { en: "Order", hi: "ऑर्डर" },
+  kit_escrow_locked: { en: "escrow locked", hi: "एस्क्रो में सुरक्षित" },
+  kit_evidence: { en: "Evidence", hi: "सबूत" },
+  kit_ai_analysis: { en: "AI Analysis", hi: "AI विश्लेषण" },
+  kit_dispatch_photo: { en: "Dispatch photo (farmer)", hi: "डिस्पैच फोटो (किसान)" },
+  kit_blur: { en: "sharpness", hi: "शार्पनेस" },
+  kit_arrival_photo: { en: "Arrival photo (buyer)", hi: "पहुंचने की फोटो (खरीदार)" },
+  kit_status: { en: "Status", hi: "स्थिति" },
+  kit_recommended: { en: "Recommended", hi: "सुझाव" },
+  kit_escrow_action: { en: "Escrow decision", hi: "एस्क्रो निर्णय" },
+  kit_refund: { en: "Refund", hi: "रिफंड" },
+  kit_split: { en: "Split", hi: "बाँटें" },
+  kit_release: { en: "Release", hi: "जारी करें" },
+  kit_fraud_title: { en: "Fraud Signals", hi: "धोखाधड़ी संकेत" },
+  kit_severity_high: { en: "High", hi: "गंभीर" },
+  kit_severity_medium: { en: "Medium", hi: "मध्यम" },
+  kit_severity_low: { en: "Low", hi: "हल्का" },
+  kit_fraud_none: { en: "No active fraud signals. All clear.", hi: "कोई सक्रिय धोखाधड़ी संकेत नहीं। सब साफ़ है।" },
+  kit_health_title: { en: "Marketplace Health", hi: "बाज़ार की सेहत" },
+  kit_target: { en: "Target", hi: "लक्ष्य" },
+  kit_slab_title: { en: "Bulk Price Slabs", hi: "थोक मूल्य स्लैब" },
+  kit_slab_yours: { en: "YOURS", hi: "आपका" },
+  kit_slab_best: { en: "Best rate", hi: "सबसे अच्छा भाव" },
+  kit_slab_at: { en: "at", hi: "पर" },
+  kit_slot_title: { en: "Choose Delivery Slot", hi: "डिलीवरी स्लॉट चुनें" },
+  kit_slot_full: { en: "Full", hi: "फुल" },
 };
+
+// Per-portal translation modules (built in parallel by portal workers) are
+// merged here so no worker ever edits this file's TRANSLATIONS block.
+Object.assign(TRANSLATIONS, PORTAL_TRANSLATIONS);
 
 interface LanguageContextType {
   language: Language;

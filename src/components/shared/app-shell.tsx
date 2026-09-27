@@ -10,6 +10,7 @@ import {
   Package,
   Scale,
   Search,
+  ShieldAlert,
   ShoppingBag,
   Sprout,
   Truck,
@@ -51,6 +52,7 @@ const NAV: Record<Role, { href: string; label: string; icon: typeof Sprout }[]> 
     { href: "/admin/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/disputes", label: "Disputes", icon: Scale },
+    { href: "/admin/fraud-review", label: "Fraud Review", icon: ShieldAlert },
     { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   ],
   bulk_buyer: [
