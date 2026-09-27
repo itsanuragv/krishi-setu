@@ -374,6 +374,8 @@ STRICT JSON OUTPUT FORMAT:
         const geminiRes = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          // 12s timeout per model: never hang the voice assistant on a dead AI backend
+          signal: AbortSignal.timeout(12000),
           body: JSON.stringify({
             contents,
             generationConfig: {
