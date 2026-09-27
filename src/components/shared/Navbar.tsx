@@ -43,11 +43,11 @@ export function Navbar({ hideTicker = false }: { hideTicker?: boolean }) {
   }, [pathname]);
 
   const navItems = [
-    { href: "/farmer", label: t("nav_farmer"), icon: Sprout },
-    { href: "/consumer", label: t("nav_consumer"), icon: ShoppingBag },
+    { href: "/farmer/dashboard", label: t("nav_farmer"), icon: Sprout },
+    { href: "/consumer/dashboard", label: t("nav_consumer"), icon: ShoppingBag },
     { href: "/buyer/dashboard", label: t("nav_buyer"), icon: Warehouse },
-    { href: "/delivery", label: t("nav_delivery"), icon: Truck },
-    { href: "/admin", label: t("nav_admin"), icon: ShieldCheck },
+    { href: "/delivery/dashboard", label: t("nav_delivery"), icon: Truck },
+    { href: "/admin/dashboard", label: t("nav_admin"), icon: ShieldCheck },
   ];
 
   const handleLanguageToggle = () => {
@@ -88,7 +88,7 @@ export function Navbar({ hideTicker = false }: { hideTicker?: boolean }) {
           <nav className="hidden lg:flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
               return (
                 <Link
                   key={item.href}
@@ -197,7 +197,7 @@ export function Navbar({ hideTicker = false }: { hideTicker?: boolean }) {
                 <div className="space-y-1.5">
                   {navItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = pathname === item.href;
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                     return (
                       <Link
                         key={item.href}

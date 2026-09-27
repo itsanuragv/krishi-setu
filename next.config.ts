@@ -28,6 +28,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    // Legacy role landing pages -> new portal dashboards (no dead ends)
+    return [
+      { source: "/farmer", destination: "/farmer/dashboard", permanent: false },
+      { source: "/consumer", destination: "/consumer/dashboard", permanent: false },
+      { source: "/delivery", destination: "/delivery/dashboard", permanent: false },
+      { source: "/admin", destination: "/admin/dashboard", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;
