@@ -351,11 +351,14 @@ Respond with STRICT JSON adhering exactly to this structure (no markdown fences,
   "assayerVerificationId": "KS-QC-XXXXXX"
 }`;
 
-    // Valid production Gemini vision model endpoints
+    // Valid production Gemini vision model endpoints (multimodal Flash models).
+    // NOTE: the older gemini-2.0-flash / gemini-1.5-* IDs were retired by Google,
+    // which made every grading call silently fall through to the hardcoded fallback.
     const candidateModels = [
-      "gemini-2.0-flash",
-      "gemini-1.5-flash",
-      "gemini-1.5-pro",
+      "gemini-3.5-flash-lite",
+      "gemini-3.5-flash",
+      "gemini-2.5-flash",
+      "gemini-3.7-flash",
     ];
     let rawJson: string | null = null;
 
