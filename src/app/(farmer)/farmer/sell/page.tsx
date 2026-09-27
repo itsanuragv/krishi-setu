@@ -1,522 +1,484 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import imageCompression from "browser-image-compression";
-import { 
-  Mic, 
-  MicOff, 
-  Sparkles, 
-  CheckCircle2, 
-  ArrowRight, 
-  Camera, 
-  RotateCcw 
+import {
+  Camera,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+  ArrowRight,
+  ArrowLeft,
+  TrendingUp,
+  RefreshCw,
 } from "lucide-react";
-import { createProductSchema, type CreateProductInput } from "@/lib/schemas/product";
-import { productApi } from "@/features/api";
+import {
+  PortalShell,
+  VoiceFab,
+  MandiCompareCard,
+} from "@/components/portals";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
-import { getSpeechRecognition, type SpeechRecognitionInstance, type SpeechRecognitionEvent, type SpeechRecognitionErrorEvent } from "@/lib/speech-types";
-import { OpenCVScan, type CropGradingData } from "@/components/shared/OpenCVScan";
+import { MOCK_PRODUCE_LISTINGS } from "@/lib/mock-data";
+import {
+  addFarmerListing,
+  buildDraftListing,
+  mandiRateForCrop,
+  parseVoiceDraft,
+} from "@/lib/portal-mocks/farmer";
+import { formatInr, cn } from "@/lib/utils";
 
-const STEPS = ["Details", "Grade & harvest", "Photos", "Review"];
+type QcState = "idle" | "scanning" | "pass" | "fail";
 
-export default function SellPage() {
+export default function FarmerSellPage() {
+  const { t } = useLanguage();
   const router = useRouter();
-  const { language } = useLanguage();
   const [step, setStep] = useState(0);
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [isListening, setIsListening] = useState(false);
-  const [isVoiceThinking, setIsVoiceThinking] = useState(false);
-  const [voiceBannerMsg, setVoiceBannerMsg] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [qc, setQc] = useState<QcState>("idle");
+  const [qcGrade, setQcGrade] = useState("A");
+  const scanTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-
-  const form = useForm<CreateProductInput>({
-    resolver: zodResolver(createProductSchema),
-    defaultValues: {
-      crop: "",
-      variety: "",
-      quantityKg: 50,
-      pricePerKg: 20,
-      grade: "A",
-      harvestDate: new Date().toISOString().slice(0, 10),
-      description: "",
-      district: "Sehore",
-      photos: [],
-    },
+  const [fields, setFields] = useState({
+    crop: "",
+    variety: "",
+    quantity: "100",
+    unit: "quintal",
+    grade: "A",
+    harvestDate: new Date().toISOString().slice(0, 10),
+    district: "Indore",
+    notes: "",
   });
+  const [price, setPrice] = useState(3400);
 
-  const values = form.watch();
+  const steps = [t("farmer_sell_step1"), t("farmer_sell_step2"), t("farmer_sell_step3")];
+  const mandi = mandiRateForCrop(fields.crop, MOCK_PRODUCE_LISTINGS);
+  const sliderMin = Math.max(500, Math.round((mandi * 0.6) / 50) * 50);
+  const sliderMax = Math.round((mandi * 1.8) / 50) * 50;
+  const margin = price - mandi;
 
-  // Speech synthesis with optimal native voice
-  const speak = useCallback((text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = language === "hi" ? "hi-IN" : "en-IN";
-      utterance.rate = 1.0;
-      utterance.pitch = 1.02;
-
-      const voices = window.speechSynthesis.getVoices();
-      if (voices && voices.length > 0) {
-        if (language === "hi") {
-          const hiVoice = voices.find(v => 
-            v.lang.toLowerCase().startsWith("hi") && 
-            (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Swara") || v.name.includes("Madhur"))
-          ) || voices.find(v => v.lang.toLowerCase().startsWith("hi"));
-          if (hiVoice) utterance.voice = hiVoice;
-        } else {
-          const enVoice = voices.find(v => 
-            v.lang.toLowerCase().includes("en-in") || 
-            v.name.includes("Natural") || 
-            v.name.includes("Google")
-          );
-          if (enVoice) utterance.voice = enVoice;
-        }
-      }
-
-      window.speechSynthesis.speak(utterance);
-    } catch {
-      // Ignore on restricted web views
-    }
-  }, [language]);
-
-  const processVoiceListing = useCallback(async (text: string) => {
-    if (!text.trim()) return;
-    setIsListening(false);
-    setIsVoiceThinking(true);
-
-    try {
-      const res = await fetch("/api/voice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, language: language === "hi" ? "hi-IN" : "en-IN" }),
-      });
-
-      const data = await res.json();
-      const crop = data.cropData?.crop || "Sharbati Wheat";
-      const variety = data.cropData?.variety || "MP Sharbati Golden A+";
-      const qty = data.cropData?.quantityKg || 5000;
-      const price = data.cropData?.pricePerKg || 34;
-
-      form.setValue("crop", crop);
-      form.setValue("variety", variety);
-      form.setValue("quantityKg", qty);
-      form.setValue("pricePerKg", price);
-      form.setValue("description", `Freshly harvested ${crop} (${variety}). Listed via Kisan Voice Saathi.`);
-
-      const spokenFeedback = data.spokenResponse || (language === "hi"
-        ? `${qty} किलो ${crop} ₹${price} प्रति किलो दर्ज किया गया है।`
-        : `Auto-filled ${qty}kg ${crop} at ₹${price}/kg.`);
-
-      setVoiceBannerMsg(spokenFeedback);
-      speak(spokenFeedback);
-      toast.success(spokenFeedback);
-    } catch (err) {
-      console.error("Voice listing parse error:", err);
-      toast.error("Could not process voice input. Please try again.");
-    } finally {
-      setIsVoiceThinking(false);
-    }
-  }, [form, language, speak]);
-
-  // Speech Recognition setup with interim live speech streaming
   useEffect(() => {
-    const SpeechRecognition = getSpeechRecognition();
-    if (!SpeechRecognition) return;
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.lang = language === "hi" ? "hi-IN" : "en-IN";
-
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = "";
-      let final = "";
-
-      const startIndex = event.resultIndex ?? 0;
-      for (let i = startIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          final += event.results[i][0].transcript;
-        } else {
-          interim += event.results[i][0].transcript;
-        }
-      }
-
-      if (interim) {
-        setVoiceBannerMsg(`बोल रहे हैं: "${interim}"...`);
-      }
-
-      if (final) {
-        processVoiceListing(final);
-      }
+    return () => {
+      if (scanTimer.current) clearTimeout(scanTimer.current);
     };
+  }, []);
 
-    recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
-      setIsListening(false);
-      if (e.error !== "no-speech") {
-        toast.error(`Mic Error: ${e.error}`);
+  function set<K extends keyof typeof fields>(key: K, value: (typeof fields)[K]) {
+    setFields((f) => ({ ...f, [key]: value }));
+  }
+
+  function onPhotoFile(file: File | undefined) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPhoto(reader.result as string);
+      setQc("idle");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function runQc() {
+    if (!photo || qc === "scanning") return;
+    setQc("scanning");
+    scanTimer.current = setTimeout(() => {
+      const pass = Math.random() < 0.8;
+      if (pass) {
+        setQcGrade(Math.random() < 0.7 ? "A" : "B");
+        setQc("pass");
+      } else {
+        setQc("fail");
       }
-    };
+    }, 1600);
+  }
 
-    recognition.onend = () => {
-      setIsListening(false);
-    };
+  function retake() {
+    setPhoto(null);
+    setQc("idle");
+  }
 
-    recognitionRef.current = recognition;
-  }, [language, processVoiceListing]);
-
-  function toggleMic() {
-    if (!recognitionRef.current) {
-      toast.error("Web Speech is not supported on this browser. Try the 1-click sample prompts below.");
+  function handleVoice(transcript: string) {
+    if (!transcript.trim()) {
+      toast.error(t("farmer_sell_voice_missed"));
       return;
     }
+    const parsed = parseVoiceDraft(transcript);
+    setFields((f) => ({
+      ...f,
+      crop: parsed.crop || f.crop,
+      quantity: parsed.quantity ? String(parsed.quantity) : f.quantity,
+      unit: parsed.unit || f.unit,
+    }));
+    if (parsed.price) setPrice(parsed.price);
+    toast.success(t("farmer_sell_voice_filled"));
+  }
 
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      try {
-        recognitionRef.current.start();
-        setIsListening(true);
-      } catch {
-        recognitionRef.current.stop();
-        setIsListening(false);
+  function goNext() {
+    if (step === 0) {
+      if (!photo) {
+        toast.error(t("farmer_sell_need_photo"));
+        return;
       }
-    }
-  }
-
-  async function onFiles(files: FileList | null) {
-    if (!files) return;
-    const compressed: string[] = [];
-    for (const file of Array.from(files).slice(0, 4)) {
-      if (!file.type.startsWith("image/")) continue;
-      if (file.size > 8 * 1024 * 1024) {
-        toast.error("Image too large (max 8MB before compress)");
-        continue;
+      if (qc === "fail") {
+        toast.error(t("farmer_sell_qc_fail"));
+        return;
       }
-      const blob = await imageCompression(file, { maxSizeMB: 0.4, maxWidthOrHeight: 1280 });
-      compressed.push(URL.createObjectURL(blob));
-    }
-    setPhotos((p) => [...p, ...compressed].slice(0, 6));
-  }
-
-  async function submit() {
-    const parsed = createProductSchema.safeParse({ ...values, photos });
-    if (!parsed.success) {
-      toast.error("Please complete required fields");
-      return;
-    }
-    try {
-      await productApi.create(parsed.data);
-      const confirmMsg = language === "hi" ? "आपकी फसल सफलतापूर्वक लिस्ट हो गई है।" : "Your crop listing is published successfully.";
-      speak(confirmMsg);
-      toast.success(confirmMsg);
-      router.push("/farmer/dashboard");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not publish");
+      if (qc === "idle") {
+        runQc();
+        return;
+      }
+      if (qc === "scanning") return;
+      if (qc === "pass") set("grade", qcGrade);
+      setStep(1);
+    } else if (step === 1) {
+      if (!fields.crop.trim() || !fields.quantity || Number(fields.quantity) <= 0) {
+        toast.error(t("farmer_sell_need_details"));
+        return;
+      }
+      setStep(2);
     }
   }
 
-  const SAMPLE_SELL_PROMPTS = [
-    "100 क्विंटल सीहोर शरबती गेहूं 3400 रुपये क्विंटल बेचना है",
-    "50 क्विंटल पीला सोयाबीन JS-9560 4850 रुपये",
-    "60 क्विंटल देशी बाजरा 2600 रुपये क्विंटल",
-  ];
+  function publish() {
+    addFarmerListing(
+      buildDraftListing({
+        crop: fields.crop,
+        quantity: Number(fields.quantity) || 0,
+        unit: fields.unit,
+        price,
+        photo: photo ?? undefined,
+      })
+    );
+    toast.success(t("farmer_sell_published"));
+    router.push("/farmer/dashboard");
+  }
 
   return (
-    <div className="mx-auto max-w-lg space-y-5">
-      {/* Header & Title */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-slate-900">
-            {language === "hi" ? "फसल लिस्ट करें" : "Sell Farm Produce"}
+    <PortalShell accent="farmer">
+      <div className="mx-auto max-w-lg space-y-5 pb-4">
+        {/* Header */}
+        <header className="pt-1">
+          <h1 className="font-heading text-2xl font-bold text-[#1F2937]">
+            {t("farmer_sell_title")}
           </h1>
-          <p className="text-xs text-muted-foreground">
-            {language === "hi" ? "बोलकर या फॉर्म भरकर अपनी फसल दर्ज करें" : "Auto-fill using voice or enter crop parameters"}
-          </p>
-        </div>
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-          Voice First
-        </span>
-      </div>
+          <p className="mt-1 text-sm text-[#4B5563]">{t("farmer_sell_sub")}</p>
+        </header>
 
-      {/* Voice-First Auto-Fill Hero Card */}
-      <div className="rounded-3xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-4 sm:p-5 shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
-              <Sparkles className="size-4.5" />
-            </div>
-            <div>
-              <p className="font-extrabold text-sm text-slate-900 leading-none">
-                {language === "hi" ? "बोलकर ऑटो-फिल करें" : "Voice-to-Form Auto-Fill"}
-              </p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                {language === "hi" ? "फसल का नाम, मात्रा और भाव बोलें" : "Speak crop name, quantity & floor price"}
-              </p>
-            </div>
-          </div>
+        {/* Step indicator */}
+        <ol className="flex gap-2" aria-label="steps">
+          {steps.map((label, i) => (
+            <li
+              key={label}
+              className={cn(
+                "flex h-11 flex-1 items-center justify-center rounded-full px-2 text-center font-heading text-xs font-bold transition-colors",
+                i === step
+                  ? "bg-[var(--portal)] text-white shadow-sm"
+                  : i < step
+                    ? "bg-[var(--portal-light)] text-[var(--portal-dark)]"
+                    : "bg-[#F3F4F6] text-[#6B7280]"
+              )}
+            >
+              {i + 1}. {label}
+            </li>
+          ))}
+        </ol>
 
-          <Button
-            type="button"
-            onClick={toggleMic}
-            className={`gap-2 text-xs font-bold rounded-xl h-11 px-4 shadow-sm transition-transform active:scale-95 ${
-              isListening ? "bg-rose-600 hover:bg-rose-700 text-white" : "bg-emerald-600 hover:bg-emerald-700 text-white"
-            }`}
-          >
-            {isListening ? (
-              <>
-                <MicOff className="size-4 animate-pulse" />
-                <span>सुन रहे हैं...</span>
-              </>
-            ) : isVoiceThinking ? (
-              <>
-                <RotateCcw className="size-4 animate-spin" />
-                <span>AI सोच रहा है...</span>
-              </>
-            ) : (
-              <>
-                <Mic className="size-4" />
-                <span>माइक चालू करें</span>
-              </>
-            )}
-          </Button>
-        </div>
-
-        {/* Live Spoken Voice Banner */}
-        {voiceBannerMsg && (
-          <div className="flex items-center gap-2 rounded-xl bg-emerald-100/80 p-2.5 text-xs font-semibold text-emerald-900 border border-emerald-300 animate-in fade-in">
-            <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-            <span>{voiceBannerMsg}</span>
-          </div>
-        )}
-
-        {/* 1-Click Voice Presets */}
-        <div className="space-y-1 pt-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            या एक क्लिक में टेस्ट करें (Sample prompts):
-          </span>
-          <div className="flex flex-wrap gap-1.5">
-            {SAMPLE_SELL_PROMPTS.map((promptText, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => processVoiceListing(promptText)}
-                className="rounded-lg border border-emerald-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition-colors shadow-2xs"
-              >
-                🎙️ {promptText}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Steps Indicator */}
-      <ol className="flex gap-2 text-xs">
-        {STEPS.map((label, i) => (
-          <li
-            key={label}
-            className={`flex-1 rounded-full px-2 py-1 text-center font-bold text-[11px] transition-colors ${
-              i === step ? "bg-primary text-primary-foreground shadow-xs" : "bg-muted text-muted-foreground"
-            }`}
-          >
-            {label}
-          </li>
-        ))}
-      </ol>
-
-      {/* Wizard Form Card */}
-      <Card className="rounded-3xl border border-slate-200 shadow-sm">
-        <CardHeader className="pb-3 border-b border-slate-100">
-          <CardTitle className="text-base font-bold flex items-center justify-between">
-            <span>Step {step + 1}: {STEPS[step]}</span>
-            <span className="text-xs text-muted-foreground font-normal">
-              {step === 0 && "Crop parameters"}
-              {step === 1 && "Quality grade"}
-              {step === 2 && "Produce photos"}
-              {step === 3 && "Final submission"}
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 pt-4">
-          {step === 0 && (
-            <>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Crop Name (फसल का नाम)</Label>
-                <Input {...form.register("crop")} placeholder="e.g. Sharbati Wheat, Soyabean, Bajra" className="rounded-xl h-11" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Variety (किस्म)</Label>
-                <Input {...form.register("variety")} placeholder="e.g. MP Sharbati Golden, JS-9560, Pusa 1121" className="rounded-xl h-11" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-700">Quantity (kg)</Label>
-                  <Input type="number" {...form.register("quantityKg")} className="rounded-xl h-11" />
+        <Card className="shadow-sm">
+          <CardContent className="space-y-5 p-4 sm:p-5">
+            {/* ── Step 1: Photo + simulated QC ── */}
+            {step === 0 && (
+              <div className="space-y-4">
+                <div>
+                  <p className="font-heading text-base font-bold text-[#1F2937]">
+                    {t("farmer_sell_photo_title")}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[#4B5563]">{t("farmer_sell_photo_hint")}</p>
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-700">Floor Price (₹ / kg)</Label>
-                  <Input type="number" {...form.register("pricePerKg")} className="rounded-xl h-11" />
-                </div>
-              </div>
-            </>
-          )}
 
-          {step === 1 && (
-            <>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Quality Grade</Label>
-                <select className="h-11 w-full rounded-xl border border-input bg-card px-3 text-sm font-medium" {...form.register("grade")}>
-                  <option value="A">Grade A — Premium Export Quality</option>
-                  <option value="B">Grade B — Standard Retail Mandi</option>
-                  <option value="C">Grade C — Processing & Puree</option>
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Harvest Date</Label>
-                <Input type="date" {...form.register("harvestDate")} className="rounded-xl h-11" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Farm District / Cluster</Label>
-                <Input {...form.register("district")} placeholder="Pune / Nashik" className="rounded-xl h-11" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Notes / Freshness description</Label>
-                <Textarea {...form.register("description")} rows={3} className="rounded-xl resize-none" />
-              </div>
-            </>
-          )}
+                {photo ? (
+                  <div className="relative overflow-hidden rounded-2xl border border-[#E5E7EB]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={photo} alt="crop" className="aspect-video w-full object-cover" />
+                  </div>
+                ) : (
+                  <label className="flex min-h-[180px] cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[var(--portal)]/40 bg-[var(--portal-soft)] p-6 text-center transition-colors hover:bg-[var(--portal-light)]">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--portal)] text-white">
+                      <Camera className="h-7 w-7" />
+                    </span>
+                    <span className="font-heading text-sm font-bold text-[var(--portal-dark)]">
+                      {t("farmer_sell_photo_cta")}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      className="hidden"
+                      onChange={(e) => onPhotoFile(e.target.files?.[0])}
+                    />
+                  </label>
+                )}
 
-          {step === 2 && (
-            <div className="space-y-4">
-              <div>
-                <Label className="text-xs font-bold text-slate-700">
-                  {language === "hi" ? "फसल फोटो व एआई गुणवत्ता सत्यापन" : "Produce Photos & AI Quality Grading"}
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {language === "hi"
-                    ? "ओपनसीवी और जेमिनी एआई द्वारा फोटो से गुणवत्ता, ग्रेड और शेल्फ लाइफ का तुरंत पता लगाएं।"
-                    : "Two-tier verification: OpenCV edge focus check + Gemini Vision APMC grading."}
-                </p>
-              </div>
+                {photo && qc === "idle" && (
+                  <Button
+                    onClick={runQc}
+                    className="h-12 w-full rounded-xl bg-[var(--portal)] font-heading font-bold text-white hover:bg-[var(--portal-dark)]"
+                  >
+                    {t("farmer_sell_qc_run")}
+                  </Button>
+                )}
 
-              {/* Integrated AI Produce Scanner */}
-              <OpenCVScan 
-                onScanComplete={(res) => {
-                  if (res.grading) {
-                    const gradeVal = res.grading.grade === "Grade B" ? "B" : res.grading.grade === "Grade C" ? "C" : "A";
-                    form.setValue("grade", gradeVal);
-                    if (!form.getValues("crop")) form.setValue("crop", res.grading.cropName);
-                    if (!form.getValues("variety")) form.setValue("variety", res.grading.variety);
-                    form.setValue("description", `${language === "hi" ? res.grading.feedbackHi : res.grading.feedbackEn} [Assayed ID: ${res.grading.assayerVerificationId}]`);
-                  }
-                }}
-              />
+                {qc === "scanning" && (
+                  <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#F3F4F6] p-5 text-sm font-semibold text-[#4B5563]">
+                    <Loader2 className="h-5 w-5 animate-spin text-[var(--portal)]" />
+                    {t("farmer_sell_qc_scanning")}
+                  </div>
+                )}
 
-              <div className="pt-2">
-                <Label className="text-xs font-bold text-slate-700">
-                  {language === "hi" ? "अतिरिक्त तस्वीरें अपलोड करें (अधिकतम 4)" : "Upload Additional Produce Photos (Max 4)"}
-                </Label>
-                <label className="mt-2 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/40 p-4 text-center cursor-pointer hover:bg-emerald-50 transition-colors">
-                  <Camera className="size-6 text-emerald-600 mb-1" />
-                  <span className="text-xs font-bold text-emerald-800">
-                    {language === "hi" ? "गैलरी से चुनें या फोटो खींचें" : "Choose from Gallery or Camera"}
-                  </span>
-                  <span className="text-[11px] text-slate-500">Auto-compressed at edge (&lt;400KB)</span>
-                  <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
-                </label>
-              </div>
-
-              {photos.length > 0 && (
-                <div className="grid grid-cols-3 gap-2">
-                  {photos.map((u, i) => (
-                    <div key={i} className="relative aspect-video rounded-xl overflow-hidden border border-slate-200">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={u} alt="" className="h-full w-full object-cover" />
+                {qc === "pass" && (
+                  <div className="flex items-start gap-3 rounded-2xl border border-[#2E7D32]/30 bg-[#E8F5E9] p-4">
+                    <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-[#2E7D32]" />
+                    <div>
+                      <p className="font-heading text-sm font-bold text-[#1B5E20]">
+                        {t("farmer_sell_qc_pass")} — Grade {qcGrade}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[#2E7D32]">{t("farmer_sell_qc_pass_sub")}</p>
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {qc === "fail" && (
+                  <div className="space-y-3 rounded-2xl border border-[#DC2626]/30 bg-[#FEF2F2] p-4">
+                    <div className="flex items-start gap-3">
+                      <XCircle className="mt-0.5 h-6 w-6 shrink-0 text-[#DC2626]" />
+                      <div>
+                        <p className="font-heading text-sm font-bold text-[#991B1B]">
+                          {t("farmer_sell_qc_fail")}
+                        </p>
+                        <p className="mt-0.5 text-xs text-[#B91C1C]">{t("farmer_sell_qc_fail_sub")}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={retake}
+                      variant="outline"
+                      className="h-12 w-full gap-2 rounded-xl border-[#DC2626]/40 font-heading font-bold text-[#B91C1C]"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      {t("farmer_sell_retake")}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Step 2: Details + voice prefill ── */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 rounded-2xl bg-[var(--portal-soft)] p-3">
+                  <VoiceFab onResult={handleVoice} className="scale-90" />
+                  <p className="text-xs font-medium text-[#4B5563]">
+                    {t("farmer_sell_voice_hint")}
+                  </p>
                 </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_crop")}</Label>
+                  <Input
+                    value={fields.crop}
+                    onChange={(e) => set("crop", e.target.value)}
+                    placeholder="Sharbati Wheat"
+                    className="h-12 rounded-xl"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_variety")}</Label>
+                  <Input
+                    value={fields.variety}
+                    onChange={(e) => set("variety", e.target.value)}
+                    placeholder="MP Sharbati Golden"
+                    className="h-12 rounded-xl"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_qty")}</Label>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      value={fields.quantity}
+                      onChange={(e) => set("quantity", e.target.value)}
+                      className="h-12 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_unit")}</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(["quintal", "kg"] as const).map((u) => (
+                        <button
+                          key={u}
+                          type="button"
+                          onClick={() => set("unit", u)}
+                          className={cn(
+                            "h-12 rounded-xl border font-heading text-xs font-bold transition-colors",
+                            fields.unit === u
+                              ? "border-[var(--portal)] bg-[var(--portal-light)] text-[var(--portal-dark)]"
+                              : "border-[#E5E7EB] bg-white text-[#6B7280]"
+                          )}
+                        >
+                          {u === "quintal" ? t("farmer_sell_unit_quintal") : t("farmer_sell_unit_kg")}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_grade")}</Label>
+                    <div className="flex gap-2">
+                      {(["A", "B", "C"] as const).map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => set("grade", g)}
+                          className={cn(
+                            "h-12 flex-1 rounded-xl border font-heading text-sm font-bold transition-colors",
+                            fields.grade === g
+                              ? "border-[var(--portal)] bg-[var(--portal-light)] text-[var(--portal-dark)]"
+                              : "border-[#E5E7EB] bg-white text-[#6B7280]"
+                          )}
+                        >
+                          {g}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_harvest")}</Label>
+                    <Input
+                      type="date"
+                      value={fields.harvestDate}
+                      onChange={(e) => set("harvestDate", e.target.value)}
+                      className="h-12 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_district")}</Label>
+                  <Input
+                    value={fields.district}
+                    onChange={(e) => set("district", e.target.value)}
+                    className="h-12 rounded-xl"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-[#1F2937]">{t("farmer_sell_f_notes")}</Label>
+                  <Textarea
+                    value={fields.notes}
+                    onChange={(e) => set("notes", e.target.value)}
+                    rows={2}
+                    className="resize-none rounded-xl"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* ── Step 3: Price slider vs mandi ── */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <div>
+                  <p className="font-heading text-base font-bold text-[#1F2937]">
+                    {fields.crop || t("farmer_sell_step3")} · {fields.quantity}{" "}
+                    {fields.unit === "kg" ? t("farmer_unit_kg") : t("farmer_unit_quintal")}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[#4B5563]">{t("farmer_sell_price_hint")}</p>
+                </div>
+
+                <MandiCompareCard
+                  crop={fields.crop || "—"}
+                  mandiPrice={mandi}
+                  yourPrice={price}
+                  unit={fields.unit}
+                />
+
+                <div className="rounded-2xl border border-[#E5E7EB] p-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold text-[#1F2937]">
+                      {t("farmer_sell_price_yours")} (₹/{fields.unit})
+                    </Label>
+                    <span className="font-heading text-2xl font-bold text-[var(--portal-dark)]">
+                      {formatInr(price)}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={sliderMin}
+                    max={sliderMax}
+                    step={50}
+                    value={Math.min(Math.max(price, sliderMin), sliderMax)}
+                    onChange={(e) => setPrice(Number(e.target.value))}
+                    className="mt-2 h-12 w-full accent-[#2E7D32]"
+                    aria-label={t("farmer_sell_price_yours")}
+                  />
+                  <div className="flex justify-between text-[11px] font-medium text-[#6B7280]">
+                    <span>{formatInr(sliderMin)}</span>
+                    <span>{formatInr(sliderMax)}</span>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    "flex items-center gap-2 rounded-2xl p-4 font-heading text-sm font-bold",
+                    margin >= 0 ? "bg-[#E8F5E9] text-[#1B5E20]" : "bg-[#FEF2F2] text-[#991B1B]"
+                  )}
+                >
+                  <TrendingUp className="h-5 w-5 shrink-0" />
+                  {t("farmer_sell_price_margin")}: {margin >= 0 ? "+" : "−"}
+                  {formatInr(Math.abs(margin))}/
+                  {fields.unit === "kg" ? t("farmer_unit_kg") : t("farmer_unit_quintal")}
+                </div>
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div className="flex gap-3 border-t border-[#F3F4F6] pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStep((s) => Math.max(0, s - 1))}
+                disabled={step === 0}
+                className="h-12 flex-1 gap-1 rounded-xl font-heading font-bold"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                {t("farmer_sell_prev")}
+              </Button>
+              {step < 2 ? (
+                <Button
+                  type="button"
+                  onClick={goNext}
+                  className="h-12 flex-1 gap-1 rounded-xl bg-[var(--portal)] font-heading font-bold text-white hover:bg-[var(--portal-dark)]"
+                >
+                  {t("farmer_sell_next")}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={publish}
+                  className="h-12 flex-1 rounded-xl bg-[var(--portal)] font-heading font-bold text-white hover:bg-[var(--portal-dark)]"
+                >
+                  {t("farmer_sell_publish")}
+                </Button>
               )}
             </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-3 rounded-2xl bg-slate-50 p-4 border border-slate-200/80 text-xs">
-              <p className="font-bold text-sm text-slate-900 border-b border-slate-200 pb-2">Listing Summary</p>
-              <div className="grid grid-cols-2 gap-2 text-slate-600">
-                <div>
-                  <span className="text-slate-400 block">Crop:</span>
-                  <strong className="text-slate-900">{values.crop || "—"}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Variety:</span>
-                  <strong className="text-slate-900">{values.variety || "—"}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Quantity:</span>
-                  <strong className="text-slate-900">{values.quantityKg} kg</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Price / kg:</span>
-                  <strong className="text-emerald-700 font-bold">₹{values.pricePerKg}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Grade:</span>
-                  <strong className="text-slate-900">Grade {values.grade}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">District:</span>
-                  <strong className="text-slate-900">{values.district}</strong>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Controls */}
-          <div className="flex justify-between pt-2 border-t border-slate-100">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={step === 0}
-              onClick={() => setStep((s) => s - 1)}
-              className="text-xs rounded-xl"
-            >
-              Previous
-            </Button>
-            {step < STEPS.length - 1 ? (
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => setStep((s) => s + 1)}
-                className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs gap-1 rounded-xl font-bold"
-              >
-                <span>Next Step</span>
-                <ArrowRight className="size-3.5" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                size="sm"
-                onClick={submit}
-                className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs"
-              >
-                Publish Listing
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </PortalShell>
   );
 }

@@ -3,22 +3,30 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { AlertTriangle, Check, KeyRound, ShieldCheck, Truck } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 import { orderApi } from "@/features/api";
 import { subscribeToOrder } from "@/lib/ws-client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PortalShell } from "@/components/portals";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { MapView } from "@/components/shared/map-view";
-import { ShieldCheck, Truck, AlertTriangle, KeyRound } from "lucide-react";
+import { cn, formatInr } from "@/lib/utils";
+import {
+  ORDER_TIMELINE,
+  mockConsumerOrder,
+  timelineIndexForStatus,
+} from "@/lib/portal-mocks/consumer";
 
-export default function TrackPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ConsumerTrackPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data } = useQuery({ queryKey: ["order", id], queryFn: () => orderApi.get(id) });
+  const { t } = useLanguage();
+  const { data, isLoading } = useQuery({
+    queryKey: ["order", id],
+    queryFn: () => orderApi.get(id),
+    retry: 1,
+  });
   const [liveStatus, setLiveStatus] = useState<string>();
-
-  // Mock driver live movement
-  const [driverLat, setDriverLat] = useState(19.25);
-  const [driverLng, setDriverLng] = useState(73.81);
 
   useEffect(() => {
     return subscribeToOrder(id, (event) => {
@@ -27,129 +35,149 @@ export default function TrackPage({ params }: { params: Promise<{ id: string }> 
     });
   }, [id]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDriverLat((prev) => (prev > 18.6 ? prev - 0.04 : 19.25));
-      setDriverLng((prev) => (prev < 73.84 ? prev + 0.01 : 73.81));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
+  const fallback = mockConsumerOrder(id);
   const order = data?.order;
-  const status = liveStatus ?? order?.status ?? "in_delivery";
+  const status = liveStatus ?? order?.status ?? fallback.status;
+  const crop = order?.crop ?? fallback.crop;
+  const farmerName = order?.farmerName ?? fallback.farmerName;
+  const totalAmount = order?.totalAmount ?? fallback.totalAmount;
+  const pickupCode = order?.pickupCode ?? fallback.pickupCode ?? "4821";
+
+  const currentStep = timelineIndexForStatus(status);
+  const done = currentStep < 0; // disputed/cancelled — timeline halts
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold">Live Delivery Tracking</h1>
-          <p className="text-xs text-muted-foreground">Order #{id} · Direct Farm Dispatch</p>
-        </div>
-        <StatusBadge status={status} />
-      </div>
-
-      {/* Interactive Map View */}
-      <MapView
-        origin={{
-          lat: 19.9975,
-          lng: 73.7898,
-          label: `${order?.farmerName ?? "Ramesh Yadav"} (Farm)`,
-          details: "Niphad, Nashik",
-          type: "farmer",
-        }}
-        destination={{
-          lat: 18.5204,
-          lng: 73.8567,
-          label: "Your Address",
-          details: "Pune, Maharashtra",
-          type: "consumer",
-        }}
-        driver={{
-          lat: driverLat,
-          lng: driverLng,
-          label: "Suresh (Delivery Vehicle)",
-          type: "delivery",
-        }}
-        radiusKm={25}
-        heightClass="h-80 sm:h-96"
-      />
-
-      {/* PIN & Escrow Card */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="border-amber-200 bg-amber-50/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base text-amber-900">
-              <KeyRound className="size-4 text-amber-600" />
-              Delivery Handoff PIN
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-center justify-between rounded-xl bg-card p-3 border border-amber-200">
-              <span className="text-xs text-muted-foreground">Share ONLY after inspecting produce</span>
-              <span className="font-mono text-2xl font-bold tracking-widest text-primary">
-                {order?.pickupCode ?? "4821"}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Once the delivery partner enters this PIN, payment will be settled from Escrow to the farmer.
+    <PortalShell accent="consumer">
+      <div className="space-y-6 pb-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="font-heading text-2xl font-bold text-[#1F2937]">
+              {t("consumer_track_title")}
+            </h1>
+            <p className="mt-1 text-sm text-[#4B5563]">
+              #{id} · {crop} · {farmerName}
             </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-emerald-200 bg-emerald-50/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base text-emerald-900">
-              <ShieldCheck className="size-4 text-emerald-600" />
-              100% Escrow Protection
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-xs text-emerald-950">
-            <p>
-              ₹{order?.totalAmount ?? 480} is currently safely locked in Krishi Setu Escrow.
-            </p>
-            <p className="text-muted-foreground">
-              Transit Window: &lt;12 Hours (Farm-to-Door). OR-Tools route optimization prevents spoilage.
-            </p>
-            <div className="pt-2 flex gap-2">
-              <Link href="/consumer/disputes/new" className="w-full">
-                <Button variant="outline" size="sm" className="w-full border-amber-300 text-amber-800 hover:bg-amber-100">
-                  <AlertTriangle className="mr-1 size-3.5" />
-                  Report Issue / Dispute
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Transit Timeline */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Truck className="size-4 text-primary" />
-            Transit Milestones
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border">
-            <div className="relative">
-              <div className="absolute -left-6 top-0.5 size-3 rounded-full bg-emerald-600 ring-4 ring-emerald-100" />
-              <p className="text-sm font-semibold">Harvest & Farm Dispatch</p>
-              <p className="text-xs text-muted-foreground">Passed pre-dispatch image QC · Niphad Farm</p>
-            </div>
-            <div className="relative">
-              <div className="absolute -left-6 top-0.5 size-3 rounded-full bg-amber-500 ring-4 ring-amber-100 animate-pulse" />
-              <p className="text-sm font-semibold text-amber-700">In Transit via Local Partner</p>
-              <p className="text-xs text-muted-foreground">Optimal route clustered within 25km corridor</p>
-            </div>
-            <div className="relative">
-              <div className="absolute -left-6 top-0.5 size-3 rounded-full bg-muted-foreground/30 ring-4 ring-muted" />
-              <p className="text-sm font-semibold text-muted-foreground">Doorstep Arrival & Quality Inspection</p>
-              <p className="text-xs text-muted-foreground">Verify freshness before sharing PIN</p>
-            </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          <StatusBadge status={status} />
+        </div>
+
+        {isLoading ? (
+          <Card className="rounded-2xl border-[#E5E7EB]">
+            <CardContent className="space-y-3 p-5">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-12 animate-pulse rounded-xl bg-[#F3F4F6]" />
+              ))}
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {/* PIN & Escrow cards */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Card className="rounded-2xl border-[var(--portal)]/40 bg-[var(--portal-soft)]">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base text-[var(--portal-dark)]">
+                    <KeyRound className="h-4 w-4" />
+                    {t("consumer_track_pin_title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--portal)]/30 bg-white p-3.5">
+                    <span className="text-xs leading-snug text-[#6B7280]">
+                      {t("consumer_track_pin_hint")}
+                    </span>
+                    <span className="font-mono text-2xl font-bold tracking-[0.2em] text-[var(--portal-dark)]">
+                      {pickupCode}
+                    </span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[#6B7280]">
+                    {t("consumer_track_pin_note")}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-2xl border-[#2E7D32]/30 bg-[#F1F8E9]">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base text-[#1B5E20]">
+                    <ShieldCheck className="h-4 w-4" />
+                    {t("consumer_track_escrow_title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2.5">
+                  <p className="text-sm font-bold text-[#1F2937]">
+                    {formatInr(totalAmount)}{" "}
+                    <span className="text-xs font-semibold text-[#4B5563]">
+                      · {t("consumer_escrow_locked")}
+                    </span>
+                  </p>
+                  <p className="text-xs leading-relaxed text-[#4B5563]">
+                    {t("consumer_track_escrow_body")}
+                  </p>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="h-10 w-full rounded-xl border-[#DC2626]/40 text-[#DC2626] hover:bg-red-50"
+                  >
+                    <Link href={`/consumer/disputes/new?orderId=${id}`}>
+                      <AlertTriangle className="mr-1.5 h-3.5 w-3.5" />
+                      {t("consumer_track_report")}
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Delivery timeline */}
+            <Card className="rounded-2xl border-[#E5E7EB]">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base text-[#1F2937]">
+                  <Truck className="h-4 w-4 text-[var(--portal)]" />
+                  {t("consumer_track_title")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-5">
+                <ol className="relative space-y-1 border-l-2 border-[#E5E7EB] pl-0">
+                  {ORDER_TIMELINE.map((step, i) => {
+                    const isCurrent = !done && i === currentStep;
+                    const isPast = !done && i < currentStep;
+                    return (
+                      <li key={step.key} className="relative flex gap-4 pb-6 pl-8 last:pb-0">
+                        <span
+                          aria-hidden
+                          className={cn(
+                            "absolute -left-[15px] top-0.5 flex h-7 w-7 items-center justify-center rounded-full ring-4",
+                            isPast && "bg-[#2E7D32] text-white ring-[#E8F5E9]",
+                            isCurrent &&
+                              "animate-pulse bg-[var(--portal)] text-white ring-[var(--portal-light)]",
+                            !isPast && !isCurrent && "bg-[#E5E7EB] text-[#9CA3AF] ring-[#F3F4F6]"
+                          )}
+                        >
+                          {isPast ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <span className="text-xs font-bold">{i + 1}</span>
+                          )}
+                        </span>
+                        <div className={cn(!isPast && !isCurrent && "opacity-60")}>
+                          <p
+                            className={cn(
+                              "text-sm font-bold",
+                              isCurrent ? "text-[var(--portal-dark)]" : "text-[#1F2937]"
+                            )}
+                          >
+                            {t(step.labelKey)}
+                          </p>
+                          <p className="mt-0.5 text-xs text-[#6B7280]">{t(step.subKey)}</p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+    </PortalShell>
   );
 }

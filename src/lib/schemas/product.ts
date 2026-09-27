@@ -22,6 +22,11 @@ export const productSchema = z.object({
   grade: cropGradeSchema,
   harvestDate: z.string(),
   photos: z.array(z.string()),
+  farmerPhoto: z.string().optional(),
+  priceSlabs: z
+    .array(z.object({ minQty: z.number().positive(), price: z.number().positive() }))
+    .optional(),
+  gradeSpec: z.string().optional(),
   location: geoPointSchema,
   status: z.enum(["listed", "matched", "sold", "expired"]),
   description: z.string().optional(),

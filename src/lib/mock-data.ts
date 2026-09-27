@@ -14,6 +14,11 @@ export interface ProduceListing {
   mandiBenchmarkPrice: number; // ₹ (APMC Mandi retail)
   imageUrl: string;
   matchScore: number;
+  harvestDate?: string; // e.g. "24 Sep"
+  farmerPhoto?: string;
+  gradeSpec?: string; // e.g. "Grade A: 80–120g, no blemish"
+  priceSlabs?: { minQty: number; price: number }[];
+  payoutEtaDays?: number;
   breakdown: {
     priceIndex: { score: number; detail: string };
     distance: { score: number; detail: string };
@@ -390,3 +395,161 @@ export const ADMIN_KPIS = {
   farmersOnboarded: "3,890",
   intermediaryCutBypassed: "41.8%",
 };
+
+// ---------------------------------------------------------------------------
+// Portal v2 additive mock extensions (faker seed 26033 preserved — deterministic)
+// ---------------------------------------------------------------------------
+
+export const FARMER_PHOTOS = [
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&auto=format&fit=crop&q=60",
+];
+
+/** Reverse marketplace: buyer posts a requirement, farmers pool contributions. */
+export interface Requirement {
+  id: string;
+  buyerName: string;
+  business: string;
+  crop: string;
+  quantityKg: number;
+  grade: string;
+  targetPrice: number;
+  district: string;
+  deadline: string;
+  pooledKg: number;
+  contributors: number;
+  status: "open" | "filling" | "fulfilled";
+}
+
+export const MOCK_REQUIREMENTS: Requirement[] = [
+  {
+    id: "req-1",
+    buyerName: "Hotel Shreemaya",
+    business: "HoReCa · Indore",
+    crop: "Tamatar (Tomato)",
+    quantityKg: 500,
+    grade: "Grade A",
+    targetPrice: 22,
+    district: "Indore",
+    deadline: "30 Sep",
+    pooledKg: 320,
+    contributors: 6,
+    status: "filling",
+  },
+  {
+    id: "req-2",
+    buyerName: "Malwa Agro Mills",
+    business: "Processor · Ujjain",
+    crop: "Soyabean JS-9560",
+    quantityKg: 3000,
+    grade: "Grade A",
+    targetPrice: 48,
+    district: "Ujjain",
+    deadline: "2 Oct",
+    pooledKg: 3000,
+    contributors: 14,
+    status: "fulfilled",
+  },
+  {
+    id: "req-3",
+    buyerName: "FreshKart Retail",
+    business: "Retail chain · Bhopal",
+    crop: "Shimla Mirch (Capsicum)",
+    quantityKg: 800,
+    grade: "Grade A",
+    targetPrice: 35,
+    district: "Bhopal",
+    deadline: "4 Oct",
+    pooledKg: 120,
+    contributors: 3,
+    status: "open",
+  },
+];
+
+export interface FraudSignal {
+  id: string;
+  label: string;
+  detail: string;
+  severity: "high" | "medium" | "low";
+}
+
+export const MOCK_FRAUD_SIGNALS: FraudSignal[] = [
+  {
+    id: "fs-1",
+    label: "Photo duplication detected",
+    detail: "Listing prod-118 reuses dispatch photos from 3 older listings (perceptual hash match 97%).",
+    severity: "high",
+  },
+  {
+    id: "fs-2",
+    label: "Serial complainant",
+    detail: "Buyer u-consumer-7 raised 4 disputes in 90 days (threshold >3). Win-rate 0% — possible refund gaming.",
+    severity: "medium",
+  },
+  {
+    id: "fs-3",
+    label: "Velocity anomaly",
+    detail: "Farmer u-farmer-12 listed 22 lots in 6 hours from a single device. Possible account sharing.",
+    severity: "medium",
+  },
+  {
+    id: "fs-4",
+    label: "Collusion flag",
+    detail: "Farmer u-farmer-3 and buyer u-consumer-2 share a UPI VPA and device fingerprint across 9 orders.",
+    severity: "high",
+  },
+  {
+    id: "fs-5",
+    label: "Grade inflation",
+    detail: "2 listings claim Grade A but OpenCV blur scores <60. Downgraded to B pending re-scan.",
+    severity: "low",
+  },
+];
+
+export interface KycApplicant {
+  id: string;
+  name: string;
+  role: "farmer" | "delivery" | "buyer";
+  district: string;
+  submittedAgo: string;
+  documents: string[];
+}
+
+export const MOCK_KYC_QUEUE: KycApplicant[] = [
+  { id: "kyc-1", name: "Dinesh Choudhary", role: "farmer", district: "Sehore", submittedAgo: "2h ago", documents: ["Aadhaar", "PM-KISAN ID", "Land record"] },
+  { id: "kyc-2", name: "Sunita Verma", role: "delivery", district: "Indore", submittedAgo: "5h ago", documents: ["Aadhaar", "Driving licence", "Vehicle RC"] },
+  { id: "kyc-3", name: "Annapurna Foods", role: "buyer", district: "Bhopal", submittedAgo: "1d ago", documents: ["GSTIN", "FSSAI licence"] },
+  { id: "kyc-4", name: "Prakash Malviya", role: "farmer", district: "Dewas", submittedAgo: "1d ago", documents: ["Aadhaar", "PM-KISAN ID"] },
+];
+
+export interface HealthKpi {
+  id: string;
+  label: string;
+  value: string;
+  target: string;
+  onTrack: boolean;
+  hint?: string;
+}
+
+export const MOCK_HEALTH_KPIS: HealthKpi[] = [
+  { id: "hk-1", label: "Dispute rate", value: "1.1%", target: "<1.5%", onTrack: true },
+  { id: "hk-2", label: "Median resolution", value: "9.2h", target: "<12h", onTrack: true },
+  { id: "hk-3", label: "Auto-resolved", value: "64%", target: ">60%", onTrack: true },
+  { id: "hk-4", label: "Farmer payout TAT", value: "3.4h", target: "<4h", onTrack: true, hint: "PIN → UPI release" },
+];
+
+export interface PayoutItem {
+  id: string;
+  label: string;
+  amount: number;
+  etaDays: number;
+  status: "incoming" | "released";
+}
+
+export const MOCK_PAYOUT_SCHEDULE: PayoutItem[] = [
+  { id: "po-1", label: "Tamatar · 120kg · Hotel Shreemaya", amount: 2640, etaDays: 0, status: "released" },
+  { id: "po-2", label: "Sharbati Wheat · 40 quintal · Malwa Agro", amount: 11840, etaDays: 2, status: "incoming" },
+  { id: "po-3", label: "Soyabean · 25 quintal · FPO pool", amount: 121250 - 106770, etaDays: 4, status: "incoming" },
+];

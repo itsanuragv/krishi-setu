@@ -1,179 +1,198 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Star, ShieldCheck, CheckCircle2, TrendingUp, BadgeCheck, Lightbulb } from "lucide-react";
+import { PortalShell } from "@/components/portals";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, ShieldCheck, CheckCircle2, TrendingUp, AlertCircle, Award } from "lucide-react";
-import { RATING_CONFIG } from "@/config/rating-config";
+import { useLanguage } from "@/context/LanguageContext";
+import { FARMER_PROFILE, FARMER_REVIEWS } from "@/lib/portal-mocks/farmer";
+import { cn } from "@/lib/utils";
 
-const REVIEWS = [
-  {
-    id: "r-1",
-    buyerName: "Ananya Sharma",
-    buyerType: "Consumer (Indore)",
-    rating: 5,
-    date: "12 Sep 2026",
-    crop: "Wheat (MP Sharbati Golden A+)",
-    comment: "Exceptional Sharbati wheat quality! Moisture tested at 10.4%, pristine golden amber grains, chakki flour made from this is soft and sweet.",
-  },
-  {
-    id: "r-2",
-    buyerName: "Malwa Agro Food Mills",
-    buyerType: "FPO Bulk Buyer (Dewas)",
-    rating: 5,
-    date: "08 Sep 2026",
-    crop: "Soyabean (JS-9560 Bold Grain)",
-    comment: "Consistent Grade-A bold grains. Direct truck loading at farm gate went smoothly. Oil content assayed above 19.5%.",
-  },
-  {
-    id: "r-3",
-    buyerName: "Rahul Deshmukh",
-    buyerType: "Grain Wholesaler",
-    rating: 5,
-    date: "01 Sep 2026",
-    crop: "Pearl Millet / Bajra (Desi Shanker Shri Anna)",
-    comment: "Excellent pesticide-free bajra lot. Moisture under 11%, zero weevils or dust, prompt verified QR escrow payment.",
-  },
-];
+function ScoreRing({ score }: { score: number }) {
+  const size = 168;
+  const stroke = 14;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="#E5E7EB"
+          strokeWidth={stroke}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="var(--portal)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c - (score / 100) * c}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="font-heading text-5xl font-bold text-[#1F2937]">{score}</span>
+        <span className="text-xs font-semibold text-[#6B7280]">/ 100</span>
+      </div>
+    </div>
+  );
+}
 
 export default function FarmerRatingsPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold">Trust Score & Ratings</h1>
-          <p className="text-xs text-muted-foreground">
-            Module 15: Deterministic Trust Calculation & Algorithmic Matching Priority
-          </p>
-        </div>
-        <Badge className="w-fit bg-emerald-700 text-white gap-1 px-3 py-1">
-          <ShieldCheck className="size-4" />
-          Verified Producer · Level 1
-        </Badge>
-      </div>
+  const { t } = useLanguage();
 
-      {/* Trust Score Hero Card */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="md:col-span-1 border-primary/30 bg-gradient-to-br from-card to-emerald-50/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
-              <Award className="size-4 text-primary" />
-              Krishi Setu Trust Index
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-baseline gap-2">
-              <span className="font-display text-5xl font-bold text-primary">86</span>
-              <span className="text-lg text-muted-foreground font-semibold">/ 100</span>
+  const pillars = [
+    {
+      label: t("farmer_rate_pillar_ontime"),
+      value: "98.4%",
+      icon: <CheckCircle2 className="h-5 w-5 text-[#2E7D32]" />,
+    },
+    {
+      label: t("farmer_rate_pillar_qc"),
+      value: "99.2%",
+      icon: <ShieldCheck className="h-5 w-5 text-[var(--portal)]" />,
+    },
+    {
+      label: t("farmer_rate_pillar_disputes"),
+      value: "0",
+      icon: <BadgeCheck className="h-5 w-5 text-[#2E7D32]" />,
+      tag: t("farmer_rate_pillar_clean"),
+    },
+    {
+      label: t("farmer_rate_pillar_repeat"),
+      value: "42%",
+      icon: <TrendingUp className="h-5 w-5 text-[#F57C00]" />,
+    },
+  ];
+
+  const tips = [
+    t("farmer_rate_tip1"),
+    t("farmer_rate_tip2"),
+    t("farmer_rate_tip3"),
+    t("farmer_rate_tip4"),
+  ];
+
+  return (
+    <PortalShell accent="farmer">
+      <div className="mx-auto max-w-3xl space-y-6 pb-4">
+        <header className="pt-1">
+          <h1 className="font-heading text-2xl font-bold text-[#1F2937]">
+            {t("farmer_rate_title")}
+          </h1>
+          <p className="mt-1 text-sm text-[#4B5563]">{t("farmer_rate_sub")}</p>
+        </header>
+
+        {/* Score hero */}
+        <Card className="overflow-hidden shadow-sm">
+          <div className="bg-[linear-gradient(135deg,var(--portal),var(--portal-dark))] p-5 sm:p-6">
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-8">
+              <div className="rounded-full bg-white/95 p-2">
+                <ScoreRing score={FARMER_PROFILE.trustScore} />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <Badge className="gap-1 bg-white/20 text-white hover:bg-white/20">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  {t("farmer_rate_verified")}
+                </Badge>
+                <div className="mt-2 flex items-center justify-center gap-1 sm:justify-start">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} className="h-4 w-4 fill-[#FBBF24] text-[#FBBF24]" />
+                  ))}
+                  <span className="ml-1 text-sm font-bold text-white">
+                    {FARMER_PROFILE.rating} ({FARMER_PROFILE.reviewCount})
+                  </span>
+                </div>
+                <p className="mt-2 text-sm font-semibold text-white/90">
+                  {t("farmer_rate_boost").replace("{pct}", String(FARMER_PROFILE.matchBoostPct))}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-1 text-amber-500">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} className="size-4 fill-amber-400 text-amber-400" />
-              ))}
-              <span className="ml-1 text-xs font-bold text-foreground">4.8 (34 reviews)</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Your listings receive a <span className="font-semibold text-emerald-800">+18% boost</span> in the
-              5-Factor Matching algorithm.
-            </p>
-          </CardContent>
+          </div>
         </Card>
 
-        {/* 4 Pillars Breakdown */}
-        <div className="grid grid-cols-2 gap-3 md:col-span-2">
-          <Card className="p-4 flex flex-col justify-between">
-            <span className="text-xs text-muted-foreground">On-Time Dispatch Rate</span>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-2xl font-bold">98.4%</span>
-              <CheckCircle2 className="size-5 text-emerald-600" />
-            </div>
-            <span className="text-[11px] text-emerald-700">Consistently &lt;12h transit window</span>
-          </Card>
-
-          <Card className="p-4 flex flex-col justify-between">
-            <span className="text-xs text-muted-foreground">Quality Accuracy (QC)</span>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-2xl font-bold">99.2%</span>
-              <ShieldCheck className="size-5 text-primary" />
-            </div>
-            <span className="text-[11px] text-emerald-700">Validated by OpenCV pre-upload</span>
-          </Card>
-
-          <Card className="p-4 flex flex-col justify-between">
-            <span className="text-xs text-muted-foreground">Dispute Frequency</span>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-2xl font-bold">0.0%</span>
-              <Badge variant="outline" className="text-emerald-700 border-emerald-300">Clean</Badge>
-            </div>
-            <span className="text-[11px] text-muted-foreground">Zero unresolved complaints</span>
-          </Card>
-
-          <Card className="p-4 flex flex-col justify-between">
-            <span className="text-xs text-muted-foreground">Repeat Buyer Demand</span>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-2xl font-bold">42%</span>
-              <TrendingUp className="size-5 text-amber-600" />
-            </div>
-            <span className="text-[11px] text-muted-foreground">High consumer loyalty</span>
-          </Card>
-        </div>
-      </div>
-
-      {/* Algorithm Transparency Card */}
-      <Card className="border-border bg-card">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AlertCircle className="size-4 text-primary" />
-            Transparent Scoring Formula (Platform Trust Governance)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-xs text-muted-foreground space-y-2">
-          <p>
-            Unlike opaque commercial apps, Krishi Setu uses a transparent scoring function:
-          </p>
-          <div className="rounded-lg bg-muted/60 p-3 font-mono text-[11px] text-foreground">
-            Trust Score = (0.35 × OnTimeRate) + (0.30 × QualityScore) + (0.20 × OrderCompletion) + (0.15 × AvgRating)
-          </div>
-          <p>
-            Scores update nightly via automated Celery jobs after each physical PIN delivery confirmation.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Reviews List */}
-      <div className="space-y-3">
-        <h2 className="font-display text-lg font-bold">Recent Verified Buyer Feedback</h2>
-        <div className="space-y-3">
-          {REVIEWS.map((rev) => (
-            <Card key={rev.id}>
-              <CardContent className="p-4 space-y-2">
+        {/* Pillars */}
+        <div className="grid grid-cols-2 gap-3">
+          {pillars.map((p) => (
+            <Card key={p.label} className="shadow-sm">
+              <CardContent className="flex min-h-[104px] flex-col justify-between gap-2 p-4">
+                <span className="text-xs font-medium text-[#4B5563]">{p.label}</span>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm">{rev.buyerName}</span>
-                    <Badge variant="outline" className="text-[10px]">{rev.buyerType}</Badge>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{rev.date}</span>
+                  <span className="font-heading text-2xl font-bold text-[#1F2937]">{p.value}</span>
+                  {p.icon}
                 </div>
-                {RATING_CONFIG.SHOW_STAR_RATINGS && (
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex items-center gap-0.5 text-amber-500">
-                      {Array.from({ length: rev.rating }).map((_, i) => (
-                        <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
-                    {RATING_CONFIG.SHOW_DUMMY_RATING_BADGE && (
-                      <span className="rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[9px] font-bold text-amber-800 tracking-wide">
-                        Sample Rating (डमी)
-                      </span>
-                    )}
-                    <span className="ml-2 text-xs font-medium text-muted-foreground">Crop: {rev.crop}</span>
-                  </div>
+                {p.tag && (
+                  <Badge variant="outline" className="w-fit border-[#2E7D32]/40 text-xs text-[#2E7D32]">
+                    {p.tag}
+                  </Badge>
                 )}
-                <p className="text-xs text-foreground/90">{rev.comment}</p>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* Reviews */}
+        <section className="space-y-3">
+          <h2 className="font-heading text-lg font-bold text-[#1F2937]">
+            {t("farmer_rate_history")}
+          </h2>
+          <div className="space-y-3">
+            {FARMER_REVIEWS.map((rev) => (
+              <Card key={rev.id} className="shadow-sm">
+                <CardContent className="space-y-2 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="truncate text-sm font-bold text-[#1F2937]">
+                        {rev.buyerName}
+                      </span>
+                      <Badge variant="outline" className="shrink-0 text-[10px]">
+                        {rev.buyerType}
+                      </Badge>
+                    </div>
+                    <span className="shrink-0 text-xs text-[#6B7280]">{rev.date}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: rev.rating }).map((_, i) => (
+                      <Star key={i} className="h-3.5 w-3.5 fill-[#FBBF24] text-[#FBBF24]" />
+                    ))}
+                    <span className="ml-2 text-xs font-medium text-[#6B7280]">{rev.crop}</span>
+                  </div>
+                  <p className="text-sm leading-relaxed text-[#4B5563]">{rev.comment}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Tips */}
+        <section className="space-y-3">
+          <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-[#1F2937]">
+            <Lightbulb className="h-5 w-5 text-[#F57C00]" />
+            {t("farmer_rate_tips_title")}
+          </h2>
+          <Card className="shadow-sm">
+            <CardContent className="space-y-3 p-4 sm:p-5">
+              {tips.map((tip, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <span
+                    className={cn(
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--portal-light)] font-heading text-sm font-bold text-[var(--portal-dark)]"
+                    )}
+                  >
+                    {i + 1}
+                  </span>
+                  <p className="pt-1 text-sm leading-relaxed text-[#1F2937]">{tip}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </section>
       </div>
-    </div>
+    </PortalShell>
   );
 }
