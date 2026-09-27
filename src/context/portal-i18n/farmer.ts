@@ -34,8 +34,8 @@ export const farmerTranslations: Translations = {
   },
   farmer_dash_mandi_heading: { en: "Aaj ka bhav", hi: "आज का भाव" },
   farmer_dash_mandi_sub: {
-    en: "Mandi rate vs your farm-gate price",
-    hi: "मंडी भाव बनाम आपका खेत भाव",
+    en: "Mandi take-home vs your farm-gate price — no middlemen",
+    hi: "मंडी में हाथ क्या आता बनाम आपका खेत भाव — कोई बिचौलिया नहीं",
   },
   farmer_dash_listings_heading: { en: "Aapki faslein", hi: "आपकी फसलें" },
   farmer_dash_listings_empty: {
