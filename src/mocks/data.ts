@@ -11,12 +11,14 @@ import type { AdminKpi } from "@/lib/schemas/admin";
 faker.seed(26033);
 
 const PHOTOS = [
-  "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800", // Sharbati Wheat
-  "https://images.unsplash.com/photo-1536939459926-301728717817?w=800", // Soyabean
+  "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800", // Wheat
+  "https://images.pexels.com/photos/4518588/pexels-photo-4518588.jpeg?auto=compress&cs=tinysrgb&w=800", // Soyabean
   "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800", // Basmati Rice / Paddy
   "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=800", // Corn / Maize
-  "https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=800", // Pearl Millet / Bajra
-  "https://images.unsplash.com/photo-1543257580-7269da773bf5?w=800", // Grain Silo / Lot
+  "https://upload.wikimedia.org/wikipedia/commons/7/7c/A_closeup_of_Pearl_Millet_%28Cumbu%29.JPG", // Pearl Millet / Bajra
+  "https://cpimg.tistatic.com/6544102/b/4/milky-white-sorghum.jpg", // White Jowar
+  "https://images.pexels.com/photos/7382912/pexels-photo-7382912.jpeg?auto=compress&cs=tinysrgb&w=800", // Dollar Chana
+  "https://upload.wikimedia.org/wikipedia/commons/1/1c/Black_mustard_seeds_%28closeup%29.jpg", // Mustard Seed
 ];
 
 export const DEMO_OTP = "123456";
@@ -96,7 +98,7 @@ export const products: Product[] = crops.map((c, i) => ({
   pricePerKg: c.pricePerKg,
   grade: c.grade,
   harvestDate: "2026-09-12",
-  photos: [PHOTOS[i % PHOTOS.length]],
+  photos: [PHOTOS[i]],
   location: {
     lat: 23.2599,
     lng: 77.4126,
