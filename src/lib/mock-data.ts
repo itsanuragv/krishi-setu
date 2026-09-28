@@ -162,7 +162,7 @@ export const MOCK_PRODUCE_LISTINGS: ProduceListing[] = [
     unit: "quintal",
     farmGatePrice: 3950,
     mandiBenchmarkPrice: 4850,
-    imageUrl: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=80",
+    imageUrl: "https://images.pexels.com/photos/4518588/pexels-photo-4518588.jpeg?auto=compress&cs=tinysrgb&w=800",
     matchScore: 95,
     breakdown: {
       priceIndex: { score: 95, detail: "₹900/क्विंटल सीधा मुनाफा, 0% आढ़त कटौती" },
@@ -222,7 +222,7 @@ export const MOCK_PRODUCE_LISTINGS: ProduceListing[] = [
     unit: "quintal",
     farmGatePrice: 2050,
     mandiBenchmarkPrice: 2600,
-    imageUrl: "https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=600&auto=format&fit=crop&q=80",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7c/A_closeup_of_Pearl_Millet_%28Cumbu%29.JPG",
     matchScore: 92,
     breakdown: {
       priceIndex: { score: 94, detail: "₹550/क्विंटल अतिरिक्त लाभ (मिलेट प्रोत्साहन योजना)" },
@@ -252,7 +252,7 @@ export const MOCK_PRODUCE_LISTINGS: ProduceListing[] = [
     unit: "quintal",
     farmGatePrice: 3950,
     mandiBenchmarkPrice: 5200,
-    imageUrl: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80",
+    imageUrl: "https://cpimg.tistatic.com/6544102/b/4/milky-white-sorghum.jpg",
     matchScore: 94,
     breakdown: {
       priceIndex: { score: 95, detail: "₹1,250/क्विंटल प्रीमियम मिलेट सुपरफूड भाव" },
@@ -282,7 +282,7 @@ export const MOCK_PRODUCE_LISTINGS: ProduceListing[] = [
     unit: "quintal",
     farmGatePrice: 5400,
     mandiBenchmarkPrice: 6800,
-    imageUrl: "https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?w=600&auto=format&fit=crop&q=80",
+    imageUrl: "https://images.pexels.com/photos/7382912/pexels-photo-7382912.jpeg?auto=compress&cs=tinysrgb&w=800",
     matchScore: 95,
     breakdown: {
       priceIndex: { score: 96, detail: "₹1,400/क्विंटल प्रीमियम एक्सपोर्ट ग्रेड काबुली चना" },
