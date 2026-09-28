@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 
+// Live mandi prices via data.gov.in (Agmarknet daily prices dataset).
+// Falls back to curated static rates when the API is unreachable.
+
+// Hobby plan default is 10s; retries need headroom (plan max is 60s).
+export const maxDuration = 60;
+
 export interface LiveCropBenchmark {
   cropEn: string;
   cropHi: string;
@@ -32,6 +38,42 @@ const cache: CacheStore = {
 };
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
+
+// data.gov.in infra is flaky (dropped connections, slow responses) and can be
+// picky about non-browser clients — a browser User-Agent plus retries with
+// backoff make live fetches far more resilient. Worst case per crop is
+// ~39s (3 x 12s + backoff), well under maxDuration since crops run in parallel.
+const BROWSER_UA =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+const FETCH_ATTEMPTS = 3;
+const FETCH_TIMEOUT_MS = 12000;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchAgmarknet(url: string): Promise<any> {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < FETCH_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: "application/json", "User-Agent": BROWSER_UA },
+        cache: "no-store",
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
+      if (!res.ok) {
+        throw new Error(`Status ${res.status}`);
+      }
+      return await res.json();
+    } catch (err) {
+      lastError = err;
+      if (attempt < FETCH_ATTEMPTS - 1) {
+        await sleep(1000 * (attempt + 1));
+      }
+    }
+  }
+  throw lastError;
+}
 
 const TARGET_CROPS = [
   {
@@ -118,18 +160,7 @@ export async function GET(request: Request) {
       // Skip live fetch entirely when no key is configured -> straight to fallback
       if (apiKey) {
       try {
-        const res = await fetch(url, {
-          headers: { Accept: "application/json" },
-          cache: "no-store",
-          // 8 second timeout per request
-          signal: AbortSignal.timeout(8000),
-        });
-
-        if (!res.ok) {
-          throw new Error(`Status ${res.status}`);
-        }
-
-        const json = await res.json();
+        const json = await fetchAgmarknet(url);
         const records = json.records || [];
         const record = records[0];
 
